@@ -46,5 +46,6 @@ gnss-rtk = { version = "0.7.5", features = ["serde"] }
 cggtts = { version = "4.2.0", features = ["serde", "scheduler"], optional = true }
 
 rinex = { version = "=0.17.0-alpha-3", features = ["full"] }
-sp3 = { path = "../sp3", version = "=1.1.0-alpha-2", features = ["serde", "flate2"] }
-rinex-qc = { path = "../rinex-qc", version = "=0.2.0-alpha-3", features = ["sp3"] } 
+sp3 = { version = "=1.1.0-alpha-2", features = ["serde", "flate2"] }
+
+gnss-qc = { version = "0.0.2", features = ["sp3"] } 

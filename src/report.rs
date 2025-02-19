@@ -9,7 +9,7 @@ use std::{
 
 use crate::cli::{Cli, Context};
 
-use rinex_qc::prelude::{QcConfig, QcExtraPage, QcReport, Render};
+use gnss_qc::prelude::{QcConfig, QcExtraPage, QcReport, Render};
 
 /// Quality check report
 pub enum Report {
@@ -115,7 +115,7 @@ impl Report {
                         }
                     }
                 }
-            },
+            }
         }
     }
     /// Render as html

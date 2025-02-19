@@ -2,8 +2,8 @@ use crate::cli::Context;
 use itertools::Itertools;
 
 use cggtts::prelude::{CommonViewClass, Duration, Epoch, Track, SV};
+use gnss_qc::prelude::{html, MarkerSymbol, Markup, Mode, Plot, QcExtraPage, Render};
 use rinex::prelude::GroundPosition;
-use rinex_qc::prelude::{html, MarkerSymbol, Markup, Mode, Plot, QcExtraPage, Render};
 
 struct ReportTab {}
 

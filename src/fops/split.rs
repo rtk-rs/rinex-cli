@@ -3,7 +3,7 @@ use crate::Error;
 use clap::ArgMatches;
 use rinex::prelude::{Epoch, Split};
 
-use rinex_qc::prelude::ProductType;
+use gnss_qc::prelude::ProductType;
 
 /*
  * Splits input files at specified Time Instant

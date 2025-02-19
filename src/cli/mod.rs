@@ -8,8 +8,8 @@ use std::{
 use itertools::Itertools;
 
 use clap::{value_parser, Arg, ArgAction, ArgMatches, ColorChoice, Command};
+use gnss_qc::prelude::{QcConfig, QcContext, QcReportType};
 use rinex::prelude::GroundPosition;
-use rinex_qc::prelude::{QcConfig, QcContext, QcReportType};
 
 mod fops;
 mod positioning;
@@ -339,7 +339,7 @@ Otherwise it gets automatically picked up."))
                 } else {
                     Vec::new()
                 }
-            },
+            }
             _ => Vec::new(),
         }
     }
@@ -352,7 +352,7 @@ Otherwise it gets automatically picked up."))
                 } else {
                     Vec::new()
                 }
-            },
+            }
             _ => Vec::new(),
         }
     }

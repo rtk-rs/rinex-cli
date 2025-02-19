@@ -1,8 +1,8 @@
 use crate::cli::Context;
 use crate::Error;
 use clap::ArgMatches;
+use gnss_qc::prelude::ProductType;
 use rinex::prelude::{Rinex, RinexType};
-use rinex_qc::prelude::ProductType;
 use std::path::PathBuf;
 
 /*
@@ -30,7 +30,7 @@ pub fn diff(ctx: &Context, matches: &ArgMatches) -> Result<(), Error> {
 
             //TODO: change this to crnx2rnx_mut()
             rinex_a.crnx2rnx().substract(&rinex_b.crnx2rnx())
-        },
+        }
         t => panic!("operation not feasible for {}", t),
     };
 
