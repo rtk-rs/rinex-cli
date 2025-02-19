@@ -118,10 +118,10 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
             match clock.next_clock_at(*t, *sv) {
                 Some(dt) => {
                     candidate.set_clock_correction(dt);
-                }
+                },
                 None => {
                     error!("{} ({}) - no clock correction available", *t, *sv);
-                }
+                },
             }
             // customization: TGD
             if let Some((_, _, eph)) = eph.borrow_mut().select(*t, *sv) {
@@ -148,10 +148,10 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                         //TODO STEC/IONEX
                         candidate.set_iono_components(IonoComponents::Unknown);
                     }
-                }
+                },
                 None => {
                     candidate.set_iono_components(IonoComponents::Unknown);
-                }
+                },
             }
             // Customization: Remote
             if !remote_observations.is_empty() {
@@ -163,7 +163,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
         match solver.resolve(*t, &candidates) {
             Ok((t, pvt)) => {
                 solutions.insert(t, pvt);
-            }
+            },
             Err(e) => warn!("{} : pvt solver error \"{}\"", t, e),
         }
     }

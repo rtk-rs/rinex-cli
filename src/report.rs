@@ -115,7 +115,7 @@ impl Report {
                         }
                     }
                 }
-            }
+            },
         }
     }
     /// Render as html

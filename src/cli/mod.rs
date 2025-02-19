@@ -339,7 +339,7 @@ Otherwise it gets automatically picked up."))
                 } else {
                     Vec::new()
                 }
-            }
+            },
             _ => Vec::new(),
         }
     }
@@ -352,7 +352,7 @@ Otherwise it gets automatically picked up."))
                 } else {
                     Vec::new()
                 }
-            }
+            },
             _ => Vec::new(),
         }
     }

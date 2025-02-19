@@ -47,7 +47,7 @@ impl Technique {
         match self {
             Self::GeodeticSurvey => {
                 "Static Geodetic survey (fixed point coordinates evaluation)".to_string()
-            }
+            },
         }
     }
 }

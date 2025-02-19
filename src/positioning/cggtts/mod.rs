@@ -75,12 +75,12 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
         Some(tracking) => {
             info!("Using custom tracking duration {:?}", *tracking);
             *tracking
-        }
+        },
         _ => {
             let tracking = Duration::from_seconds(Scheduler::BIPM_TRACKING_DURATION_SECONDS.into());
             info!("Using default tracking duration {:?}", tracking);
             tracking
-        }
+        },
     };
 
     let mut trk_duration = cv_duration;
@@ -224,10 +224,10 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                     match clock.next_clock_at(*t, *sv) {
                         Some(corr) => {
                             candidate.set_clock_correction(corr);
-                        }
+                        },
                         None => {
                             error!("{} ({}) - no clock correction available", *t, *sv);
-                        }
+                        },
                     }
 
                     if let Some((_, _, eph)) = eph.borrow_mut().select(*t, *sv) {
@@ -263,7 +263,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                             // initialize new tracker
                             trackers.insert((*sv, observable.clone()), SVTracker::default());
                             trackers.get_mut(target).unwrap()
-                        }
+                        },
                         Some(tracker) => tracker,
                     };
 
@@ -360,14 +360,14 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                                                             Method::CPP | Method::PPP => {
                                                                 // TODO: grab IONOD from PVTSol
                                                                 None
-                                                            }
+                                                            },
                                                             _ => None,
                                                         },
                                                         0, // TODO "rcvr_channel" > 0 if known
                                                         GlonassChannel::default(), //TODO
                                                         &ref_observable,
                                                     )
-                                                }
+                                                },
                                                 _ => {
                                                     Track::new(
                                                         *sv,
@@ -381,20 +381,20 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                                                             Method::CPP | Method::PPP => {
                                                                 // TODO: grab IONOD from PVTSol
                                                                 None
-                                                            }
+                                                            },
                                                             _ => None,
                                                         },
                                                         0, // TODO "rcvr_channel" > 0 if known
                                                         &ref_observable,
                                                     )
-                                                }
+                                                },
                                             }; // match constellation
                                             tracks.push(track);
-                                        }
+                                        },
                                         Err(e) => {
                                             warn!("{} - track fitting error: \"{}\"", t, e);
                                             // TODO: most likely we should reset the SV signal tracker here
-                                        }
+                                        },
                                     } //.fit()
                                 }
                                 // time to release a track
@@ -406,7 +406,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                             else {
                                 tracker.latch_measurement(t, fitdata);
                             }
-                        }
+                        },
                         Err(e) => {
                             /*
                              * Any PVT resolution failures would introduce a data gap
@@ -416,7 +416,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                             // if let Some(tracker) = trackers.get_mut(&(*sv, observable.clone())) {
                             //     tracker.reset();
                             // }
-                        }
+                        },
                     } //.pvt resolve
                       // after release, reset so we start a new track
                     if should_release {

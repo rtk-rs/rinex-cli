@@ -145,10 +145,10 @@ fn user_data_parsing(
             } else {
                 error!("BASE STATION Dataset: {:?}", ctx);
             }
-        }
+        },
         _ => {
             debug!("{:?}", ctx);
-        }
+        },
     }
 
     ctx
@@ -200,7 +200,7 @@ pub fn main() -> Result<(), Error> {
                 lon_ddeg
             );
             Some((x, y, z))
-        }
+        },
         None => {
             if let Some(data_pos) = ctx_position {
                 let (x, y, z) = data_pos.to_ecef_wgs84();
@@ -223,7 +223,7 @@ pub fn main() -> Result<(), Error> {
                 warn!("No RX position defined");
                 None
             }
-        }
+        },
     };
 
     // Form context
@@ -270,7 +270,7 @@ pub fn main() -> Result<(), Error> {
                         error!("remote site does not have its geodetic marker defined: current CLI limitation.");
                         None
                     }
-                }
+                },
                 _ => None,
             }
         },
@@ -298,32 +298,32 @@ pub fn main() -> Result<(), Error> {
         Some(("filegen", submatches)) => {
             fops::filegen(&ctx, &cli.matches, submatches)?;
             return Ok(());
-        }
+        },
         Some(("merge", submatches)) => {
             fops::merge(&ctx, submatches)?;
             return Ok(());
-        }
+        },
         Some(("split", submatches)) => {
             fops::split(&ctx, submatches)?;
             return Ok(());
-        }
+        },
         Some(("tbin", submatches)) => {
             fops::time_binning(&ctx, &cli.matches, submatches)?;
             return Ok(());
-        }
+        },
         Some(("diff", submatches)) => {
             fops::diff(&ctx, submatches)?;
             return Ok(());
-        }
+        },
         Some(("ppp", submatches)) => {
             let chapter = positioning::precise_positioning(&cli, &ctx, false, submatches)?;
             extra_pages.push(chapter);
-        }
+        },
         Some(("rtk", submatches)) => {
             let chapter = positioning::precise_positioning(&cli, &ctx, true, submatches)?;
             extra_pages.push(chapter);
-        }
-        _ => {}
+        },
+        _ => {},
     }
 
     // report

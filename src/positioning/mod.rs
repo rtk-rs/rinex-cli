@@ -257,7 +257,7 @@ pub fn precise_positioning(
 
             info!("Using custom solver configuration: {:#?}", cfg);
             cfg
-        }
+        },
         None => {
             let method = Method::default();
             let mut cfg = Config::static_ppp_preset(method);
@@ -276,7 +276,7 @@ pub fn precise_positioning(
 
             info!("Using {:?} default preset: {:#?}", method, cfg);
             cfg
-        }
+        },
     };
     /* Verify requirements and print helpful comments */
     assert!(
