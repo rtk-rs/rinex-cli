@@ -69,6 +69,15 @@ Summary:
 
 ## Documentation
 
+If you intend to run our examples and tutorials on your side,
+you are expected to execute the `tools/download-data.sh` script first,
+which will retrieve the GeoRust/RINEX verification and test data, that we use
+for demonstration purposes. On linux, you can:
+
+```bash
+./tools/download-data.sh
+```
+
 Once you have installed the tool, read
 
 - [The file loading documentation](./documentation/Input.md) that will teach you
