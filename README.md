@@ -69,18 +69,23 @@ Summary:
 
 ## Documentation
 
-Once you have installed the tool, follow
+Once you have installed the tool, read
 
-- [The file loading tutorial](./documentation/Input.md) that will teach you
+- [The file loading documentation](./documentation/Input.md) that will teach you
 how to load data into the toolbox
-- [The Preprocessor tutorial](./documentation/Preprocessor.md) that will teach you
+- [The Preprocessor documentation](./documentation/Preprocessor.md) that will teach you
 how design a filter
-- [The File operations tutorial](./documentation/FileOperations.md) that will teach you
+- [The File operations documentation](./documentation/FileOperations.md) that will teach you
 how to deploy the file operations
-- [The SPP navigation tutorial](./documentation/SPP.md) that will teach you
+- [The SPP navigation documentation](./documentation/SPP.md) that will teach you
 how to deploy the navigation solver in basic setup
-- [The CGGTTS tutorial](./documentation/CGGTTS.md) that will teach you
+- [The CGGTTS documentation](./documentation/CGGTTS.md) that will teach you
 how to deploy the CGGTTS solver in basic setup
+
+## Examples
+
+We provide a set of [(command line) examples](./examples) written in Shell,
+that cover most applications.
 
 Special Thanks
 ==============
