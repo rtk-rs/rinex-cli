@@ -14,6 +14,32 @@ RINEX-Cli
 This application is part of the [RTK-rs framework](https://github.com/rtk-rs) which
 is delivered under the [Mozilla V2 Public](https://www.mozilla.org/en-US/MPL/2.0) license.
 
+## Download the tool
+
+You can download the latest version from [the release portal](https://github.com/rtk-rs/rinex-cli/releases)
+
+## Install from Cargo
+
+You can directly install the tool from Cargo with internet access:
+
+```bash
+cargo install rinex-cli
+```
+
+## Build from sources
+
+Download the version you are interested in:
+
+```bash
+git clone https://github.com/rtk-rs/rinex-cli
+```
+
+And build it using cargo:
+
+```bash
+cargo build --all-features -r
+```
+
 ## File formats & revisions
 
 `rinex-cli` supports 
@@ -27,19 +53,34 @@ Summary:
 |------------------------|-----------------------------------|------------------------------------|
 | RINEX                  | :heavy_minus_sign:                | :heavy_check_mark:                 |
 | CRINEX                 | :heavy_minus_sign:                | :heavy_check_mark:                 | 
-| gzip compressed RINEX  | Name must end with `.gz`          | `--flate2` feature must be enabled |
-| gzip compressed CRINEX | Name must end with `.gz`          | `--flate2` feature must be enabled |
+| gzip compressed RINEX  | Name must end with `.gz`          | :heavy_check_mark:                 | 
+| gzip compressed CRINEX | Name must end with `.gz`          | :heavy_check_mark:                 | 
 | .Z compressed RINEX    | Not supported                     | Not supported                      |
 | DORIS RINEX            | :heavy_minus_sign:                | :construction: Work in progress    |
-| gzip compressed DORIS  | Name must end with `.gz`          | `--flate2` feature must be enabled |
+| gzip compressed DORIS  | Name must end with `.gz`          | 
 | .Z compressed DORIS    | Not supported                     | Not supported                      |
 | SP3                    | :heavy_minus_sign:                | :heavy_check_mark:                 | 
-| gzip compressed SP3    | Name must end with `.gz`          | `--flate2` feature must be enabled | 
+| gzip compressed SP3    | Name must end with `.gz`          | :heavy_check_mark:                 | 
 | .Z compressed SP3      | Not supported                     | Not supported                      |
 | BINEX                  | :heavy_minus_sign:                | :heavy_minus_sign:                 |
 | UBX                    | :heavy_minus_sign:                | :heavy_minus_sign:                 |
 
 :heavy_minus_sign: No restrictions: file names do not have to follow naming conventions.  
+
+## Documentation
+
+Once you have installed the tool, follow
+
+- [The file loading tutorial](./documentation/Input.md) that will teach you
+how to load data into the toolbox
+- [The Preprocessor tutorial](./documentation/Preprocessor.md) that will teach you
+how design a filter
+- [The File operations tutorial](./documentation/FileOperations.md) that will teach you
+how to deploy the file operations
+- [The SPP navigation tutorial](./documentation/SPP.md) that will teach you
+how to deploy the navigation solver in basic setup
+- [The CGGTTS tutorial](./documentation/CGGTTS.md) that will teach you
+how to deploy the CGGTTS solver in basic setup
 
 Special Thanks
 ==============
