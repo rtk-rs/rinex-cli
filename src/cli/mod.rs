@@ -5,11 +5,18 @@ use std::{
     str::FromStr,
 };
 
+use anise::{
+    constants::usual_planetary_constants::MEAN_EARTH_ANGULAR_VELOCITY_DEG_S,
+    math::Vector6,
+    prelude::{Frame, Orbit},
+};
+
 use itertools::Itertools;
 
 use clap::{value_parser, Arg, ArgAction, ArgMatches, ColorChoice, Command};
+
 use gnss_qc::prelude::{QcConfig, QcContext, QcReportType};
-use rinex::prelude::GroundPosition;
+use rinex::prelude::Epoch;
 
 mod fops;
 mod positioning;
@@ -53,11 +60,9 @@ pub struct Context {
     /// $WORKSPACE is either manually definedd by CLI or we create it (as is).
     /// $PRIMARYFILE is determined from the most major file contained in the dataset.
     pub workspace: Workspace,
-    /// (RX) reference position to be used in further analysis.
-    /// It is either (priority order is important)
-    ///  1. manually defined by CLI
-    ///  2. determined from dataset
-    pub rx_ecef: Option<(f64, f64, f64)>,
+    /// (RX) [Orbit] to use, whether is was automatically picked up,
+    /// or manually overwritten.
+    pub rx_orbit: Option<Orbit>,
 }
 
 impl Context {
@@ -80,24 +85,12 @@ impl Context {
         let primary_stem: Vec<&str> = ctx_major_stem.split('.').collect();
         primary_stem[0].to_string()
     }
-    /*
-     * Utility to create a file in this session
-     */
+
+    /// Creates file within session workspace
     fn create_file(&self, path: &Path) -> std::fs::File {
         std::fs::File::create(path).unwrap_or_else(|e| {
             panic!("failed to create {}: {:?}", path.display(), e);
         })
-    }
-    // Returns True if this context is compatible with RTK positioning
-    pub fn rtk_compatible(&self) -> bool {
-        if let Some(remote) = &self.reference_site {
-            self.data.observation().is_some()
-                && self.rx_ecef.is_some()
-                && remote.data.observation().is_some()
-                && remote.rx_ecef.is_some()
-        } else {
-            false
-        }
     }
 }
 
@@ -198,6 +191,14 @@ to obtain highest precision."))
                 .help("Customize output file or report name.
 In analysis opmode, report is named index.html by default, this will redefine that.
 In file operations (filegen, etc..) we can manually define output filenames with this option."))
+            .arg(Arg::new("rnx2crx")
+                .long("rnx2crx")
+                .action(ArgAction::SetTrue)
+                .help("Any (Observation RINEX) output products is compressed to CRINEX"))
+            .arg(Arg::new("crx2rnx")
+                .long("crx2rnx")
+                .action(ArgAction::SetTrue)
+                .help("Any (Observation CRINEX) output products is decompressed to readable RINEX"))
         .next_help_heading("Report customization")
         .arg(
             Arg::new("report-sum")
@@ -284,14 +285,14 @@ Null NAV RINEX content is also invalid by definition."))
             .next_help_heading("Receiver Antenna")
                 .arg(Arg::new("rx-ecef")
                     .long("rx-ecef")
-                    .value_name("\"x,y,z\" coordinates in ECEF [m]")
-                    .help("Define the (RX) antenna position manually, in [m] ECEF.
+                    .value_name("\"x,y,z\" coordinates in ECEF !!KM!!")
+                    .help("Define the (RX) antenna position manually, in kilometers ECEF.
 Especially if your dataset does not define such position. 
 Otherwise it gets automatically picked up."))
                 .arg(Arg::new("rx-geo")
                     .long("rx-geo")
-                    .value_name("\"lat,lon,alt\" coordinates in ddeg [°]")
-                    .help("Define the (RX) antenna position manualy, in decimal degrees."))
+                    .value_name("\"lat,lon,alt\" Units: (ddeg, ddeg, !!KM!!)")
+                    .help("Define the (RX) antenna position manualy, in decimal degrees and kilometers."))
                 .next_help_heading("Exclusive Opmodes: you can only run one at a time.")
                 .subcommand(filegen::subcommand());
 
@@ -391,44 +392,59 @@ Otherwise it gets automatically picked up."))
     pub fn zero_repair(&self) -> bool {
         self.matches.get_flag("zero-repair")
     }
-    /*
-     * faillible 3D coordinates parsing
-     * it's better to panic if the descriptor is badly format
-     * then continuing with possible other coordinates than the
-     * ones desired by user
-     */
+
+    /// Parse 3D coordinates (tuplets)
     fn parse_3d_coordinates(desc: &String) -> (f64, f64, f64) {
         let content = desc.split(',').collect::<Vec<&str>>();
         if content.len() < 3 {
             panic!("expecting x, y and z coordinates (3D)");
         }
+
         let x = f64::from_str(content[0].trim())
-            .unwrap_or_else(|_| panic!("failed to parse x coordinates"));
+            .unwrap_or_else(|e| panic!("failed to parse x coordinates: {}", e));
+
         let y = f64::from_str(content[1].trim())
-            .unwrap_or_else(|_| panic!("failed to parse y coordinates"));
+            .unwrap_or_else(|e| panic!("failed to parse y coordinates: {}", e));
+
         let z = f64::from_str(content[2].trim())
-            .unwrap_or_else(|_| panic!("failed to parse z coordinates"));
+            .unwrap_or_else(|e| panic!("failed to parse z coordinates: {}", e));
+
         (x, y, z)
     }
-    fn manual_ecef(&self) -> Option<(f64, f64, f64)> {
+
+    /// Returns possible ECEF km triplet manually defined
+    fn manual_ecef_km(&self) -> Option<(f64, f64, f64)> {
         let desc = self.matches.get_one::<String>("rx-ecef")?;
         let ecef = Self::parse_3d_coordinates(desc);
         Some(ecef)
     }
-    fn manual_geodetic(&self) -> Option<(f64, f64, f64)> {
+
+    fn manual_geodetic_ddeg_ddeg_km(&self) -> Option<(f64, f64, f64)> {
         let desc = self.matches.get_one::<String>("rx-geo")?;
         let geo = Self::parse_3d_coordinates(desc);
         Some(geo)
     }
-    /// Returns RX Position possibly specified by user
-    pub fn manual_position(&self) -> Option<(f64, f64, f64)> {
-        if let Some(position) = self.manual_ecef() {
-            Some(position)
+
+    /// Returns RX Position possibly specified by user, in km ECEF.
+    pub fn manual_rx_orbit(&self, epoch: Epoch, frame: Frame) -> Option<Orbit> {
+        if let Some((x0_km, y0_km, z0_km)) = self.manual_ecef_km() {
+            let pos_vel = Vector6::new(x0_km, y0_km, z0_km, 0.0, 0.0, 0.0);
+            Some(Orbit::from_cartesian_pos_vel(pos_vel, epoch, frame))
         } else {
-            self.manual_geodetic()
-                .map(|position| GroundPosition::from_geodetic(position).to_ecef_wgs84())
+            let (lat_ddeg, long_ddeg, alt_km) = self.manual_geodetic_ddeg_ddeg_km()?;
+            let orbit = Orbit::try_latlongalt(
+                lat_ddeg,
+                long_ddeg,
+                alt_km,
+                MEAN_EARTH_ANGULAR_VELOCITY_DEG_S,
+                epoch,
+                frame,
+            )
+            .unwrap_or_else(|e| panic!("physical error: {}", e));
+            Some(orbit)
         }
     }
+
     /// True if File Operations to generate data is being deployed
     pub fn has_fops_output_product(&self) -> bool {
         matches!(
@@ -444,11 +460,8 @@ Otherwise it gets automatically picked up."))
     pub fn force_report_synthesis(&self) -> bool {
         self.matches.get_flag("report-force")
     }
-    /*
-     * We hash all vital CLI information.
-     * This helps in determining whether we need to update an existing report
-     * or not.
-     */
+
+    /// Hash all critical parameters, defining a user session uniquely
     pub fn hash(&self) -> u64 {
         let mut hasher = DefaultHasher::new();
         let mut string = self
@@ -458,26 +471,27 @@ Otherwise it gets automatically picked up."))
             .chain(self.rover_files().into_iter().sorted())
             .chain(self.preprocessing().into_iter().sorted())
             .join(",");
+
         if let Some(custom) = self.custom_output_name() {
             string.push_str(custom);
         }
-        if let Some(geo) = self.manual_geodetic() {
-            string.push_str(&format!("{:?}", geo));
-        }
-        if let Some(ecef) = self.manual_ecef() {
-            string.push_str(&format!("{:?}", ecef));
-        }
+
+        // if let Some(geo) = self.manual_geodetic_ddeg() {
+        //     string.push_str(&format!("{:?}", geo));
+        // }
+
+        // if let Some(ecef) = self.manual_ecef_km() {
+        //     string.push_str(&format!("{:?}", ecef));
+        // }
+
         string.hash(&mut hasher);
         hasher.finish()
     }
+
     /// Returns QcConfig from command line
     pub fn qc_config(&self) -> QcConfig {
         QcConfig {
-            manual_reference: if let Some(manual) = self.manual_position() {
-                Some(GroundPosition::from_ecef_wgs84(manual))
-            } else {
-                None
-            },
+            manual_rx_orbit: None,
             report: if self.matches.get_flag("report-sum") {
                 QcReportType::Summary
             } else {
@@ -494,5 +508,15 @@ Otherwise it gets automatically picked up."))
     /// True if jpl_bpc_update is requested
     pub fn jpl_bpc_update(&self) -> bool {
         self.matches.get_flag("jpl-bpc")
+    }
+
+    /// Internal seamless CRNX2RNX decompression
+    pub fn crnx2rnx(&self) -> bool {
+        self.matches.get_flag("crx2rnx")
+    }
+
+    /// Internal seamless RNX2CRX compression
+    pub fn rnx2crnx(&self) -> bool {
+        self.matches.get_flag("rnx2crx")
     }
 }

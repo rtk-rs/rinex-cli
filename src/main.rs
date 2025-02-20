@@ -2,29 +2,28 @@
 //! Refer to README for command line arguments.    
 //! Homepage: <https://github.com/georust/rinex-cli>
 
-//mod analysis; // basic analysis
 mod cli; // command line interface
-mod fops;
-mod positioning;
+mod fops; // file operations
+mod positioning; // post processed positioning
+mod preprocessing; // preprocessing
+mod report; // custom reports
 
-mod preprocessing;
 use preprocessing::preprocess;
-
-mod report;
 use report::Report;
+
+use gnss_qc::prelude::{QcContext, QcExtraPage};
+use rinex::prelude::{FormattingError as RinexFormattingError, ParsingError as RinexParsingError};
 
 use std::path::Path;
 use walkdir::WalkDir;
 
 extern crate gnss_rs as gnss;
 
-use gnss_qc::prelude::{QcContext, QcExtraPage};
-use rinex::prelude::{MergeError, Rinex};
+use rinex::prelude::{nav::Orbit, qc::MergeError, Rinex};
+
 use sp3::prelude::SP3;
 
 use cli::{Cli, Context, RemoteReferenceSite, Workspace};
-
-use map_3d::{ecef2geodetic, Ellipsoid};
 
 #[cfg(feature = "csv")]
 use csv::Error as CsvError;
@@ -40,10 +39,14 @@ use thiserror::Error;
 pub enum Error {
     #[error("i/o error")]
     StdioError(#[from] std::io::Error),
-    #[error("rinex error")]
-    RinexError(#[from] rinex::Error),
     #[error("missing OBS RINEX")]
     MissingObservationRinex,
+    #[error("RINEX parsing error: {0}")]
+    RinexParsing(#[from] RinexParsingError),
+    #[error("RINEX formatting error: {0}")]
+    RinexFormatting(#[from] RinexFormattingError),
+    #[error("Qc merge error: {0}")]
+    Merge(#[from] MergeError),
     #[error("missing (BRDC) NAV RINEX")]
     MissingNavigationRinex,
     #[error("missing IONEX")]
@@ -52,8 +55,6 @@ pub enum Error {
     MissingMeteoRinex,
     #[error("missing Clock RINEX")]
     MissingClockRinex,
-    #[error("file merge error: {0}")]
-    MergeError(#[from] MergeError),
     #[error("positioning solver error")]
     PositioningSolverError(#[from] positioning::Error),
     #[cfg(feature = "csv")]
@@ -61,9 +62,7 @@ pub enum Error {
     CsvError(#[from] CsvError),
 }
 
-/*
- * Parses and preprepocess all files passed by User
- */
+/// Parses and preprepocess all files passed by User
 fn user_data_parsing(
     cli: &Cli,
     single_files: Vec<&String>,
@@ -78,64 +77,130 @@ fn user_data_parsing(
     for dir in directories.iter() {
         let walkdir = WalkDir::new(dir).max_depth(max_depth);
         for entry in walkdir.into_iter().filter_map(|e| e.ok()) {
-            if !entry.path().is_dir() {
-                let path = entry.path();
-                if let Ok(rinex) = Rinex::from_path(path) {
-                    let loading = ctx.load_rinex(path, rinex);
-                    if loading.is_ok() {
-                        info!("Loading RINEX file \"{}\"", path.display());
+            let path = entry.path();
+
+            if !path.is_dir() {
+                let extension = path
+                    .extension()
+                    .unwrap_or_else(|| {
+                        panic!("failed to determine file extension: \"{}\"", path.display())
+                    })
+                    .to_string_lossy()
+                    .to_string();
+
+                if extension == "gz" {
+                    if let Ok(rinex) = Rinex::from_gzip_file(path) {
+                        let loading = ctx.load_rinex(path, rinex);
+                        if loading.is_ok() {
+                            info!("Loading RINEX file \"{}\"", path.display());
+                        } else {
+                            warn!(
+                                "failed to load RINEX file \"{}\": {}",
+                                path.display(),
+                                loading.err().unwrap()
+                            );
+                        }
+                    } else if let Ok(sp3) = SP3::from_path(path) {
+                        let loading = ctx.load_sp3(path, sp3);
+                        if loading.is_ok() {
+                            info!("Loading SP3 file \"{}\"", path.display());
+                        } else {
+                            warn!(
+                                "failed to load SP3 file \"{}\": {}",
+                                path.display(),
+                                loading.err().unwrap()
+                            );
+                        }
                     } else {
-                        warn!(
-                            "failed to load RINEX file \"{}\": {}",
-                            path.display(),
-                            loading.err().unwrap()
-                        );
-                    }
-                } else if let Ok(sp3) = SP3::from_path(path) {
-                    let loading = ctx.load_sp3(path, sp3);
-                    if loading.is_ok() {
-                        info!("Loading SP3 file \"{}\"", path.display());
-                    } else {
-                        warn!(
-                            "failed to load SP3 file \"{}\": {}",
-                            path.display(),
-                            loading.err().unwrap()
-                        );
+                        warn!("non supported file format \"{}\"", path.display());
                     }
                 } else {
-                    warn!("non supported file format \"{}\"", path.display());
+                    if let Ok(rinex) = Rinex::from_file(path) {
+                        let loading = ctx.load_rinex(path, rinex);
+                        if loading.is_ok() {
+                            info!("Loading RINEX file \"{}\"", path.display());
+                        } else {
+                            warn!(
+                                "failed to load RINEX file \"{}\": {}",
+                                path.display(),
+                                loading.err().unwrap()
+                            );
+                        }
+                    } else if let Ok(sp3) = SP3::from_path(path) {
+                        let loading = ctx.load_sp3(path, sp3);
+                        if loading.is_ok() {
+                            info!("Loading SP3 file \"{}\"", path.display());
+                        } else {
+                            warn!(
+                                "failed to load SP3 file \"{}\": {}",
+                                path.display(),
+                                loading.err().unwrap()
+                            );
+                        }
+                    }
                 }
             }
         }
     }
+
     // load individual files
     for fp in single_files.iter() {
         let path = Path::new(fp);
-        if let Ok(rinex) = Rinex::from_path(path) {
-            let loading = ctx.load_rinex(path, rinex);
-            if loading.is_err() {
-                warn!(
-                    "failed to load RINEX file \"{}\": {}",
-                    path.display(),
-                    loading.err().unwrap()
-                );
-            }
-        } else if let Ok(sp3) = SP3::from_path(path) {
-            let loading = ctx.load_sp3(path, sp3);
-            if loading.is_err() {
-                warn!(
-                    "failed to load SP3 file \"{}\": {}",
-                    path.display(),
-                    loading.err().unwrap()
-                );
+
+        let extension = path
+            .extension()
+            .unwrap_or_else(|| panic!("failed to determine file extension: \"{}\"", path.display()))
+            .to_string_lossy()
+            .to_string();
+
+        if extension == "gz" {
+            if let Ok(rinex) = Rinex::from_gzip_file(path) {
+                let loading = ctx.load_rinex(path, rinex);
+                if loading.is_err() {
+                    warn!(
+                        "failed to load RINEX file \"{}\": {}",
+                        path.display(),
+                        loading.err().unwrap()
+                    );
+                }
+            } else if let Ok(sp3) = SP3::from_path(path) {
+                let loading = ctx.load_sp3(path, sp3);
+                if loading.is_err() {
+                    warn!(
+                        "failed to load SP3 file \"{}\": {}",
+                        path.display(),
+                        loading.err().unwrap()
+                    );
+                }
+            } else {
+                warn!("non supported file format \"{}\"", path.display());
             }
         } else {
-            warn!("non supported file format \"{}\"", path.display());
+            if let Ok(rinex) = Rinex::from_file(path) {
+                let loading = ctx.load_rinex(path, rinex);
+                if loading.is_err() {
+                    warn!(
+                        "failed to load RINEX file \"{}\": {}",
+                        path.display(),
+                        loading.err().unwrap()
+                    );
+                }
+            } else if let Ok(sp3) = SP3::from_path(path) {
+                let loading = ctx.load_sp3(path, sp3);
+                if loading.is_err() {
+                    warn!(
+                        "failed to load SP3 file \"{}\": {}",
+                        path.display(),
+                        loading.err().unwrap()
+                    );
+                }
+            } else {
+                warn!("non supported file format \"{}\"", path.display());
+            }
         }
     }
-    /*
-     * Preprocessing
-     */
+
+    // Preprocessing
     preprocess(&mut ctx, cli);
 
     match cli.matches.subcommand() {
@@ -156,6 +221,7 @@ fn user_data_parsing(
 
 pub fn main() -> Result<(), Error> {
     let mut builder = Builder::from_default_env();
+
     builder
         .target(Target::Stdout)
         .format_timestamp_secs()
@@ -177,58 +243,28 @@ pub fn main() -> Result<(), Error> {
         max_recursive_depth,
         true,
     );
-    let ctx_position = data_ctx.reference_position();
+
+    let ctx_orbit = data_ctx.reference_rx_orbit();
     let ctx_stem = Context::context_stem(&mut data_ctx);
 
-    /*
-     * Determine and store RX (ECEF) position
-     * Either manually defined by User
-     *   this is useful in case not a single file has such information
-     *   or we want to use a custom location
-     * Or with smart determination from all previously parsed data
-     *   this is useful in case we don't want to bother
-     *   but we must be sure that the OBSRINEX describes the correct location
-     */
-    let rx_ecef = match cli.manual_position() {
-        Some((x, y, z)) => {
-            let (lat, lon, _) = ecef2geodetic(x, y, z, Ellipsoid::WGS84);
-            let (lat_ddeg, lon_ddeg) = (lat.to_degrees(), lon.to_degrees());
-            info!(
-                "Manually defined position: {:?} [ECEF] (lat={:.5}°, lon={:.5}°)",
-                (x, y, z),
-                lat_ddeg,
-                lon_ddeg
-            );
-            Some((x, y, z))
-        },
-        None => {
-            if let Some(data_pos) = ctx_position {
-                let (x, y, z) = data_pos.to_ecef_wgs84();
-                let (lat, lon, _) = ecef2geodetic(x, y, z, Ellipsoid::WGS84);
-                let (lat_ddeg, lon_ddeg) = (lat.to_degrees(), lon.to_degrees());
-                info!(
-                    "Position defined in dataset: {:?} [ECEF] (lat={:.5}°, lon={:.5}°)",
-                    (x, y, z),
-                    lat_ddeg,
-                    lon_ddeg
-                );
-                Some((x, y, z))
+    // Input context
+    let mut ctx = Context {
+        name: ctx_stem.clone(),
+        rx_orbit: {
+            // possible reference point
+            if let Some(rx_orbit) = data_ctx.reference_rx_orbit() {
+                let posvel = rx_orbit.to_cartesian_pos_vel();
+                let (x0_km, y0_km, z0_km) = (posvel[0], posvel[1], posvel[2]);
+                let (lat_ddeg, long_ddeg, _) = rx_orbit
+                    .latlongalt()
+                    .unwrap_or_else(|e| panic!("latlongalt - physical error: {}", e));
+                info!("reference point identified: {:.5E}km, {:.5E}km, {:.5E}km (lat={:.5}°, long={:.5}°)", x0_km, y0_km, z0_km, lat_ddeg, long_ddeg);
+                Some(rx_orbit)
             } else {
-                /*
-                 * Dataset does not contain any position,
-                 * and User did not specify any.
-                 * This is not problematic unless user is interested in
-                 * advanced operations, which will most likely fail soon or later.
-                 */
-                warn!("No RX position defined");
+                warn!("no reference point identifed");
                 None
             }
         },
-    };
-
-    // Form context
-    let ctx = Context {
-        name: ctx_stem.clone(),
         data: data_ctx,
         reference_site: {
             match cli.matches.subcommand() {
@@ -241,53 +277,74 @@ pub fn main() -> Result<(), Error> {
                         max_recursive_depth,
                         false,
                     );
-                    // We currently require remote site
-                    // to have its geodetic marker declared
-                    if let Some(reference_point) = data.reference_position() {
-                        let (base_x0_m, base_y0_m, base_z0_m) = reference_point.to_ecef_wgs84();
-                        if let Some(rx_ecef) = rx_ecef {
-                            let baseline_m = ((base_x0_m - rx_ecef.0).powi(2)
-                                + (base_y0_m - rx_ecef.1).powi(2)
-                                + (base_z0_m - rx_ecef.2).powi(2))
-                            .sqrt();
-                            if baseline_m > 1000.0 {
-                                info!(
-                                    "Rover / Reference site baseline projection: {:.3}km",
-                                    baseline_m / 1000.0
-                                );
-                            } else {
-                                info!(
-                                    "Rover / Reference site baseline projection: {:.3}m",
-                                    baseline_m
-                                );
-                            }
-                        }
-                        Some(RemoteReferenceSite {
-                            data,
-                            rx_ecef: Some((base_x0_m, base_y0_m, base_z0_m)),
-                        })
-                    } else {
-                        error!("remote site does not have its geodetic marker defined: current CLI limitation.");
-                        None
-                    }
+                    Some(RemoteReferenceSite {
+                        data,
+                        rx_ecef: Some((0.0, 0.0, 0.0)),
+                    })
                 },
                 _ => None,
             }
         },
         quiet: cli.matches.get_flag("quiet"),
         workspace: Workspace::new(&ctx_stem, &cli),
-        rx_ecef,
     };
 
-    // On File Operations (Data synthesis)
-    //  prepare one subfolder to store the output products
-    if cli.has_fops_output_product() {
-        ctx.workspace.create_subdir("OUTPUT");
+    // ground reference point
+    match ctx.rx_orbit {
+        Some(orbit) => {
+            if let Some(obs_rinex) = ctx.data.observation() {
+                if let Some(t0) = obs_rinex.first_epoch() {
+                    if let Some(rx_orbit) = cli.manual_rx_orbit(t0, ctx.data.earth_cef) {
+                        let posvel = rx_orbit.to_cartesian_pos_vel();
+                        let (x0_km, y0_km, z0_km) = (posvel[0], posvel[1], posvel[2]);
+                        let (lat_ddeg, long_ddeg, _) = rx_orbit
+                            .latlongalt()
+                            .unwrap_or_else(|e| panic!("latlongalt - physical error: {}", e));
+                        info!("reference point manually overwritten: {:.5E}km, {:.5E}km, {:.5E}km (lat={:.5}°, long={:.5}°)", x0_km, y0_km, z0_km, lat_ddeg, long_ddeg);
+                        ctx.rx_orbit = Some(rx_orbit);
+                    }
+                }
+            } else {
+                panic!("manual definition of a reference point requires OBS RINEX");
+            }
+        },
+        None => {
+            if let Some(obs_rinex) = ctx.data.observation() {
+                if let Some(t0) = obs_rinex.first_epoch() {
+                    if let Some(rx_orbit) = cli.manual_rx_orbit(t0, ctx.data.earth_cef) {
+                        let posvel = rx_orbit.to_cartesian_pos_vel();
+                        let (x0_km, y0_km, z0_km) = (posvel[0], posvel[1], posvel[2]);
+                        let (lat_ddeg, long_ddeg, _) = rx_orbit
+                            .latlongalt()
+                            .unwrap_or_else(|e| panic!("latlongalt - physical error: {}", e));
+                        info!("manually defined reference point: {:.5E}km, {:.5E}km, {:.5E}km (lat={:.5}°, long={:.5}°)", x0_km, y0_km, z0_km, lat_ddeg, long_ddeg);
+                        ctx.rx_orbit = Some(rx_orbit);
+                    }
+                }
+            }
+        },
     }
 
-    /*
-     * Exclusive opmodes
-     */
+    // Prepare for output productes (on any FOPS)
+    if cli.has_fops_output_product() {
+        ctx.workspace.create_subdir("OUTPUT");
+
+        // possible seamless CRINEX/RINEX compression
+        if cli.rnx2crnx() {
+            if let Some(observation) = ctx.data.observation_mut() {
+                info!("internal RNX2CRX compression");
+                observation.rnx2crnx_mut();
+            }
+        }
+        if cli.crnx2rnx() {
+            if let Some(observation) = ctx.data.observation_mut() {
+                info!("internal CRX2RNX decompression");
+                observation.crnx2rnx_mut();
+            }
+        }
+    }
+
+    // Exclusive opmodes to follow
     let mut extra_pages = Vec::<QcExtraPage>::new();
 
     match cli.matches.subcommand() {
@@ -335,7 +392,7 @@ pub fn main() -> Result<(), Error> {
         report.customize(extra);
     }
 
-    // generation
+    // synthesis
     report.generate(&cli, &ctx)?;
 
     if !ctx.quiet {

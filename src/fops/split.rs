@@ -1,9 +1,10 @@
 use crate::cli::Context;
 use crate::Error;
 use clap::ArgMatches;
-use rinex::prelude::{Epoch, Split};
-
 use gnss_qc::prelude::ProductType;
+use rinex::prelude::Epoch;
+
+use rinex::prelude::qc::Split;
 
 /*
  * Splits input files at specified Time Instant
