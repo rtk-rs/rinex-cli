@@ -4,7 +4,7 @@
 # that is used for thorough library testing and validation
 # which spans all formats and revisions
 LOCAL_DIR=data
-GEORUST_URL=https://github.com/georust/rinex/tree/main/test_resources
+GEORUST_URL=https://raw.githubusercontent.com/georust/rinex/refs/heads/main/test_resources
 
 FILES=(
     "CRNX/V3/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz"

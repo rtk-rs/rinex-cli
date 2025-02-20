@@ -80,7 +80,7 @@ for demonstration purposes. On linux, you can:
 
 Once you have installed the tool, read
 
-- [The file loading documentation](./documentation/Input.md) that will teach you
+- [The file loading documentation](./documentation/FileLoading.md) that will teach you
 how to load data into the toolbox
 - [The Preprocessor documentation](./documentation/Preprocessor.md) that will teach you
 how design a filter
