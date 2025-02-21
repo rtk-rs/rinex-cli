@@ -45,7 +45,7 @@ gnss-rs = { version = "2.3.2", features = ["serde"] }
 gnss-rtk = { version = "0.7.5", features = ["serde"] }
 cggtts = { version = "4.2.0", features = ["serde", "scheduler"], optional = true }
 
-rinex = { path = "../../rinex/rinex", features = ["full"] }
-sp3 = { path = "../../rinex/sp3", features = ["serde", "flate2"] }
+rinex = { git = "https://github.com/georust/rinex", branch = "rinex-backend", features = ["full"] }
+sp3 = { git = "https://github.com/georust/rinex", branch = "rinex-backend", features = ["qc", "processing", "serde"], optional = true }
 
-gnss-qc = { path = "../gnss-qc", features = ["sp3"] } 
+gnss-qc = { git = "https://github.com/rtk-rs/gnss-qc", branch = "rinex-upgrade", features = ["sp3"] } 
