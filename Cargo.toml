@@ -44,8 +44,9 @@ hifitime = { version = "4.0", features = ["serde", "std"] }
 gnss-rs = { version = "2.3.2", features = ["serde"] }
 gnss-rtk = { version = "0.7.5", features = ["serde"] }
 cggtts = { version = "4.2.0", features = ["serde", "scheduler"], optional = true }
-
-rinex = { git = "https://github.com/georust/rinex", branch = "main", features = ["obs", "nav", "ionex", "antex", "clock", "flate2", "processing", "serde"] }
-sp3 = { git = "https://github.com/georust/rinex", branch = "main", features = ["processing", "anise", "flate2", "serde"] }
-
 gnss-qc = { git = "https://github.com/rtk-rs/gnss-qc", branch = "main", features = ["sp3"] } 
+
+rinex = { git = "https://github.com/rtk-rs/rinex", branch = "main", features = ["obs", "nav", "ionex", "antex", "clock", "flate2", "processing", "serde"] }
+
+sp3 = { git = "https://github.com/rtk-rs/sp3", branch = "main", features = ["processing", "anise", "flate2", "serde"] }
+
