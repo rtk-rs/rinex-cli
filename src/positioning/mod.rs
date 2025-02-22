@@ -21,8 +21,11 @@ mod cggtts; // CGGTTS special solver
 #[cfg(feature = "cggtts")]
 use cggtts::{post_process as cggtts_post_process, Report as CggttsReport};
 
-mod rtk;
-pub use rtk::RemoteRTKReference;
+#[cfg(feature = "cggtts")]
+use gnss_rtk::prelude::PVTSolutionType;
+
+// mod rtk;
+// pub use rtk::RemoteRTKReference;
 
 mod orbit;
 use orbit::Orbits;
@@ -40,7 +43,7 @@ use gnss_qc::prelude::QcExtraPage;
 
 use gnss_rtk::prelude::{
     BdModel, Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel, Method,
-    NgModel, Orbit, PVTSolutionType, Solver,
+    NgModel, Solver,
 };
 
 use thiserror::Error;
@@ -194,20 +197,21 @@ fn rtk_reference_carrier(carrier: RTKCarrier) -> bool {
  * Grabs nearest KB model (in time)
  */
 pub fn kb_model(nav: &Rinex, t: Epoch) -> Option<KbModel> {
-    let (_, sv, kb_model) = nav
-        .klobuchar_models()
-        .min_by_key(|(t_i, _, _)| (t - *t_i).abs())?;
+    let (nav_key, model) = nav
+        .nav_klobuchar_models_iter()
+        .min_by_key(|(k_i, _)| (k_i.epoch - t).abs())?;
+
     Some(KbModel {
         h_km: {
-            match sv.constellation {
+            match nav_key.sv.constellation {
                 Constellation::BeiDou => 375.0,
                 // we only expect GPS or BDS here,
                 // badly formed RINEX will generate errors in the solutions
                 _ => 350.0,
             }
         },
-        alpha: kb_model.alpha,
-        beta: kb_model.beta,
+        alpha: model.alpha,
+        beta: model.beta,
     })
 }
 
@@ -215,18 +219,22 @@ pub fn kb_model(nav: &Rinex, t: Epoch) -> Option<KbModel> {
  * Grabs nearest BD model (in time)
  */
 pub fn bd_model(nav: &Rinex, t: Epoch) -> Option<BdModel> {
-    nav.bdgim_models()
-        .min_by_key(|(t_i, _)| (t - *t_i).abs())
-        .map(|(_, model)| BdModel { alpha: model.alpha })
+    let (_, model) = nav
+        .nav_bdgim_models_iter()
+        .min_by_key(|(k_i, _)| (k_i.epoch - t).abs())?;
+
+    Some(BdModel { alpha: model.alpha })
 }
 
 /*
  * Grabs nearest NG model (in time)
  */
 pub fn ng_model(nav: &Rinex, t: Epoch) -> Option<NgModel> {
-    nav.nequick_g_models()
-        .min_by_key(|(t_i, _)| (t - *t_i).abs())
-        .map(|(_, model)| NgModel { a: model.a })
+    let (_, model) = nav
+        .nav_nequickg_models_iter()
+        .min_by_key(|(k_i, _)| (k_i.epoch - t).abs())?;
+
+    Some(NgModel { a: model.a })
 }
 
 pub fn precise_positioning(
@@ -292,7 +300,7 @@ pub fn precise_positioning(
 
     if let Some(obs_rinex) = ctx.data.observation() {
         if let Some(obs_header) = &obs_rinex.header.obs {
-            if let Some(time_of_first_obs) = obs_header.time_of_first_obs {
+            if let Some(time_of_first_obs) = obs_header.timeof_first_obs {
                 if let Some(clk_rinex) = ctx.data.clock() {
                     if let Some(clk_header) = &clk_rinex.header.clock {
                         if let Some(time_scale) = clk_header.timescale {
@@ -306,11 +314,11 @@ pub fn precise_positioning(
                     }
                 } else if let Some(sp3) = ctx.data.sp3() {
                     if ctx.data.sp3_has_clock() {
-                        if sp3.time_scale == time_of_first_obs.time_scale {
+                        if sp3.header.timescale == time_of_first_obs.time_scale {
                             info!("Temporal PPP compliancy");
                         } else {
                             error!("Working with different timescales in OBS/SP3 is not PPP compatible and will generate tiny errors");
-                            if sp3.epoch_interval >= Duration::from_seconds(300.0) {
+                            if sp3.header.epoch_interval >= Duration::from_seconds(300.0) {
                                 warn!("Interpolating clock states from low sample rate SP3 will most likely introduce errors");
                             }
                         }
@@ -327,33 +335,21 @@ pub fn precise_positioning(
     let eph = RefCell::new(EphemerisSource::from_ctx(ctx));
     let clocks = Clock::new(&ctx, &eph);
     let orbits = Orbits::new(&ctx, &eph);
-    let mut rtk_reference = RemoteRTKReference::from_ctx(&ctx);
 
-    // The CGGTTS opmode (TimeOnly) is not designed
-    // to support lack of apriori knowledge
+    // let mut rtk_reference = RemoteRTKReference::from_ctx(&ctx);
+
+    // reference point is mandatory to CGGTTS opmode
     #[cfg(feature = "cggtts")]
-    let apriori = if matches.get_flag("cggtts") {
-        if let Some((x, y, z)) = ctx.rx_ecef {
-            Some(Orbit::from_position(
-                x / 1.0E3,
-                y / 1.0E3,
-                z / 1.0E3,
-                Epoch::default(),
-                ctx.data.earth_cef,
-            ))
-        } else {
+    if matches.get_flag("cggtts") {
+        if ctx.rx_orbit.is_none() {
             panic!(
-                "--cggtts opmode cannot work without a priori position knowledge.
-You either need to specify it manually (see --help), or use RINEX files that define
-a static reference position"
+                "cggtts needs a reference point (x0, y0, z0).
+If your dataset does not describe one, you can manually describe one, see --help."
             );
         }
-    } else {
-        None
-    };
+    }
 
-    #[cfg(not(feature = "cggtts"))]
-    let apriori = None;
+    let apriori = ctx.rx_orbit;
 
     let solver = Solver::new_almanac_frame(
         &cfg,
@@ -366,7 +362,7 @@ a static reference position"
     #[cfg(feature = "cggtts")]
     if matches.get_flag("cggtts") {
         //* CGGTTS special opmode */
-        let tracks = cggtts::resolve(ctx, &eph, clocks, solver, matches)?;
+        let tracks = cggtts::resolve(ctx, &eph, clocks, solver, cfg.method, matches)?;
         if !tracks.is_empty() {
             cggtts_post_process(&ctx, &tracks, matches)?;
             let report = CggttsReport::new(&ctx, &tracks);
@@ -379,7 +375,7 @@ a static reference position"
     }
 
     /* PPP */
-    let solutions = ppp::resolve(ctx, &eph, clocks, &mut rtk_reference, solver);
+    let solutions = ppp::resolve(ctx, &eph, clocks, solver);
     if !solutions.is_empty() {
         ppp_post_process(&ctx, &solutions, matches)?;
         let report = PPPReport::new(&cfg, &ctx, &solutions);

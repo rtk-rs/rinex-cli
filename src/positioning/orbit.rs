@@ -41,36 +41,39 @@ impl<'a, 'b> Orbits<'a, 'b> {
                 if let Some(sp3) = ctx.data.sp3() {
                     if let Some(atx) = ctx.data.antex() {
                         info!("Orbit source created: operating with Ultra Precise Orbits.");
-                        Box::new(sp3.sv_position().filter_map(|(t, sv, (x_km, y_km, z_km))| {
-                            // TODO: needs rework and support all frequencies
-                            let delta = atx.sv_antenna_apc_offset(t, sv, Carrier::L1)?;
-                            let delta = Vector3::new(delta.0, delta.1, delta.2);
-                            let r_sat = Vector3::new(x_km * 1.0E3, y_km * 1.0E3, z_km * 1.0E3);
-                            let k = -r_sat
-                                / (r_sat[0].powi(2) + r_sat[1].powi(2) + r_sat[3].powi(2)).sqrt();
+                        Box::new(sp3.satellites_position_km_iter().filter_map(
+                            |(t, sv, (x_km, y_km, z_km))| {
+                                // TODO: needs rework and support all frequencies
+                                let delta = atx.sv_antenna_apc_offset(t, sv, Carrier::L1)?;
+                                let delta = Vector3::new(delta.0, delta.1, delta.2);
+                                let r_sat = Vector3::new(x_km * 1.0E3, y_km * 1.0E3, z_km * 1.0E3);
+                                let k = -r_sat
+                                    / (r_sat[0].powi(2) + r_sat[1].powi(2) + r_sat[3].powi(2))
+                                        .sqrt();
 
-                            let r_sun = sun_unit_vector(&ctx.data.almanac, t).ok()?;
-                            let norm = ((r_sun[0] - r_sat[0]).powi(2)
-                                + (r_sun[1] - r_sat[1]).powi(2)
-                                + (r_sun[2] - r_sat[2]).powi(2))
-                            .sqrt();
+                                let r_sun = sun_unit_vector(&ctx.data.almanac, t).ok()?;
+                                let norm = ((r_sun[0] - r_sat[0]).powi(2)
+                                    + (r_sun[1] - r_sat[1]).powi(2)
+                                    + (r_sun[2] - r_sat[2]).powi(2))
+                                .sqrt();
 
-                            let e = (r_sun - r_sat) / norm;
-                            let j = Vector3::new(k[0] * e[0], k[1] * e[1], k[2] * e[2]);
-                            let i = Vector3::new(j[0] * k[0], j[1] * k[1], j[2] * k[2]);
-                            let r_dot = Vector3::new(
-                                (i[0] + j[0] + k[0]) * delta[0],
-                                (i[1] + j[1] + k[1]) * delta[1],
-                                (i[2] + j[2] + k[2]) * delta[2],
-                            );
+                                let e = (r_sun - r_sat) / norm;
+                                let j = Vector3::new(k[0] * e[0], k[1] * e[1], k[2] * e[2]);
+                                let i = Vector3::new(j[0] * k[0], j[1] * k[1], j[2] * k[2]);
+                                let r_dot = Vector3::new(
+                                    (i[0] + j[0] + k[0]) * delta[0],
+                                    (i[1] + j[1] + k[1]) * delta[1],
+                                    (i[2] + j[2] + k[2]) * delta[2],
+                                );
 
-                            let r_sat = r_sat - r_dot;
-                            Some((t, sv, (r_sat[0], r_sat[1], r_sat[2])))
-                        }))
+                                let r_sat = r_sat - r_dot;
+                                Some((t, sv, (r_sat[0], r_sat[1], r_sat[2])))
+                            },
+                        ))
                     } else {
                         info!("Orbit source created: operating with Precise Orbits.");
                         warn!("Cannot determine exact precise coordinates without ANTEX data: expect tiny errors (<1m).");
-                        Box::new(sp3.sv_position())
+                        Box::new(sp3.satellites_position_km_iter())
                     }
                 } else {
                     warn!("Orbit source created: operating without Precise Orbits.");
