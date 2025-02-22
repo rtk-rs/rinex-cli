@@ -49,4 +49,3 @@ gnss-qc = { git = "https://github.com/rtk-rs/gnss-qc", branch = "main", features
 rinex = { git = "https://github.com/rtk-rs/rinex", branch = "main", features = ["obs", "nav", "ionex", "antex", "clock", "flate2", "processing", "serde"] }
 
 sp3 = { git = "https://github.com/rtk-rs/sp3", branch = "main", features = ["processing", "anise", "flate2", "serde"] }
-
