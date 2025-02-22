@@ -19,7 +19,7 @@ use walkdir::WalkDir;
 
 extern crate gnss_rs as gnss;
 
-use rinex::prelude::{nav::Orbit, qc::MergeError, Rinex};
+use rinex::prelude::{qc::MergeError, Rinex};
 
 use sp3::prelude::SP3;
 
@@ -100,7 +100,7 @@ fn user_data_parsing(
                                 loading.err().unwrap()
                             );
                         }
-                    } else if let Ok(sp3) = SP3::from_path(path) {
+                    } else if let Ok(sp3) = SP3::from_gzip_file(path) {
                         let loading = ctx.load_sp3(path, sp3);
                         if loading.is_ok() {
                             info!("Loading SP3 file \"{}\"", path.display());
@@ -126,7 +126,7 @@ fn user_data_parsing(
                                 loading.err().unwrap()
                             );
                         }
-                    } else if let Ok(sp3) = SP3::from_path(path) {
+                    } else if let Ok(sp3) = SP3::from_file(path) {
                         let loading = ctx.load_sp3(path, sp3);
                         if loading.is_ok() {
                             info!("Loading SP3 file \"{}\"", path.display());
@@ -163,7 +163,7 @@ fn user_data_parsing(
                         loading.err().unwrap()
                     );
                 }
-            } else if let Ok(sp3) = SP3::from_path(path) {
+            } else if let Ok(sp3) = SP3::from_gzip_file(path) {
                 let loading = ctx.load_sp3(path, sp3);
                 if loading.is_err() {
                     warn!(
@@ -185,7 +185,7 @@ fn user_data_parsing(
                         loading.err().unwrap()
                     );
                 }
-            } else if let Ok(sp3) = SP3::from_path(path) {
+            } else if let Ok(sp3) = SP3::from_file(path) {
                 let loading = ctx.load_sp3(path, sp3);
                 if loading.is_err() {
                     warn!(
@@ -244,7 +244,6 @@ pub fn main() -> Result<(), Error> {
         true,
     );
 
-    let ctx_orbit = data_ctx.reference_rx_orbit();
     let ctx_stem = Context::context_stem(&mut data_ctx);
 
     // Input context
@@ -291,7 +290,7 @@ pub fn main() -> Result<(), Error> {
 
     // ground reference point
     match ctx.rx_orbit {
-        Some(orbit) => {
+        Some(_) => {
             if let Some(obs_rinex) = ctx.data.observation() {
                 if let Some(t0) = obs_rinex.first_epoch() {
                     if let Some(rx_orbit) = cli.manual_rx_orbit(t0, ctx.data.earth_cef) {

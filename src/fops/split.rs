@@ -4,7 +4,7 @@ use clap::ArgMatches;
 use gnss_qc::prelude::ProductType;
 use rinex::prelude::Epoch;
 
-use rinex::prelude::qc::Split;
+use rinex::prelude::processing::Split;
 
 /*
  * Splits input files at specified Time Instant

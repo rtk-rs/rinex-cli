@@ -21,6 +21,9 @@ mod cggtts; // CGGTTS special solver
 #[cfg(feature = "cggtts")]
 use cggtts::{post_process as cggtts_post_process, Report as CggttsReport};
 
+#[cfg(feature = "cggtts")]
+use gnss_rtk::prelude::PVTSolutionType;
+
 // mod rtk;
 // pub use rtk::RemoteRTKReference;
 
@@ -40,7 +43,7 @@ use gnss_qc::prelude::QcExtraPage;
 
 use gnss_rtk::prelude::{
     BdModel, Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel, Method,
-    NgModel, Orbit, PVTSolutionType, Solver,
+    NgModel, Solver,
 };
 
 use thiserror::Error;
@@ -311,11 +314,11 @@ pub fn precise_positioning(
                     }
                 } else if let Some(sp3) = ctx.data.sp3() {
                     if ctx.data.sp3_has_clock() {
-                        if sp3.time_scale == time_of_first_obs.time_scale {
+                        if sp3.header.timescale == time_of_first_obs.time_scale {
                             info!("Temporal PPP compliancy");
                         } else {
                             error!("Working with different timescales in OBS/SP3 is not PPP compatible and will generate tiny errors");
-                            if sp3.epoch_interval >= Duration::from_seconds(300.0) {
+                            if sp3.header.epoch_interval >= Duration::from_seconds(300.0) {
                                 warn!("Interpolating clock states from low sample rate SP3 will most likely introduce errors");
                             }
                         }

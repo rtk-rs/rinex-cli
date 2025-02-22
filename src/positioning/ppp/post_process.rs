@@ -1,7 +1,4 @@
-use std::{
-    collections::{BTreeMap, HashMap},
-    io::Write,
-};
+use std::{collections::BTreeMap, io::Write};
 
 use crate::cli::Context;
 
@@ -15,14 +12,19 @@ extern crate gpx;
 #[cfg(feature = "gpx")]
 use gpx::{errors::GpxError, Gpx, GpxVersion, Waypoint};
 
+#[cfg(feature = "gpx")]
+use geo_types::Point as GeoPoint;
+
 #[cfg(feature = "kml")]
 use kml::{
     types::AltitudeMode, types::Coord as KmlCoord, types::Geometry as KmlGeometry,
     types::KmlDocument, types::Placemark, types::Point as KmlPoint, Kml, KmlVersion, KmlWriter,
 };
 
+#[cfg(feature = "kml")]
+use std::collections::HashMap;
+
 extern crate geo_types;
-use geo_types::Point as GeoPoint;
 
 #[derive(Debug, Error)]
 pub enum Error {

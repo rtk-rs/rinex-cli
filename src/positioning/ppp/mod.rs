@@ -13,7 +13,6 @@ use std::{
 
 use rinex::{
     carrier::Carrier,
-    observation::LliFlags,
     prelude::{Observable, SV},
 };
 

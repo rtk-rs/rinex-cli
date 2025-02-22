@@ -341,10 +341,7 @@ impl ReportContent {
                             (format!("Solver: {:02}%", pct), false)
                         };
 
-                        let posvel = sol_i.state.to_cartesian_pos_vel();
-                        let (x_m, y_m, z_m) =
-                            (posvel[0] * 1.0E3, pos_vel[1] * 1.0E3, pos_vel[2] * 1.0E3);
-                        let (lat_ddeg, long_ddeg, alt_km) = sol_i
+                        let (lat_ddeg, long_ddeg, _) = sol_i
                             .state
                             .latlongalt()
                             .unwrap_or_else(|e| panic!("latlongalt: physical error: {}", e));
