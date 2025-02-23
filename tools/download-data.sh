@@ -4,7 +4,7 @@
 # that is used for thorough library testing and validation
 # which spans all formats and revisions
 LOCAL_DIR=data
-GEORUST_URL=https://raw.githubusercontent.com/georust/rinex/refs/heads/main/test_resources
+RINEX_URL=https://raw.githubusercontent.com/rtk-rs/rinex/refs/heads/main/test_resources
 
 FILES=(
     "CRNX/V3/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz"
@@ -24,7 +24,7 @@ echo "Downloading test/example data..."
 for file in "${FILES[@]}"; do
     file_name=$(basename $file)
     wget -q \
-        --show-progress $GEORUST_URL/$file
+        --show-progress $RINEX_URL/$file
 done
 
 echo "Test data downloaded!"
