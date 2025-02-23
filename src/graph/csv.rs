@@ -33,7 +33,7 @@ impl CSV {
         writeln!(fd, "labels : {}", labels)?;
         writeln!(
             fd,
-            "version: rinex-cli v{} - https://georust.org",
+            "version: rinex-cli v{} - https://github.com/rtk-rs",
             env!("CARGO_PKG_VERSION")
         )?;
         writeln!(fd, "================================================")?;

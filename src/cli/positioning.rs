@@ -12,7 +12,7 @@ fn shared_args(cmd: Command) -> Command {
             .action(ArgAction::Append)
             .help("Position Solver configuration file (JSON). See --help.")
             .long_help("
-Read [https://github.com/georust/rinex/wiki/Positioning] 
+Read [https://github.com/rtk-rs/rinex-cli/wiki/Positioning] 
 and refer to the tutorials/ folder shipped with the RINEX repo.
 [https://docs.rs/gnss-rtk/latest/gnss_rtk/prelude/struct.Config.html] is the structure to represent in JSON.
 "));
@@ -65,7 +65,7 @@ and refer to the tutorials/ folder shipped with the RINEX repo.
                 .long("cggtts")
                 .action(ArgAction::SetTrue)
                 .help("Activate CGGTTS special solver. See --help.")
-                .long_help("Refer to the [https://github.com/georust/rinex/wiki/CGGTTS] tutorial."))
+                .long_help("Refer to the [https://github.com/rtk-rs/rinex-cli/wiki/CGGTTS] tutorial."))
             .arg(Arg::new("tracking")
                 .long("trk")
                 .value_parser(value_parser!(Duration))

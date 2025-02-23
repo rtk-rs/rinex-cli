@@ -69,7 +69,7 @@ pub fn post_process(
             }
         })
         .comments(&format!(
-            "rinex-cli v{} - https://georust.org",
+            "rinex-cli v{} - https://github.com/rtk-rs",
             env!("CARGO_PKG_VERSION")
         ));
 

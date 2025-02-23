@@ -170,7 +170,7 @@ pub fn post_process(
         let kmldoc = KmlDocument {
             version: KmlVersion::V23,
             attrs: [(
-                String::from("https://georust.org/"),
+                String::from("https://github.com/rtk-rs/"),
                 env!("CARGO_PKG_VERSION").to_string(),
             )]
             .into_iter()
