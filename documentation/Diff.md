@@ -14,7 +14,7 @@ rinex-cli \
     diff data/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz
 ```
 
-Example (2): merging two CRINEX files together.
+Example (2): differentiate two CRINEX together
 
 ```bash
 rinex-cli \

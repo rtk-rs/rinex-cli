@@ -64,32 +64,31 @@ Summary:
 
 ## Documentation
 
-If you intend to run our examples and tutorials on your side,
-you are expected to execute the `tools/download-data.sh` script first,
-which will retrieve the GeoRust/RINEX verification and test data, that we use
-for demonstration purposes. On linux, you can:
+If you intend to run our examples and tutorials,
+you are expected to first source our `tools/download-data.sh` script,
+it will download our test data (a few RINEX files) and define the example environment:
 
 ```bash
-./tools/download-data.sh
+source tools/download-data.sh
+echo $DATA_DIR
 ```
 
-Once you have installed the tool, read
+Once you have installed the tool, read the sections you are interested in:
 
-- [The file loading documentation](./documentation/FileLoading.md) that will teach you
+- [File loading interface documentation](./documentation/FileLoading.md) that will teach you
 how to load data into the toolbox
-- [The Preprocessor documentation](./documentation/Preprocessor.md) that will teach you
-how design a filter
-- [The Merge operation documentation](./documentation/Merge.md)
-- [The Split operation documentation](./documentation/Split.md)
-- [The Time Binning operation documentation](./documentation/Tbin.md)
-- [The Differentiation operation documentation](./documentation/Diff.md)
-- [The PPP opmode documentation](./documentation/PPP.md)
-- [The PPP with special CGGTTS option documentation](./documentation/CGGTTS.md)
-
-## Examples
-
-We provide a set of [(command line) examples](./examples) written in Shell,
-that cover most applications.
+- [The Preprocessor documentation](./documentation/Preprocessor.md) will teach you
+how design a filter and take advantage of it in your processing pipelines.
+- [Merge operation documentation](./documentation/Merge.md) will teach you how to 
+merge two RINEX files into a single one
+- [Split operation documentation](./documentation/Split.md) demonstrates how to
+split one RINEX file into two
+- [Time Binning documentation](./documentation/Tbin.md) demonstrates a few options
+to create a batch of files from a single RINEX
+- [The differentiation documentation](./documentation/Diff.md) explains the
+special `diff` opmode
+- [Post processed navigation documentation](./documentation/PPP.md)
+- [Static navigation dedicated to CGGTTS solutions solving](./documentation/CGGTTS.md)
 
 Special Thanks
 ==============
