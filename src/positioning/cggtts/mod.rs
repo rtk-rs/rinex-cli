@@ -17,12 +17,16 @@ use rinex::{
 };
 
 use gnss_rtk::prelude::{
-    Candidate, Carrier as RTKCarrier, Duration, 
-    // IonoComponents, 
-    // IonosphereBias, 
+    Candidate,
+    Carrier as RTKCarrier,
+    Duration,
+    // IonoComponents,
+    // IonosphereBias,
     Method,
-    Observation, OrbitSource, Solver, 
-    // TropoComponents, 
+    Observation,
+    OrbitSource,
+    Solver,
+    // TropoComponents,
     SPEED_OF_LIGHT_M_S,
 };
 
@@ -39,7 +43,7 @@ use crate::{
         // bd_model,
         cast_rtk_carrier,
         kb_model,
-        // ng_model, 
+        // ng_model,
         // tropo_components,
         rtk_reference_carrier,
         ClockStateProvider,

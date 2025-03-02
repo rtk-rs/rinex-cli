@@ -181,8 +181,7 @@ impl OrbitSource for Orbits<'_, '_> {
             );
             Some(orbit)
         } else {
-            error!(
-                "{}({}) undefined orbital state", t, sv);
+            error!("{}({}) undefined orbital state", t, sv);
 
             None
         }

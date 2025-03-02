@@ -29,10 +29,17 @@ Download the version you are interested in:
 git clone https://github.com/rtk-rs/rinex-cli
 ```
 
-And build it using cargo:
+This will build and install the stripped binary to `${HOME}/.cargo/bin`, which
+is usally defined in the ${PATH}. Because our examples span all applications, you should
+activate `--all-features`:
 
 ```bash
-cargo build --all-features -r
+cargo install --all-features --path .
+
+rinex-cli --version
+
+which rinex-cli
+${HOME}/.cargo/bin/rinex-cli
 ```
 
 ## File formats & revisions
@@ -65,8 +72,8 @@ Summary:
 ## Documentation
 
 If you intend to run our examples and tutorials,
-you are expected to first source our `tools/download-data.sh` script,
-it will download our test data (a few RINEX files) and define the example environment:
+you are expected to first source our `tools/download-data.sh` script.  
+It will download our test data (a few RINEX files) and define the example environment:
 
 ```bash
 source tools/download-data.sh

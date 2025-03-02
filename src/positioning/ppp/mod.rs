@@ -27,9 +27,13 @@ pub use report::Report;
 pub mod post_process;
 
 use gnss_rtk::prelude::{
-    Candidate, Epoch, 
-    // IonoComponents, 
-    Observation, OrbitSource, PVTSolution, Solver,
+    Candidate,
+    Epoch,
+    // IonoComponents,
+    Observation,
+    OrbitSource,
+    PVTSolution,
+    Solver,
     // TropoComponents,
 };
 

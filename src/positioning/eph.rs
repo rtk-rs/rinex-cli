@@ -4,9 +4,9 @@ use rinex::prelude::{Epoch, SV};
 use std::collections::HashMap;
 
 pub struct EphemerisSource<'a> {
+    sv: SV,
     eos: bool,
     toc: Epoch,
-    sv: SV,
     buffer: HashMap<SV, Vec<(Epoch, Epoch, Ephemeris)>>,
     iter: Box<dyn Iterator<Item = (SV, Epoch, Epoch, &'a Ephemeris)> + 'a>,
 }
@@ -14,31 +14,27 @@ pub struct EphemerisSource<'a> {
 impl<'a> EphemerisSource<'a> {
     /// Builds new [EphemerisSource] from [Context]
     pub fn from_ctx(ctx: &'a Context) -> Self {
-        if let Some(brdc) = ctx.data.brdc_navigation() {
-            info!("Ephemeris data source created.");
-            let mut s = Self {
-                eos: false,
-                toc: Epoch::default(),
-                sv: SV::default(),
-                buffer: HashMap::with_capacity(32),
-                iter: Box::new(brdc.nav_ephemeris_frames_iter().filter_map(|(k, v)| {
-                    let sv_ts = k.sv.timescale()?;
-                    let toe = v.toe(sv_ts)?;
-                    Some((k.sv, k.epoch, toe, v))
-                })),
-            };
-            s.consume_many(32); // fill in with some data
-            s
-        } else {
-            warn!("Operating without ephemeris source.");
-            Self {
-                eos: true,
-                toc: Epoch::default(),
-                sv: SV::default(),
-                buffer: Default::default(),
-                iter: Box::new([].into_iter()),
-            }
-        }
+        let brdc = ctx
+            .data
+            .brdc_navigation()
+            .expect("Navigation RINEX is currently mandatory..");
+
+        info!("Ephemeris data source created.");
+
+        let mut s = Self {
+            eos: false,
+            sv: SV::default(),
+            toc: Epoch::default(),
+            buffer: HashMap::with_capacity(32),
+            iter: Box::new(brdc.nav_ephemeris_frames_iter().filter_map(|(k, v)| {
+                let sv_ts = k.sv.timescale()?;
+                let toe = v.toe(sv_ts)?;
+                Some((k.sv, k.epoch, toe, v))
+            })),
+        };
+
+        s.consume_many(32); // fill in with some data
+        s
     }
 
     /// Consume one entry from [Iterator]

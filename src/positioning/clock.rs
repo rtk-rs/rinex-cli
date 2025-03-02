@@ -53,7 +53,7 @@ impl ClockStateProvider for Clock<'_, '_> {
         }
         let (toc, _, eph) = self.eph.borrow_mut().select(t, sv)?;
         let dt = eph.clock_correction(toc, t, sv, 8)?;
-        debug!("{}({}) estimated clock correction: {}", t, sv, dt);
+        debug!("{}({}) clock correction: {}", t, sv, dt);
         Some(ClockCorrection::without_relativistic_correction(dt))
     }
 }
