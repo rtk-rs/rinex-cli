@@ -2,8 +2,14 @@ use crate::cli::Context;
 use std::collections::BTreeMap;
 
 use gnss_rtk::prelude::{
-    Config as NaviConfig, Duration, Epoch, Filter as NaviFilter, Method as NaviMethod, PVTSolution,
-    TimeScale, SV,
+    Config as NaviConfig,
+    Duration,
+    Epoch,
+    //Filter as NaviFilter,
+    Method as NaviMethod,
+    PVTSolution,
+    TimeScale,
+    SV,
 };
 
 use gnss_qc::{
@@ -53,7 +59,7 @@ impl Technique {
 struct Summary {
     technique: Technique,
     method: NaviMethod,
-    filter: NaviFilter,
+    // filter: NaviFilter,
     orbit: String,
     first_epoch: Epoch,
     last_epoch: Epoch,
@@ -134,14 +140,14 @@ impl Render for Summary {
                                 (self.timescale.to_string())
                             }
                         }
-                        tr {
-                            th class="is-info" {
-                                "Navigation Filter"
-                            }
-                            td {
-                                (self.filter.to_string())
-                            }
-                        }
+                        // tr {
+                        //     th class="is-info" {
+                        //         "Navigation Filter"
+                        //     }
+                        //     td {
+                        //         (self.filter.to_string())
+                        //     }
+                        // }
                         tr {
                             th class="is-info" {
                                 "Final"
@@ -246,13 +252,13 @@ impl Summary {
             lat_long_alt_ddeg_ddeg_km: (lat_ddeg, long_ddeg, alt_km),
             orbit: {
                 if ctx.data.has_sp3() {
-                    format!("Interpolation X{}", cfg.interp_order)
+                    "SP3".to_string()
                 } else {
                     "Kepler".to_string()
                 }
             },
             method: cfg.method,
-            filter: cfg.solver.filter,
+            // filter: cfg.solver.filter,
             duration: last_epoch - first_epoch,
             technique: Technique::GeodeticSurvey,
         }

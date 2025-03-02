@@ -42,7 +42,7 @@ anise = { version = "0.5.3", features = ["embed_ephem"] }
 hifitime = { version = "4.0", features = ["serde", "std"] }
 
 gnss-rs = { version = "2.3.2", features = ["serde"] }
-gnss-rtk = { version = "0.7.5", features = ["serde"] }
+gnss-rtk = { git = "https://github.com/rtk-rs/gnss-rtk", branch = "nav_x4", features = ["serde"] }
 cggtts = { version = "4.2.0", features = ["serde", "scheduler"], optional = true }
 gnss-qc = { git = "https://github.com/rtk-rs/gnss-qc", branch = "main", features = ["sp3"] } 
 

@@ -17,8 +17,13 @@ use rinex::{
 };
 
 use gnss_rtk::prelude::{
-    Candidate, Carrier as RTKCarrier, Duration, IonoComponents, IonosphereBias, Method,
-    Observation, OrbitSource, Solver, TropoComponents, SPEED_OF_LIGHT_M_S,
+    Candidate, Carrier as RTKCarrier, Duration, 
+    // IonoComponents, 
+    // IonosphereBias, 
+    Method,
+    Observation, OrbitSource, Solver, 
+    // TropoComponents, 
+    SPEED_OF_LIGHT_M_S,
 };
 
 use cggtts::{
@@ -31,10 +36,11 @@ use hifitime::Unit;
 use crate::{
     cli::Context,
     positioning::{
-        bd_model,
+        // bd_model,
         cast_rtk_carrier,
         kb_model,
-        ng_model, //tropo_components,
+        // ng_model, 
+        // tropo_components,
         rtk_reference_carrier,
         ClockStateProvider,
         EphemerisSource,
@@ -134,38 +140,38 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                     }
                 }
 
-                let tropo = TropoComponents::Unknown;
-                cd.set_tropo_components(tropo);
+                // let tropo = TropoComponents::Unknown;
+                // cd.set_tropo_components(tropo);
 
-                let mut iono = IonoComponents::Unknown;
+                // let mut iono = IonoComponents::Unknown;
 
-                if let Some(model) = kb_model(nav_data, past_t) {
-                    iono = IonoComponents::KbModel(model);
-                } else if let Some(model) = ng_model(nav_data, past_t) {
-                    iono = IonoComponents::NgModel(model);
-                } else if let Some(model) = bd_model(nav_data, past_t) {
-                    iono = IonoComponents::BdModel(model);
-                }
+                // if let Some(model) = kb_model(nav_data, past_t) {
+                //     iono = IonoComponents::KbModel(model);
+                // } else if let Some(model) = ng_model(nav_data, past_t) {
+                //     iono = IonoComponents::NgModel(model);
+                // } else if let Some(model) = bd_model(nav_data, past_t) {
+                //     iono = IonoComponents::BdModel(model);
+                // }
 
-                match iono {
-                    IonoComponents::Unknown => {
-                        warn!("{} ({}) - undefined ionosphere parameters", past_t, *sv)
-                    },
-                    IonoComponents::KbModel(_) => info!(
-                        "{} ({}) - using KLOBUCHAR ionosphere parameters",
-                        past_t, *sv
-                    ),
-                    IonoComponents::NgModel(_) => info!(
-                        "{} ({}) - using NEQUICK-G ionosphere parameters",
-                        past_t, *sv
-                    ),
-                    IonoComponents::BdModel(_) => {
-                        info!("{} ({}) - using BDGIM ionosphere parameters", past_t, *sv)
-                    },
-                    _ => {},
-                }
+                // match iono {
+                //     IonoComponents::Unknown => {
+                //         warn!("{} ({}) - undefined ionosphere parameters", past_t, *sv)
+                //     },
+                //     IonoComponents::KbModel(_) => info!(
+                //         "{} ({}) - using KLOBUCHAR ionosphere parameters",
+                //         past_t, *sv
+                //     ),
+                //     IonoComponents::NgModel(_) => info!(
+                //         "{} ({}) - using NEQUICK-G ionosphere parameters",
+                //         past_t, *sv
+                //     ),
+                //     IonoComponents::BdModel(_) => {
+                //         info!("{} ({}) - using BDGIM ionosphere parameters", past_t, *sv)
+                //     },
+                //     _ => {},
+                // }
 
-                cd.set_iono_components(iono);
+                // cd.set_iono_components(iono);
 
                 match solver.resolve(past_t, &[cd]) {
                     Ok((t, pvt_solution)) => {
@@ -211,15 +217,17 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                             let mdtr = pvt_data.tropo_bias.unwrap_or_default() / SPEED_OF_LIGHT_M_S;
 
                             // ionod
-                            let mdio = match pvt_data.iono_bias {
-                                Some(IonosphereBias::Modeled(bias)) => Some(bias),
-                                _ => None,
-                            };
+                            let mdio = None;
+                            // match pvt_data.iono_bias {
+                            //     Some(IonosphereBias::Modeled(bias)) => Some(bias),
+                            //     _ => None,
+                            // };
 
-                            let msio = match pvt_data.iono_bias {
-                                Some(IonosphereBias::Measured(bias)) => Some(bias),
-                                _ => None,
-                            };
+                            let msio = None;
+                            // match pvt_data.iono_bias {
+                            //     Some(IonosphereBias::Measured(bias)) => Some(bias),
+                            //     _ => None,
+                            // };
 
                             // track fitting
                             let fitdata = FitData {
@@ -355,13 +363,14 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
             {
                 match signal.observable {
                     Observable::PhaseRange(_) => {
-                        observation.set_ambiguous_phase_range(signal.value);
+                        observation.ambiguity = None;
+                        observation.phase_range_m = Some(signal.value);
                     },
                     Observable::PseudoRange(_) => {
-                        observation.set_pseudo_range(signal.value);
+                        observation.pseudo_range_m = Some(signal.value);
                     },
                     Observable::Doppler(_) => {
-                        observation.set_doppler(signal.value);
+                        observation.doppler = Some(signal.value);
                     },
                     _ => {},
                 }

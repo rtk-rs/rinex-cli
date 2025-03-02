@@ -42,8 +42,7 @@ use rinex::{
 use gnss_qc::prelude::QcExtraPage;
 
 use gnss_rtk::prelude::{
-    BdModel, Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel, Method,
-    NgModel, Solver,
+    Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel, Method, Solver,
 };
 
 use thiserror::Error;
@@ -215,27 +214,27 @@ pub fn kb_model(nav: &Rinex, t: Epoch) -> Option<KbModel> {
     })
 }
 
-/*
- * Grabs nearest BD model (in time)
- */
-pub fn bd_model(nav: &Rinex, t: Epoch) -> Option<BdModel> {
-    let (_, model) = nav
-        .nav_bdgim_models_iter()
-        .min_by_key(|(k_i, _)| (k_i.epoch - t).abs())?;
+// /*
+//  * Grabs nearest BD model (in time)
+//  */
+// pub fn bd_model(nav: &Rinex, t: Epoch) -> Option<BdModel> {
+//     let (_, model) = nav
+//         .nav_bdgim_models_iter()
+//         .min_by_key(|(k_i, _)| (k_i.epoch - t).abs())?;
 
-    Some(BdModel { alpha: model.alpha })
-}
+//     Some(BdModel { alpha: model.alpha })
+// }
 
-/*
- * Grabs nearest NG model (in time)
- */
-pub fn ng_model(nav: &Rinex, t: Epoch) -> Option<NgModel> {
-    let (_, model) = nav
-        .nav_nequickg_models_iter()
-        .min_by_key(|(k_i, _)| (k_i.epoch - t).abs())?;
+// /*
+//  * Grabs nearest NG model (in time)
+//  */
+// pub fn ng_model(nav: &Rinex, t: Epoch) -> Option<NgModel> {
+//     let (_, model) = nav
+//         .nav_nequickg_models_iter()
+//         .min_by_key(|(k_i, _)| (k_i.epoch - t).abs())?;
 
-    Some(NgModel { a: model.a })
-}
+//     Some(NgModel { a: model.a })
+// }
 
 pub fn precise_positioning(
     _cli: &Cli,
@@ -256,7 +255,7 @@ pub fn precise_positioning(
              */
             #[cfg(feature = "cggtts")]
             if matches.get_flag("cggtts") {
-                cfg.sol_type = PVTSolutionType::TimeOnly;
+                cfg.solution = PVTSolutionType::TimeOnly;
             }
             #[cfg(not(feature = "cggtts"))]
             if matches.get_flag("cggtts") {
@@ -275,7 +274,7 @@ pub fn precise_positioning(
              */
             #[cfg(feature = "cggtts")]
             if matches.get_flag("cggtts") {
-                cfg.sol_type = PVTSolutionType::TimeOnly;
+                cfg.solution = PVTSolutionType::TimeOnly;
             }
             #[cfg(not(feature = "cggtts"))]
             if matches.get_flag("cggtts") {
@@ -351,12 +350,20 @@ If your dataset does not describe one, you can manually describe one, see --help
 
     let apriori = ctx.rx_orbit;
 
+    let apriori_ecef_m = match apriori {
+        Some(apriori) => {
+            let pos_vel = apriori.to_cartesian_pos_vel();
+            Some((pos_vel[0] * 1.0E3, pos_vel[1] * 1.0E3, pos_vel[2] * 1.0E3))
+        },
+        None => None,
+    };
+
     let solver = Solver::new_almanac_frame(
-        &cfg,
-        apriori,
-        orbits,
+        cfg.clone(),
         ctx.data.almanac.clone(),
         ctx.data.earth_cef,
+        orbits,
+        apriori_ecef_m,
     );
 
     #[cfg(feature = "cggtts")]

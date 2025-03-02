@@ -2,7 +2,12 @@
 use crate::{
     cli::Context,
     positioning::{
-        bd_model, cast_rtk_carrier, kb_model, ng_model, ClockStateProvider, EphemerisSource,
+        //bd_model,
+        cast_rtk_carrier,
+        kb_model,
+        //ng_model,
+        ClockStateProvider,
+        EphemerisSource,
     },
 };
 
@@ -22,8 +27,10 @@ pub use report::Report;
 pub mod post_process;
 
 use gnss_rtk::prelude::{
-    Candidate, Epoch, IonoComponents, Observation, OrbitSource, PVTSolution, Solver,
-    TropoComponents,
+    Candidate, Epoch, 
+    // IonoComponents, 
+    Observation, OrbitSource, PVTSolution, Solver,
+    // TropoComponents,
 };
 
 pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
@@ -75,45 +82,45 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                         }
                     }
 
-                    let tropo = TropoComponents::Unknown;
-                    cd.set_tropo_components(tropo);
+                    // let tropo = TropoComponents::Unknown;
+                    // cd.set_tropo_components(tropo);
 
-                    let mut iono = IonoComponents::Unknown;
+                    // let mut iono = IonoComponents::Unknown;
 
-                    match ctx.data.brdc_navigation() {
-                        Some(brdc) => {
-                            if let Some(model) = kb_model(brdc, past_t) {
-                                iono = IonoComponents::KbModel(model);
-                            } else if let Some(model) = ng_model(brdc, past_t) {
-                                iono = IonoComponents::NgModel(model);
-                            } else if let Some(model) = bd_model(brdc, past_t) {
-                                iono = IonoComponents::BdModel(model);
-                            }
-                        },
-                        None => {
-                            cd.set_iono_components(IonoComponents::Unknown);
-                        },
-                    }
+                    // match ctx.data.brdc_navigation() {
+                    //     Some(brdc) => {
+                    //         if let Some(model) = kb_model(brdc, past_t) {
+                    //             iono = IonoComponents::KbModel(model);
+                    //         // } else if let Some(model) = ng_model(brdc, past_t) {
+                    //         //     iono = IonoComponents::NgModel(model);
+                    //         // } else if let Some(model) = bd_model(brdc, past_t) {
+                    //         //     iono = IonoComponents::BdModel(model);
+                    //         }
+                    //     },
+                    //     None => {
+                    //         // cd.set_iono_components(IonoComponents::Unknown);
+                    //     },
+                    // }
 
-                    match iono {
-                        IonoComponents::Unknown => {
-                            warn!("{} ({}) - undefined ionosphere parameters", past_t, *sv)
-                        },
-                        IonoComponents::KbModel(_) => info!(
-                            "{} ({}) - using KLOBUCHAR ionosphere parameters",
-                            past_t, *sv
-                        ),
-                        IonoComponents::NgModel(_) => info!(
-                            "{} ({}) - using NEQUICK-G ionosphere parameters",
-                            past_t, *sv
-                        ),
-                        IonoComponents::BdModel(_) => {
-                            info!("{} ({}) - using BDGIM ionosphere parameters", past_t, *sv)
-                        },
-                        _ => {},
-                    }
+                    // match iono {
+                    //     IonoComponents::Unknown => {
+                    //         warn!("{} ({}) - undefined ionosphere parameters", past_t, *sv)
+                    //     },
+                    //     IonoComponents::KbModel(_) => info!(
+                    //         "{} ({}) - using KLOBUCHAR ionosphere parameters",
+                    //         past_t, *sv
+                    //     ),
+                    //     IonoComponents::NgModel(_) => info!(
+                    //         "{} ({}) - using NEQUICK-G ionosphere parameters",
+                    //         past_t, *sv
+                    //     ),
+                    //     IonoComponents::BdModel(_) => {
+                    //         info!("{} ({}) - using BDGIM ionosphere parameters", past_t, *sv)
+                    //     },
+                    //     _ => {},
+                    // }
 
-                    cd.set_iono_components(iono);
+                    // cd.set_iono_components(iono);
 
                     candidates.push(cd);
                 }
@@ -143,13 +150,14 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
             {
                 match signal.observable {
                     Observable::PhaseRange(_) => {
-                        observation.set_ambiguous_phase_range(signal.value);
+                        observation.ambiguity = None;
+                        observation.phase_range_m = Some(signal.value);
                     },
                     Observable::PseudoRange(_) => {
-                        observation.set_pseudo_range(signal.value);
+                        observation.pseudo_range_m = Some(signal.value);
                     },
                     Observable::Doppler(_) => {
-                        observation.set_doppler(signal.value);
+                        observation.doppler = Some(signal.value);
                     },
                     _ => {},
                 }
