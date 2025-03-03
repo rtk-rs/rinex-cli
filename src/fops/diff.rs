@@ -10,9 +10,10 @@ use std::path::PathBuf;
  */
 pub fn diff(ctx: &Context, matches: &ArgMatches) -> Result<(), Error> {
     let ctx_data = &ctx.data;
+
     let path_a = ctx_data
         .files(ProductType::Observation)
-        .expect("failed to determine output file name")
+        .expect("diff only works on OBS RINEX currently")
         .first()
         .unwrap();
 
@@ -20,7 +21,7 @@ pub fn diff(ctx: &Context, matches: &ArgMatches) -> Result<(), Error> {
 
     let extension_b = path_b
         .extension()
-        .unwrap_or_else(|| panic!("failed to determine file extension: {}", path_b.display()))
+        .unwrap_or_else(|| panic!("Failed to determine file extension: {}", path_b.display()))
         .to_string_lossy()
         .to_string();
 
