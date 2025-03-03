@@ -28,7 +28,7 @@ thiserror = "2"
 itertools = "0.14"
 map_3d = "0.1.5"
 
-maud = "0.26"
+maud = "0.27"
 plotly = "0.9"
 
 clap = { version = "4.4.13", features = ["derive", "color"] }
