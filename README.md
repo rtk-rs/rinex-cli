@@ -29,10 +29,17 @@ Download the version you are interested in:
 git clone https://github.com/rtk-rs/rinex-cli
 ```
 
-And build it using cargo:
+This will build and install the stripped binary to `${HOME}/.cargo/bin`, which
+is usally defined in the ${PATH}. Because our examples span all applications, you should
+activate `--all-features`:
 
 ```bash
-cargo build --all-features -r
+cargo install --all-features --path .
+
+rinex-cli --version
+
+which rinex-cli
+${HOME}/.cargo/bin/rinex-cli
 ```
 
 ## File formats & revisions
@@ -64,32 +71,44 @@ Summary:
 
 ## Documentation
 
-If you intend to run our examples and tutorials on your side,
-you are expected to execute the `tools/download-data.sh` script first,
-which will retrieve the GeoRust/RINEX verification and test data, that we use
-for demonstration purposes. On linux, you can:
+If you intend to run our examples and tutorials,
+you are expected to first source our `tools/download-data.sh` script.  
+It will download our test data (a few RINEX files) and define the example environment:
 
 ```bash
-./tools/download-data.sh
+source tools/download-data.sh
+echo $DATA_DIR
 ```
 
-Once you have installed the tool, read
+Once you have installed the tool, read the first few steps:
 
-- [The file loading documentation](./documentation/FileLoading.md) that will teach you
-how to load data into the toolbox
-- [The Preprocessor documentation](./documentation/Preprocessor.md) that will teach you
-how design a filter
-- [The Merge operation documentation](./documentation/Merge.md)
-- [The Split operation documentation](./documentation/Split.md)
-- [The Time Binning operation documentation](./documentation/Tbin.md)
-- [The Differentiation operation documentation](./documentation/Diff.md)
-- [The PPP opmode documentation](./documentation/PPP.md)
-- [The PPP with special CGGTTS option documentation](./documentation/CGGTTS.md)
+- [File loading interface](./documentation/FileLoading.md): learn how to load data into the toolbox
+- [The Preprocessor documentation](./documentation/Preprocessor.md) will teach you
+how design a filter and deploy up to complex processing pipelines
+- [The Input / Output page](./documentation/InputOutput.md) summarizes the output you can
+generate, based on your input products
 
-## Examples
+Then, continue your learning journey with:
 
-We provide a set of [(command line) examples](./examples) written in Shell,
-that cover most applications.
+- [The Merge operation](./documentation/Merge.md): to merge RINEX files together,
+which is particularly useful in Data production context & files management
+
+- [The Split operation](./documentation/Split.md): demonstrates how to
+split one RINEX file into two
+
+- [Time Binning operation](./documentation/Tbin.md): allows creating a batch of RINEX
+from a single one (basically, dividing into sub-parts)
+
+- [The differentiation operation](./documentation/Diff.md): to create a special RINEX
+by substracting one from the other
+
+Dive into the world of precise navigation:
+
+- [Introduction to the PPP (Post Processed Positioning) opmode](./documentation/PPP.md)
+
+- [Focus on the PPP +cggtts special option](./documentation/CGGTTS.md)
+
+- [Many examples](./examples/README.md) are provided, spanning many applications
 
 Special Thanks
 ==============

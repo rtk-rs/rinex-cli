@@ -3,8 +3,9 @@
 # Downloads some of the georust/rinex test_data
 # that is used for thorough library testing and validation
 # which spans all formats and revisions
-LOCAL_DIR=data
-GEORUST_URL=https://raw.githubusercontent.com/georust/rinex/refs/heads/main/test_resources
+BASE_DIR=$(pwd)
+EXTRACT_DIR=$BASE_DIR/data
+GITHUB_URL=https://raw.githubusercontent.com/rtk-rs/rinex/refs/heads/main/test_resources
 
 FILES=(
     "CRNX/V3/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz"
@@ -16,18 +17,16 @@ FILES=(
     "CLK/V3/GRG0MGXFIN_20201770000_01D_30S_CLK.CLK.gz"
 )
     
-mkdir -p $LOCAL_DIR
-cd $LOCAL_DIR
+mkdir -p $EXTRACT_DIR
 
-echo "Downloading test/example data..."
-
+echo "Downloading test data..."
 for file in "${FILES[@]}"; do
     file_name=$(basename $file)
     wget -q \
-        --show-progress $GEORUST_URL/$file
+        -P $EXTRACT_DIR \
+        --show-progress $GITHUB_URL/$file
 done
 
 echo "Test data downloaded!"
-
-cd ..
-ls -lah data/
+ls -lah $EXTRACT_DIR
+export DATA_DIR=$EXTRACT_DIR

@@ -37,6 +37,12 @@ rinex-cli -q -d data/
 
 ## File naming conventions
 
-The toolbox can operate on files that do not follow standard naming conventions.  
+The toolbox accepts files that do not follow standard naming conventions.
+
 Note that working with files that do not following standard naming conventions will limit our 
 smart file production capabilities. See [File Operations](./FileOperations) for more information.
+
+## Tutorials
+
+The output product you can generate, [now depends on the operation you will select
+and the input you just loaded](./InputOutput.md)
