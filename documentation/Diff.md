@@ -1,12 +1,14 @@
-File Operation: diff
-====================
+FIle (A) - (B) special operation
+================================
 
-The `diff` opmode allows performing the A-B operation, on identical physics (usually "Observables")
-sampled at the same time. It requires a secondary file, which serves as Reference (B) in the differential operation.
+Amongst many file operations, `rinex-cli` allows differentiating two files of the same kind.  
 
-This is intended to be used on Observation RINEX.
+The differentiation is applied is a very precise manner, where only identical physics (also referred to as _Observables_ in RINEX 
+terminology) are differentiated to one another.
 
-Example (1): it is not possible to differentiate different file formats
+This operation may apply to many exotic applications.
+
+Example (1): `diff` can only apply if both input products format do match, the following is an incorrect operation.
 
 ```bash
 rinex-cli \
@@ -14,10 +16,20 @@ rinex-cli \
     diff data/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz
 ```
 
-Example (2): differentiate two CRINEX together
+Example (2): Generate a CRINEX that equals `CRINEX{ RINEX(A-B) }`
 
 ```bash
 rinex-cli \
+    --fp data/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
+    diff data/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz
+```
+
+Like any file operations, use `--unzip` to silentely decompress, and `--crx2rnx` to silentely decompress to RINEX.  
+This this third example, we now obtain readable RINEX:
+
+```bash
+rinex-cli \
+    --crx2rnx \
     --fp data/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
     diff data/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz
 ```

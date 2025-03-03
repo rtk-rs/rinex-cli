@@ -1,11 +1,11 @@
-File Operation: merge
-=====================
+File merging
+============
 
-File merging consists in creating one output product from two input of the same kind.
+File merging consists in creating one output product from two products of the same kind.  
+This operation is requested with `merge` which requires a secondary input file.
 
-This operation is requested with `merge` which requires a secondary input file, this one is to serve as the reference point in the Merge(A, B) operation.
-
-Example (1): attempting to merge Navigation RINEX into Observation is an invalid operation
+Example (1): attempting to merge Navigation RINEX into Observation is an invalid operation.
+Both files must be of the same kind
 
 ```bash
 rinex-cli \

@@ -16,7 +16,8 @@ pub fn time_binning(
     submatches: &ArgMatches,
 ) -> Result<(), Error> {
     let ctx_data = &ctx.data;
-    let duration = matches
+
+    let duration = submatches
         .get_one::<Duration>("interval")
         .expect("duration is required");
 
