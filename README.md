@@ -80,22 +80,35 @@ source tools/download-data.sh
 echo $DATA_DIR
 ```
 
-Once you have installed the tool, read the sections you are interested in:
+Once you have installed the tool, read the first few steps:
 
-- [File loading interface documentation](./documentation/FileLoading.md) that will teach you
-how to load data into the toolbox
+- [File loading interface](./documentation/FileLoading.md): learn how to load data into the toolbox
 - [The Preprocessor documentation](./documentation/Preprocessor.md) will teach you
-how design a filter and take advantage of it in your processing pipelines.
-- [Merge operation documentation](./documentation/Merge.md) will teach you how to 
-merge two RINEX files into a single one
-- [Split operation documentation](./documentation/Split.md) demonstrates how to
+how design a filter and deploy up to complex processing pipelines
+- [The Input / Output page](./documentation/InputOutput.md) summarizes the output you can
+generate, based on your input products
+
+Then, continue your learning journey with:
+
+- [The Merge operation](./documentation/Merge.md): to merge RINEX files together,
+which is particularly useful in Data production context & files management
+
+- [The Split operation](./documentation/Split.md): demonstrates how to
 split one RINEX file into two
-- [Time Binning documentation](./documentation/Tbin.md) demonstrates a few options
-to create a batch of files from a single RINEX
-- [The differentiation documentation](./documentation/Diff.md) explains the
-special `diff` opmode
-- [Post processed navigation documentation](./documentation/PPP.md)
-- [Static navigation dedicated to CGGTTS solutions solving](./documentation/CGGTTS.md)
+
+- [Time Binning operation](./documentation/Tbin.md): allows creating a batch of RINEX
+from a single one (basically, dividing into sub-parts)
+
+- [The differentiation operation](./documentation/Diff.md): to create a special RINEX
+by substracting one from the other
+
+Dive into the world of precise navigation:
+
+- [Introduction to the PPP (Post Processed Positioning) opmode](./documentation/PPP.md)
+
+- [Focus on the PPP +cggtts special option](./documentation/CGGTTS.md)
+
+- [Many examples](./examples/README.md) are provided, spanning many applications
 
 Special Thanks
 ==============
