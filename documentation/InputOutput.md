@@ -12,7 +12,7 @@ Quality Control (QC) is the default mode, and synthesizes a report.
 
 
 | Input                | Opmode              | Second argument   | Application                            | Output product(s)  |
-|----------------------------------------------------------------|----------------------------------------|--------------------|
+|----------------------|---------------------|-------------------|----------------------------------------|--------------------|
 | RINEX                | None                | None              | RINEX QC                               | report.html        |
 | SP3                  | None                | None              | SP3 QC                                 | report.html        |
 | RINEX + SP3          | None                | None              | Post processed, High precision geodesy | report.html        |
@@ -20,7 +20,7 @@ Quality Control (QC) is the default mode, and synthesizes a report.
 `merge` I/O: 
 
 | Input                | Opmode              | Second argument                        | Application        | Output product(s)  |
-|-------------------------------------------------------------------------------------|--------------------|--------------------|
+|----------------------|---------------------|----------------------------------------|--------------------|--------------------|
 | RINEX                | merge               | RINEX File                             | File management    | Merged RINEX       |
 | RINEX                | merge               | RINEX File `+rnx2crx`                  | File management    | Merged CRINEX      |
 | CRINEX               | merge               | RINEX File                             | File management    | Merged CRINEX      |
@@ -29,7 +29,7 @@ Quality Control (QC) is the default mode, and synthesizes a report.
 `filegen` I/O:
 
 | Input                | Opmode              | Second argument                        | Application        | Output product(s)   |
-|-------------------------------------------------------------------------------------|--------------------|---------------------|
+|----------------------|---------------------|----------------------------------------|--------------------|---------------------|
 | RINEX                | filegen             | None                                   | File management    | RINEX               |
 | RINEX                | filegen             | `+rnx2crx`                             | File management    | CRINEX              |
 | CRINEX               | filegen             | `+crx2rnx`                             | File management    | RINEX               |
@@ -39,7 +39,7 @@ Quality Control (QC) is the default mode, and synthesizes a report.
 `tbin` I/O:
 
 | Input                | Opmode              | Second argument                        | Application        | Output product(s)   |
-|-------------------------------------------------------------------------------------|--------------------|---------------------|
+|----------------------|---------------------|----------------------------------------|--------------------|---------------------|
 | RINEX                | tbin                | Duration                               | File management    | RINEX Batch         |
 | RINEX                | tbin                | Duration  `+rnx2crx`                   | File management    | CRINEX Batch        |
 | CRINEX               | tbin                | Duration  `+crx2rnx`                   | File management    | RINEX Batch         |
@@ -47,7 +47,7 @@ Quality Control (QC) is the default mode, and synthesizes a report.
 `diff` I/O:
 
 | Input                | Opmode              | Second argument                        | Application        | Output product(s)   |
-|-------------------------------------------------------------------------------------|--------------------|---------------------|
+|----------------------|---------------------|----------------------------------------|--------------------|---------------------|
 | RINEX                | diff                | Reference RINEX File                   | File management    | Special RINEX(A-B)  |
 | CRINEX               | diff                | Reference RINEX File                   | File management    | Special CRINEX(A-B) |
 | CRINEX               | diff                | Reference RINEX File `+crx2rnx`        | File management    | Special RINEX(A-B)  |
