@@ -29,7 +29,7 @@ itertools = "0.14"
 map_3d = "0.1.5"
 
 maud = "0.26"
-plotly = "0.9"
+plotly = "0.12"
 
 clap = { version = "4.4.13", features = ["derive", "color"] }
 serde = { version = "1.0", default-features = false, features = ["derive"] }
