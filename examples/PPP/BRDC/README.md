@@ -21,9 +21,5 @@ requirements to respect with your Navigation RINEX:
 - it must cover the observation time frame
 - it must cover the observed constellations
 
-Basic BRDC navigation examples:
-
 - [esbjergdnk-gps.sh](./SPP/esbjerg-dnk.sh) is the static surveying 
-of the ESBJERG (DNK) GNSS station, using constellation and signals.
-- [mojndnk-gps.sh](mojndnk-gps.sh) is the static surveying
-of the MOJN (DNK) GNSS station, using GPS constellation and signals.
+of the ESBJERG (DNK) GNSS station, using a single GPS pseudo range code

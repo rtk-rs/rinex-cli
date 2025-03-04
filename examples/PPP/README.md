@@ -1,4 +1,4 @@
-`ppp` Command line examples
-===========================
+Post Processed Positioning using `ppp` mode
+===========================================
 
 - [Broadcast (BRDC) Navigation applications](./BRDC)
