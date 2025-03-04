@@ -71,6 +71,8 @@ Summary:
 
 ## Documentation
 
+:warning: All our examples and demos are expected to be execute at the base of this repo.
+
 Once you have installed the tool, read the first few steps:
 
 - [File loading interface](./documentation/FileLoading.md): learn how to load data into the toolbox
