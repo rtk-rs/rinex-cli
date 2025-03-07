@@ -211,7 +211,7 @@ impl Summary {
 
         let satellites = solutions
             .values()
-            .map(|sol| sol.sv())
+            .map(|pvt_sol| pvt_sol.sv.keys().map(|sv| *sv))
             .fold(vec![], |mut list, svnn| {
                 for sv in svnn {
                     list.push(sv);
@@ -623,7 +623,7 @@ impl ReportContent {
 
                 let vdop = solutions
                     .iter()
-                    .map(|(_, sol)| sol.vdop(lat0_rad, lon0_rad))
+                    .map(|(_, sol)| sol.vdop)
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(
@@ -638,7 +638,7 @@ impl ReportContent {
 
                 let hdop = solutions
                     .iter()
-                    .map(|(_, sol)| sol.hdop(lat0_rad, lon0_rad))
+                    .map(|(_, sol)| sol.hdop)
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(
