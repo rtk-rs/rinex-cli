@@ -656,9 +656,9 @@ impl ReportContent {
                 let mut plot =
                     Plot::timedomain_plot("clk_offset", "Clock Offset", "Offset [s]", true);
 
-                let dt = solutions
+                let clock_offset = solutions
                     .iter()
-                    .map(|(_, sol)| sol.dt.to_seconds())
+                    .map(|(_, sol)| sol.clock_offset.to_seconds())
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(
@@ -666,7 +666,7 @@ impl ReportContent {
                     Mode::Markers,
                     MarkerSymbol::Cross,
                     &epochs,
-                    dt,
+                    clock_offset,
                     true,
                 );
                 plot.add_trace(trace);
@@ -676,9 +676,9 @@ impl ReportContent {
                 let mut plot =
                     Plot::timedomain_plot("clk_drift", "Clock Drift", "Drift [s/s]", true);
 
-                let ddt = solutions
+                let clock_drift = solutions
                     .iter()
-                    .map(|(_, sol)| sol.d_dt)
+                    .map(|(_, sol)| sol.clock_drift_s_s)
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(
@@ -686,7 +686,7 @@ impl ReportContent {
                     Mode::Markers,
                     MarkerSymbol::Cross,
                     &epochs,
-                    ddt,
+                    clock_drift,
                     true,
                 );
                 plot.add_trace(trace);

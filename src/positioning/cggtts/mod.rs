@@ -199,7 +199,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
 
                         let (azimuth, elevation) = (pvt_data.azimuth, pvt_data.elevation);
 
-                        let refsys = pvt_solution.dt.to_seconds();
+                        let refsys = pvt_solution.clock_offset.to_seconds();
                         let correction = pvt_data.clock_correction.unwrap_or_default();
                         let refsv = refsys + correction.to_seconds();
 
