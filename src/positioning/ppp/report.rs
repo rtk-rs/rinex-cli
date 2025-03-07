@@ -159,13 +159,13 @@ impl Render for Summary {
                                             "WGS84"
                                         }
                                         td {
-                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_km.0.to_degrees()))
+                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_km.0))
                                         }
                                         td {
-                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_km.1.to_degrees()))
+                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_km.1))
                                         }
                                         td {
-                                            (format!("alt={:.3}km", self.lat_long_alt_ddeg_ddeg_km.2))
+                                            (format!("alt={:.3E}m", self.lat_long_alt_ddeg_ddeg_km.2 * 1.0E3))
                                         }
                                     }
                                     tr {
