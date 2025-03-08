@@ -22,7 +22,6 @@ RTK_CONF=examples/CONFIG/CPP/basic.json
 #   -f: force new report synthesis
 #   -o: custom name
 ./target/release/rinex-cli \
-    -q \
     -f \
     -P $PIPELINE \
     -P "$TIMEFRAME" \
