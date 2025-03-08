@@ -323,6 +323,7 @@ impl ReportContent {
                     18,
                     true,
                 );
+
                 let apriori = Plot::mapbox(
                     vec![lat0_ddeg],
                     vec![lon0_ddeg],
@@ -333,7 +334,9 @@ impl ReportContent {
                     1.0,
                     true,
                 );
+
                 map_proj.add_trace(apriori);
+
                 let mut prev_pct = 0;
                 for (index, (_, sol_i)) in solutions.iter().enumerate() {
                     let pct = index * 100 / nb_solutions;
