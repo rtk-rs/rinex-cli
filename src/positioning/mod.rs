@@ -247,6 +247,7 @@ pub fn precise_positioning(
         Some(fp) => {
             let content = read_to_string(fp)
                 .unwrap_or_else(|e| panic!("failed to read configuration: {}", e));
+
             let mut cfg: Config = serde_json::from_str(&content)
                 .unwrap_or_else(|e| panic!("failed to parse configuration: {}", e));
 
@@ -285,11 +286,13 @@ pub fn precise_positioning(
             cfg
         },
     };
+
     /* Verify requirements and print helpful comments */
     assert!(
         ctx.data.observation().is_some(),
         "Positioning requires Observation RINEX"
     );
+
     if !is_rtk {
         assert!(
             ctx.data.brdc_navigation().is_some(),

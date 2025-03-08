@@ -71,14 +71,7 @@ Summary:
 
 ## Documentation
 
-If you intend to run our examples and tutorials,
-you are expected to first source our `tools/download-data.sh` script.  
-It will download our test data (a few RINEX files) and define the example environment:
-
-```bash
-source tools/download-data.sh
-echo $DATA_DIR
-```
+:warning: All our examples and demos are expected to be execute at the base of this repo.
 
 Once you have installed the tool, read the first few steps:
 

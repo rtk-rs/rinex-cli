@@ -159,13 +159,13 @@ impl Render for Summary {
                                             "WGS84"
                                         }
                                         td {
-                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_km.0.to_degrees()))
+                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_km.0))
                                         }
                                         td {
-                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_km.1.to_degrees()))
+                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_km.1))
                                         }
                                         td {
-                                            (format!("alt={:.3}km", self.lat_long_alt_ddeg_ddeg_km.2))
+                                            (format!("alt={:.3E}m", self.lat_long_alt_ddeg_ddeg_km.2 * 1.0E3))
                                         }
                                     }
                                     tr {
@@ -211,7 +211,7 @@ impl Summary {
 
         let satellites = solutions
             .values()
-            .map(|sol| sol.sv())
+            .map(|pvt_sol| pvt_sol.sv.keys().map(|sv| *sv))
             .fold(vec![], |mut list, svnn| {
                 for sv in svnn {
                     list.push(sv);
@@ -623,7 +623,7 @@ impl ReportContent {
 
                 let vdop = solutions
                     .iter()
-                    .map(|(_, sol)| sol.vdop(lat0_rad, lon0_rad))
+                    .map(|(_, sol)| sol.vdop)
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(
@@ -638,7 +638,7 @@ impl ReportContent {
 
                 let hdop = solutions
                     .iter()
-                    .map(|(_, sol)| sol.hdop(lat0_rad, lon0_rad))
+                    .map(|(_, sol)| sol.hdop)
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(
@@ -656,9 +656,9 @@ impl ReportContent {
                 let mut plot =
                     Plot::timedomain_plot("clk_offset", "Clock Offset", "Offset [s]", true);
 
-                let dt = solutions
+                let clock_offset = solutions
                     .iter()
-                    .map(|(_, sol)| sol.dt.to_seconds())
+                    .map(|(_, sol)| sol.clock_offset.to_seconds())
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(
@@ -666,7 +666,7 @@ impl ReportContent {
                     Mode::Markers,
                     MarkerSymbol::Cross,
                     &epochs,
-                    dt,
+                    clock_offset,
                     true,
                 );
                 plot.add_trace(trace);
@@ -676,9 +676,9 @@ impl ReportContent {
                 let mut plot =
                     Plot::timedomain_plot("clk_drift", "Clock Drift", "Drift [s/s]", true);
 
-                let ddt = solutions
+                let clock_drift = solutions
                     .iter()
-                    .map(|(_, sol)| sol.d_dt)
+                    .map(|(_, sol)| sol.clock_drift_s_s)
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(
@@ -686,7 +686,7 @@ impl ReportContent {
                     Mode::Markers,
                     MarkerSymbol::Cross,
                     &epochs,
-                    ddt,
+                    clock_drift,
                     true,
                 );
                 plot.add_trace(trace);

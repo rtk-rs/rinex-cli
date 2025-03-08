@@ -1,0 +1,8 @@
+{
+    "method": "CPP",
+    "timescale": "GPST",
+    "min_sv_elev": 15.0,
+    "solver": {
+        "gdop_threshold": 10.0
+    }
+}

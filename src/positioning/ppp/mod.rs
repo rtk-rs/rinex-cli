@@ -129,6 +129,8 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                     candidates.push(cd);
                 }
 
+                // panic!("proposal: {:#?}", candidates.iter().map(|cd| cd.sv).collect::<Vec<SV>>());
+
                 match solver.resolve(t, &candidates) {
                     Ok((t, pvt)) => {
                         solutions.insert(t, pvt);
@@ -188,6 +190,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                 }
             }
         } else {
+            // new SV
             match signal.observable {
                 Observable::PhaseRange(_) => {
                     sv_observations.insert(
