@@ -17,6 +17,7 @@ use rinex::{
 };
 
 use gnss_rtk::prelude::{
+    Bias,
     Candidate,
     Carrier as RTKCarrier,
     Duration,
@@ -42,10 +43,8 @@ use crate::{
     positioning::{
         // bd_model,
         cast_rtk_carrier,
-        kb_model,
         // ng_model,
         // tropo_components,
-        rtk_reference_carrier,
         ClockStateProvider,
         EphemerisSource,
         Error as PositioningError,
@@ -53,11 +52,11 @@ use crate::{
 };
 
 /// Resolves CGGTTS tracks from input context
-pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
+pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
     ctx: &Context,
     eph: &'a RefCell<EphemerisSource<'b>>,
     mut clock: CK,
-    mut solver: Solver<O>,
+    mut solver: Solver<O, B>,
     method: Method,
     matches: &ArgMatches,
 ) -> Result<Vec<Track>, PositioningError> {
@@ -81,11 +80,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
         .data
         .observation()
         .expect("RNX2CGGTTS requires OBS RINEX");
-
-    let nav_data = ctx
-        .data
-        .brdc_navigation()
-        .expect("RNX2CGGTTS requires NAV RINEX");
 
     let t0 = obs_data
         .first_epoch()
@@ -195,7 +189,12 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                             .get_mut(&(*sv, sv_reference_obs.clone()))
                             .unwrap();
 
-                        let pvt_data = pvt_solution.sv.get(sv).unwrap(); // infaillible
+                        // infaillible
+                        let pvt_data = pvt_solution
+                            .sv
+                            .iter()
+                            .find(|contrib| contrib.sv == *sv)
+                            .unwrap();
 
                         let (azimuth, elevation) = (pvt_data.azimuth, pvt_data.elevation);
 

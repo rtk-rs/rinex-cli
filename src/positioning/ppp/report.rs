@@ -211,7 +211,7 @@ impl Summary {
 
         let satellites = solutions
             .values()
-            .map(|pvt_sol| pvt_sol.sv.keys().map(|sv| *sv))
+            .map(|pvt_sol| pvt_sol.sv.iter().map(|sv| sv.sv))
             .fold(vec![], |mut list, svnn| {
                 for sv in svnn {
                     list.push(sv);
@@ -311,8 +311,6 @@ impl ReportContent {
             .latlongalt()
             .unwrap_or_else(|e| panic!("latlongalt() physical error: {}", e));
 
-        let (lat0_rad, lon0_rad) = (lat0_ddeg.to_radians(), lon0_ddeg.to_radians());
-
         let summary = Summary::new(cfg, ctx, solutions, (x0_km, y0_km, z0_km));
 
         Self {
@@ -375,14 +373,17 @@ impl ReportContent {
                     let epochs = solutions
                         .iter()
                         .filter_map(|(t, sol)| {
-                            if sol.sv.keys().contains(sv) {
+                            let list = sol.sv.iter().map(|sv| sv.sv).collect::<Vec<_>>();
+                            if list.contains(sv) {
                                 Some(*t)
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let prn = epochs.iter().map(|_| sv.prn).collect::<Vec<_>>();
+
                     let trace = Plot::timedomain_chart(
                         &sv.to_string(),
                         Mode::Markers,
@@ -504,30 +505,35 @@ impl ReportContent {
             tropod_plot: {
                 let mut plot =
                     Plot::timedomain_plot("tropo", "Troposphere Bias", "Error [m]", true);
+
                 for sv in summary.satellites.iter() {
                     let x = solutions
                         .iter()
                         .filter_map(|(t, sol)| {
-                            if sol.sv.keys().contains(sv) {
+                            let list = sol.sv.iter().map(|sv| sv.sv).collect::<Vec<_>>();
+                            if list.contains(sv) {
                                 Some(*t)
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let y = solutions
                         .iter()
                         .filter_map(|(_, sol)| {
-                            if let Some(value) =
-                                sol.sv.iter().filter(|(s, _)| *s == sv).reduce(|k, _| k)
-                            {
-                                let bias = value.1.tropo_bias?;
-                                Some(bias)
+                            if let Some(contrib) = sol.sv.iter().find(|contrib| contrib.sv == *sv) {
+                                if let Some(bias) = contrib.tropo_bias {
+                                    Some(bias)
+                                } else {
+                                    None
+                                }
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let trace = Plot::timedomain_chart(
                         &sv.to_string(),
                         Mode::Markers,
@@ -546,26 +552,30 @@ impl ReportContent {
                     let x = solutions
                         .iter()
                         .filter_map(|(t, sol)| {
-                            if sol.sv.keys().contains(sv) {
+                            let list = sol.sv.iter().map(|sv| sv.sv).collect::<Vec<_>>();
+                            if list.contains(sv) {
                                 Some(*t)
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let y = solutions
                         .iter()
                         .filter_map(|(_, sol)| {
-                            if let Some(value) =
-                                sol.sv.iter().filter(|(s, _)| *s == sv).reduce(|k, _| k)
-                            {
-                                let bias = value.1.iono_bias?;
-                                Some(bias)
+                            if let Some(contrib) = sol.sv.iter().find(|contrib| contrib.sv == *sv) {
+                                if let Some(bias) = contrib.iono_bias {
+                                    Some(bias)
+                                } else {
+                                    None
+                                }
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let trace = Plot::timedomain_chart(
                         &sv.to_string(),
                         Mode::Markers,

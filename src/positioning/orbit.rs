@@ -1,14 +1,10 @@
-use crate::{
-    cli::Context,
-    positioning::{Buffer, EphemerisSource},
-};
+use crate::{cli::Context, positioning::EphemerisSource};
 
-use std::{cell::RefCell, collections::HashMap};
+use std::cell::RefCell;
 
 use gnss_rtk::prelude::{
     Almanac, Epoch, Frame, Orbit, OrbitSource, Vector3, EARTH_J2000, SUN_J2000, SV,
 };
-use rinex::prelude::Carrier;
 
 use anise::errors::AlmanacError;
 
@@ -32,7 +28,7 @@ fn sun_unit_vector(almanac: &Almanac, t: Epoch) -> Result<Vector3<f64>, AlmanacE
 impl<'a, 'b> Orbits<'a, 'b> {
     pub fn new(ctx: &'a Context, eph: &'a RefCell<EphemerisSource<'b>>) -> Self {
         let has_precise = ctx.data.sp3().is_some();
-        let mut s = Self {
+        let s = Self {
             eph,
             has_precise,
             eos: true,
@@ -110,7 +106,7 @@ impl<'a, 'b> Orbits<'a, 'b> {
 }
 
 impl OrbitSource for Orbits<'_, '_> {
-    fn next_at(&mut self, t: Epoch, sv: SV, fr: Frame) -> Option<Orbit> {
+    fn next_at(&mut self, t: Epoch, sv: SV, _: Frame) -> Option<Orbit> {
         // let precise = if self.has_precise {
         //     // interpolation attempt
         //     if let Some(buffer) = self.buff.get_mut(&sv) {

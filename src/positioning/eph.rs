@@ -65,7 +65,6 @@ impl<'a> EphemerisSource<'a> {
     /// [Ephemeris] selection attempt, for [SV] at [Epoch]
     fn try_select(&self, t: Epoch, sv: SV) -> Option<(Epoch, Epoch, &Ephemeris)> {
         let buffer = self.buffer.get(&sv)?;
-        let sv_ts = sv.constellation.timescale()?;
 
         if sv.constellation.is_sbas() {
             buffer
