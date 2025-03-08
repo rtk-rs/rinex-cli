@@ -87,7 +87,7 @@ impl<'a> EphemerisSource<'a> {
                         None
                     }
                 })
-                .min_by_key(|(toc_i, _, _)| (t - *toe_i).abs())
+                .min_by_key(|(_, toe_i, _)| (t - *toe_i).abs())
         }
     }
 

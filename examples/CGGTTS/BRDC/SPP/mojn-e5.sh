@@ -13,7 +13,7 @@
 PIPELINE="Gal;C5Q;>E01"
 
 # Discard the first two hours of that day (another example)
-TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T09:30:00 GPST"
+TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T01:01:30 GPST"
 
 # SPP basic configuratio
 RTK_CONF=examples/CONFIG/SPP/basic.json

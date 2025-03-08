@@ -138,39 +138,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                     }
                 }
 
-                // let tropo = TropoComponents::Unknown;
-                // cd.set_tropo_components(tropo);
-
-                // let mut iono = IonoComponents::Unknown;
-
-                // if let Some(model) = kb_model(nav_data, past_t) {
-                //     iono = IonoComponents::KbModel(model);
-                // } else if let Some(model) = ng_model(nav_data, past_t) {
-                //     iono = IonoComponents::NgModel(model);
-                // } else if let Some(model) = bd_model(nav_data, past_t) {
-                //     iono = IonoComponents::BdModel(model);
-                // }
-
-                // match iono {
-                //     IonoComponents::Unknown => {
-                //         warn!("{} ({}) - undefined ionosphere parameters", past_t, *sv)
-                //     },
-                //     IonoComponents::KbModel(_) => info!(
-                //         "{} ({}) - using KLOBUCHAR ionosphere parameters",
-                //         past_t, *sv
-                //     ),
-                //     IonoComponents::NgModel(_) => info!(
-                //         "{} ({}) - using NEQUICK-G ionosphere parameters",
-                //         past_t, *sv
-                //     ),
-                //     IonoComponents::BdModel(_) => {
-                //         info!("{} ({}) - using BDGIM ionosphere parameters", past_t, *sv)
-                //     },
-                //     _ => {},
-                // }
-
-                // cd.set_iono_components(iono);
-
                 match solver.resolve(past_t, &[cd]) {
                     Ok((t, pvt_solution)) => {
                         // grab "reference" signal
