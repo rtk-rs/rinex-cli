@@ -42,7 +42,8 @@ use rinex::{
 use gnss_qc::prelude::QcExtraPage;
 
 use gnss_rtk::prelude::{
-    Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel, Method, Solver,
+    Bias, BiasRuntime, Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel,
+    Method, Solver,
 };
 
 use thiserror::Error;
@@ -57,6 +58,17 @@ pub enum Error {
     StdioError(#[from] std::io::Error),
     #[error("post process error")]
     PPPPost(#[from] PPPPostError),
+}
+
+struct NullBias {}
+
+impl Bias for NullBias {
+    fn troposphere_bias_m(&self, _: &BiasRuntime) -> f64 {
+        0.0
+    }
+    fn ionosphere_bias_m(&self, _: &BiasRuntime) -> f64 {
+        0.0
+    }
 }
 
 /*
@@ -361,11 +373,14 @@ If your dataset does not describe one, you can manually describe one, see --help
         None => None,
     };
 
+    let bias = NullBias {};
+
     let solver = Solver::new_almanac_frame(
         cfg.clone(),
         ctx.data.almanac.clone(),
         ctx.data.earth_cef,
         orbits,
+        bias,
         apriori_ecef_m,
     );
 

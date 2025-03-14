@@ -60,22 +60,9 @@ pub fn post_process(
     )?;
 
     for (epoch, solution) in solutions {
-        let cartesian = solution.state.to_cartesian_pos_vel() * 1.0E3;
-        let (x_m, y_m, z_m, vel_x_ms, vel_y_ms, vel_z_ms) = (
-            cartesian[0],
-            cartesian[1],
-            cartesian[2],
-            cartesian[3],
-            cartesian[4],
-            cartesian[5],
-        );
-        let (lat_deg, long_deg, alt_km) = solution.state.latlongalt().unwrap_or_else(|e| {
-            panic!(
-                "resolved invalid lat/long/altitude ({}) - check your input",
-                e
-            )
-        });
-        let alt_m = alt_km * 1.0E3;
+        let (x_m, y_m, z_m) = solution.pos_m;
+        let (vel_x_ms, vel_y_ms, vel_z_ms) = solution.vel_m_s;
+        let (lat_deg, long_deg, alt_m) = solution.lat_long_alt_deg_deg_m;
 
         let (lat_rad, long_rad) = (lat_deg.to_radians(), long_deg.to_radians());
         let (hdop, vdop, tdop) = (solution.hdop, solution.vdop, solution.tdop);

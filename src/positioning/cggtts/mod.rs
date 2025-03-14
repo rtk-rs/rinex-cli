@@ -17,16 +17,7 @@ use rinex::{
 };
 
 use gnss_rtk::prelude::{
-    Candidate,
-    Carrier as RTKCarrier,
-    Duration,
-    // IonoComponents,
-    // IonosphereBias,
-    Method,
-    Observation,
-    OrbitSource,
-    Solver,
-    // TropoComponents,
+    Bias, Candidate, Carrier as RTKCarrier, Duration, Method, Observation, OrbitSource, Solver,
     SPEED_OF_LIGHT_M_S,
 };
 
@@ -53,11 +44,11 @@ use crate::{
 };
 
 /// Resolves CGGTTS tracks from input context
-pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
+pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
     ctx: &Context,
     eph: &'a RefCell<EphemerisSource<'b>>,
     mut clock: CK,
-    mut solver: Solver<O>,
+    mut solver: Solver<O, B>,
     method: Method,
     matches: &ArgMatches,
 ) -> Result<Vec<Track>, PositioningError> {
