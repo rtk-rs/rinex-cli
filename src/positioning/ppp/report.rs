@@ -205,7 +205,7 @@ impl Summary {
 
         let satellites = solutions
             .values()
-            .map(|pvt_sol| pvt_sol.sv.iter().map(|sv| sv.sv))
+            .map(|pvt_sol| pvt_sol.sv.iter().map(|contrib| contrib.sv))
             .fold(vec![], |mut list, svnn| {
                 for sv in svnn {
                     list.push(sv);
@@ -363,8 +363,9 @@ impl ReportContent {
                     let epochs = solutions
                         .iter()
                         .filter_map(|(t, sol)| {
-                            let list = sol.sv.iter().map(|sv| sv.sv).collect::<Vec<_>>();
-                            if list.contains(sv) {
+                            let sv_list =
+                                sol.sv.iter().map(|contrib| contrib.sv).collect::<Vec<_>>();
+                            if sv_list.contains(sv) {
                                 Some(*t)
                             } else {
                                 None
@@ -432,7 +433,6 @@ impl ReportContent {
                     .iter()
                     .map(|(_, sol)| {
                         let alt_m = sol.lat_long_alt_deg_deg_m.2;
-                        alt_m
                     })
                     .collect::<Vec<_>>();
 
@@ -509,8 +509,9 @@ impl ReportContent {
                     let x = solutions
                         .iter()
                         .filter_map(|(t, sol)| {
-                            let list = sol.sv.iter().map(|sv| sv.sv).collect::<Vec<_>>();
-                            if list.contains(sv) {
+                            let sv_list =
+                                sol.sv.iter().map(|contrib| contrib.sv).collect::<Vec<_>>();
+                            if sv_list.contains(sv) {
                                 Some(*t)
                             } else {
                                 None
@@ -521,12 +522,14 @@ impl ReportContent {
                     let y = solutions
                         .iter()
                         .filter_map(|(_, sol)| {
-                            if let Some(contrib) = sol.sv.iter().find(|contrib| contrib.sv == *sv) {
-                                if let Some(bias) = contrib.tropo_bias {
-                                    Some(bias)
-                                } else {
-                                    None
-                                }
+                            if let Some(value) = sol
+                                .sv
+                                .iter()
+                                .filter(|contrib| contrib.sv == *sv)
+                                .reduce(|k, _| k)
+                            {
+                                let bias = value.tropo_bias?;
+                                Some(bias)
                             } else {
                                 None
                             }
@@ -551,8 +554,9 @@ impl ReportContent {
                     let x = solutions
                         .iter()
                         .filter_map(|(t, sol)| {
-                            let list = sol.sv.iter().map(|sv| sv.sv).collect::<Vec<_>>();
-                            if list.contains(sv) {
+                            let sv_list =
+                                sol.sv.iter().map(|contrib| contrib.sv).collect::<Vec<_>>();
+                            if sv_list.contains(sv) {
                                 Some(*t)
                             } else {
                                 None
@@ -563,12 +567,14 @@ impl ReportContent {
                     let y = solutions
                         .iter()
                         .filter_map(|(_, sol)| {
-                            if let Some(contrib) = sol.sv.iter().find(|contrib| contrib.sv == *sv) {
-                                if let Some(bias) = contrib.iono_bias {
-                                    Some(bias)
-                                } else {
-                                    None
-                                }
+                            if let Some(value) = sol
+                                .sv
+                                .iter()
+                                .filter(|contrib| contrib.sv == *sv)
+                                .reduce(|k, _| k)
+                            {
+                                let bias = value.iono_bias?;
+                                Some(bias)
                             } else {
                                 None
                             }

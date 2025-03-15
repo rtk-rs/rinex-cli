@@ -21,13 +21,10 @@ use gnss_rtk::prelude::{
     Candidate,
     Carrier as RTKCarrier,
     Duration,
-    // IonoComponents,
-    // IonosphereBias,
     Method,
     Observation,
     OrbitSource,
     Solver,
-    // TropoComponents,
     SPEED_OF_LIGHT_M_S,
 };
 
