@@ -13,7 +13,7 @@ pub fn post_process(
     tracks: &Vec<Track>,
     matches: &ArgMatches,
 ) -> std::io::Result<()> {
-    let obs_data = ctx.data.observation().unwrap();
+    // let obs_data = ctx.data.observation().unwrap();
 
     let mut header = Header::default();
 
@@ -63,11 +63,12 @@ pub fn post_process(
             }
         }
 
-        // TODO
+        // TODO: customizations
         let name = cggtts.standardized_file_name(None, None);
+        let fullpath = ctx.workspace.root.join(name);
 
         cggtts
-            .to_file(&name)
+            .to_file(&fullpath)
             .unwrap_or_else(|e| panic!("CGGTTS formatting error: {}", e));
     }
 

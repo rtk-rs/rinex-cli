@@ -1,6 +1,5 @@
 //! CGGTTS special resolution opmoode.
 use clap::ArgMatches;
-use plotly::common::Calendar;
 
 use std::{cell::RefCell, collections::HashMap, str::FromStr};
 
@@ -10,15 +9,13 @@ pub use post_process::post_process;
 mod report;
 pub use report::Report;
 
-use gnss::prelude::{Constellation, SV};
-
 use rinex::{
     carrier::Carrier,
-    prelude::{Observable, TimeScale},
+    prelude::{Observable, SV},
 };
 
 use gnss_rtk::prelude::{
-    Bias, Candidate, Carrier as RTKCarrier, Duration, Method, Observation, OrbitSource, Solver,
+    Bias, Candidate, Carrier as RTKCarrier, Method, Observation, OrbitSource, Signal, Solver,
     SPEED_OF_LIGHT_M_S,
 };
 
@@ -27,14 +24,30 @@ use cggtts::prelude::{
     Track,
 };
 
-use hifitime::Unit;
-
 use crate::{
     cli::Context,
     positioning::{
         cast_rtk_carrier, ClockStateProvider, EphemerisSource, Error as PositioningError,
     },
 };
+
+fn ref_rinex_observable(ppp: bool, rtk_carrier: RTKCarrier) -> Observable {
+    let mut string = if ppp {
+        "L".to_string()
+    } else {
+        "C".to_string()
+    };
+
+    let carrier = rtk_carrier.to_string();
+    string.push_str(&carrier); // TODO: this is wrong
+
+    Observable::from_str(&string).unwrap_or_else(|e| {
+        panic!(
+            "Signal identification issue: non supported constellation? - {}",
+            e
+        )
+    })
+}
 
 /// Resolves CGGTTS tracks from input context
 pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
@@ -61,9 +74,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
     // scheduling
     let mut past_t = t0;
 
-    // TODO
-    let C1C = Observable::from_str("C1C").unwrap();
-
     // TODO: allow customizations
     let cv_calendar = CommonViewCalendar::bipm();
 
@@ -72,21 +82,24 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
     let mut next_collection_start = cv_calendar.next_data_collection_after(t0);
 
     let mut tracks = Vec::<Track>::new();
-    let mut trackers = HashMap::<(SV, Observable), SVTracker>::new();
+
+    let mut trackers = HashMap::<(SV, Observable), SVTracker>::with_capacity(16);
 
     let mut sv_reference = HashMap::<SV, Observable>::new();
     let mut sv_observations = HashMap::<SV, Vec<Observation>>::new();
 
     info!(
-        "{:?} - CGGTTS mode deployed - {} until next tracking",
+        "{} - CGGTTS mode deployed - {} until next tracking",
         t0,
         next_collection_start - t0
     );
 
+    let mut release = false;
+
     for (index, (t, signal)) in obs_data.signal_observations_sampling_ok_iter().enumerate() {
         if index > 0 && t > past_t {
             if collecting {
-                info!("{:?} - new epoch", past_t);
+                info!("{} - new epoch", past_t);
                 // solving attempt
                 for (sv, observations) in sv_observations.iter() {
                     let mut cd = Candidate::new(*sv, past_t, observations.clone());
@@ -113,6 +126,12 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                                     panic!("internal error: missing SV information")
                                 });
 
+                            let ref_observable = match contrib.signal {
+                                Signal::Single(lhs) | Signal::Dual((lhs, _)) => {
+                                    ref_rinex_observable(method == Method::PPP, lhs)
+                                },
+                            };
+
                             let refsys = pvt.clock_offset.to_seconds();
                             let refsv =
                                 refsys + contrib.clock_correction.unwrap_or_default().to_seconds();
@@ -122,7 +141,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
 
                             // tracker
                             info!(
-                                "({:?} ({}) : new pvt solution (elev={:.2}°, azim={:.2}°, refsv={:.3E}, refsys={:.3})",
+                                "({} ({}) : new pvt solution (elev={:.2}°, azim={:.2}°, refsv={:.3E}, refsys={:.3E})",
                                 past_t, signal.sv, elev_deg, azim_deg, refsv, refsys,
                             );
 
@@ -154,20 +173,25 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                                 elevation: elev_deg,
                             };
 
-                            if let Some(tracker) = trackers.get_mut(&(*sv, C1C.clone())) {
+                            if let Some(tracker) = trackers.get_mut(&(*sv, ref_observable.clone()))
+                            {
                                 tracker.new_observation(data);
                             } else {
-                                let mut tracker = SVTracker::new(*sv, Some(sampling_period));
+                                let mut tracker =
+                                    SVTracker::new(*sv).with_gap_tolerance(sampling_period);
+
                                 tracker.new_observation(data);
-                                trackers.insert((*sv, C1C.clone()), tracker);
+                                trackers.insert((*sv, ref_observable.clone()), tracker);
                             }
                         },
                         Err(e) => {
                             // any PVT solution failure will introduce a gap in the track fitter
-                            error!("{:?} - solver error: {}", past_t, e);
+                            error!("{} - solver error: {}", past_t, e);
                         },
                     }
                 } // for each sv
+
+                sv_observations.clear();
             } // collecting
         } // new epoch
 
@@ -254,16 +278,15 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
 
         // update only on new epochs
         if index > 0 && t > past_t {
-            let next_scheduled_start = cv_calendar.next_period_start_after(past_t);
-
             if collecting {
-                if next_scheduled_start > next_period_start {
+                if t > next_period_start {
+                    release = true;
                     // end of period: release attempt
                     for ((sv, sv_ref), tracker) in trackers.iter_mut() {
                         match tracker.fit() {
                             Ok(fitted) => {
                                 debug!(
-                                    "{:?}({}) - new CGGTTS fit - azim={:.3}° - elev={:.3}° - refsv={:.5E}s srsv={:.5E}s/s",
+                                    "{}({}) - new CGGTTS fit - azim={:.3}° - elev={:.3}° - refsv={:.5E}s srsv={:.5E}s/s",
                                     past_t,
                                     sv,
                                     fitted.azimuth_deg,
@@ -274,36 +297,47 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
 
                                 let data = 0; // TODO
                                 let class = CommonViewClass::SingleChannel; // TODO
-                                let new_track = fitted.to_track(class, data);
+                                let new_track = fitted.to_track(class, data, &sv_ref.to_string());
 
                                 tracks.push(new_track);
                             },
                             Err(e) => {
-                                error!("{:?}({}) - CGGTTS fit error: {}", past_t, sv, e);
+                                error!("{}({}) - CGGTTS fit error: {}", past_t, sv, e);
                             },
                         }
                     }
                 } else {
-                    debug!(
-                        "{:?} - collecting for {}",
-                        past_t,
-                        next_scheduled_start - past_t
-                    );
+                    info!("{} - {} until CGGTTS release", t, next_period_start - t);
                 }
             } else {
                 // not collecting
-                collecting = past_t > next_collection_start;
+                if t >= next_collection_start {
+                    next_period_start = cv_calendar.next_period_start_after(t);
+                    collecting = true;
+                    debug!("{} - CGGTTS tracking started", t);
+                    info!("{} - {} until CGGTTS release", t, next_period_start - t);
+                }
 
                 if !collecting {
-                    debug!(
-                        "{:?} - {} until next tracking",
-                        past_t,
-                        next_collection_start - past_t
-                    );
-                } else {
-                    debug!("{:?} - CGGTTS tracking started", past_t);
+                    debug!("{} - {} until next tracking", t, next_collection_start - t);
                 }
             }
+        }
+
+        if release {
+            // reset
+            release = false;
+            next_period_start = cv_calendar.next_period_start_after(t);
+            next_collection_start = cv_calendar.next_data_collection_after(past_t);
+            collecting = t > next_collection_start;
+
+            if collecting {
+                debug!("{} - CGGTTS tracking started", t);
+            } else {
+                debug!("{} - {} until next tracking", t, next_collection_start - t);
+            }
+
+            info!("{} - {} until CGGTTS release", t, next_period_start - t);
         }
 
         past_t = t;

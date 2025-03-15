@@ -69,50 +69,8 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                         }
                     }
 
-                    // let tropo = TropoComponents::Unknown;
-                    // cd.set_tropo_components(tropo);
-
-                    // let mut iono = IonoComponents::Unknown;
-
-                    // match ctx.data.brdc_navigation() {
-                    //     Some(brdc) => {
-                    //         if let Some(model) = kb_model(brdc, past_t) {
-                    //             iono = IonoComponents::KbModel(model);
-                    //         // } else if let Some(model) = ng_model(brdc, past_t) {
-                    //         //     iono = IonoComponents::NgModel(model);
-                    //         // } else if let Some(model) = bd_model(brdc, past_t) {
-                    //         //     iono = IonoComponents::BdModel(model);
-                    //         }
-                    //     },
-                    //     None => {
-                    //         // cd.set_iono_components(IonoComponents::Unknown);
-                    //     },
-                    // }
-
-                    // match iono {
-                    //     IonoComponents::Unknown => {
-                    //         warn!("{} ({}) - undefined ionosphere parameters", past_t, *sv)
-                    //     },
-                    //     IonoComponents::KbModel(_) => info!(
-                    //         "{} ({}) - using KLOBUCHAR ionosphere parameters",
-                    //         past_t, *sv
-                    //     ),
-                    //     IonoComponents::NgModel(_) => info!(
-                    //         "{} ({}) - using NEQUICK-G ionosphere parameters",
-                    //         past_t, *sv
-                    //     ),
-                    //     IonoComponents::BdModel(_) => {
-                    //         info!("{} ({}) - using BDGIM ionosphere parameters", past_t, *sv)
-                    //     },
-                    //     _ => {},
-                    // }
-
-                    // cd.set_iono_components(iono);
-
                     candidates.push(cd);
                 }
-
-                // panic!("proposal: {:#?}", candidates.iter().map(|cd| cd.sv).collect::<Vec<SV>>());
 
                 match solver.resolve(t, &candidates) {
                     Ok((t, pvt)) => {
