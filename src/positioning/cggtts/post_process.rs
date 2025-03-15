@@ -62,8 +62,14 @@ pub fn post_process(
                 cggtts.tracks.push(trk.clone());
             }
         }
+
+        // TODO
+        let name = cggtts.standardized_file_name(None, None);
+
+        cggtts
+            .to_file(&name)
+            .unwrap_or_else(|e| panic!("CGGTTS formatting error: {}", e));
     }
-    let mut fd = ctx.workspace.create_file(&cggtts.filename());
-    write!(fd, "{}", cggtts)?;
+
     Ok(())
 }

@@ -142,12 +142,12 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                             elevation: elev_deg,
                         };
 
-                        if let Some(tracker) = trackers.get_mut(&(cd.sv, C1C.clone())) {
+                        if let Some(tracker) = trackers.get_mut(&(*sv, C1C.clone())) {
                             tracker.new_observation(data);
                         } else {
-                            let mut tracker = SVTracker::new(cd.sv, Some(sampling_period));
+                            let mut tracker = SVTracker::new(*sv, Some(sampling_period));
                             tracker.new_observation(data);
-                            trackers.insert((cd.sv, C1C.clone()), tracker);
+                            trackers.insert((*sv, C1C.clone()), tracker);
                         }
                     },
                     Err(e) => {
