@@ -19,24 +19,13 @@ pub use report::Report;
 
 pub mod post_process;
 
-use gnss_rtk::prelude::{
-    Bias,
-    // TropoComponents,
-    Candidate,
-    Epoch,
-    // IonoComponents,
-    Observation,
-    OrbitSource,
-    PVTSolution,
-    Solver,
-};
+use gnss_rtk::prelude::{Bias, Candidate, Epoch, Observation, OrbitSource, PVTSolution, Solver};
 
 pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
     ctx: &Context,
     eph: &'a RefCell<EphemerisSource<'b>>,
     mut clock: CK,
     mut solver: Solver<O, B>,
-    // rx_lat_ddeg: f64,
 ) -> BTreeMap<Epoch, PVTSolution> {
     let mut past_epoch = Option::<Epoch>::None;
 

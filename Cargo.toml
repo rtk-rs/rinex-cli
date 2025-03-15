@@ -17,6 +17,12 @@ edition = "2021"
 readme = "README.md"
 rust-version = "1.64"
 
+[features]
+default = ["cggtts"]
+
+# Enable CGGTTS solver
+cggtts = ["dep:cggtts"]
+
 [dependencies]
 log = "0.4"
 walkdir = "2.4.0"
@@ -44,11 +50,11 @@ hifitime = { version = "4.0", features = ["serde", "std"] }
 gnss-rs = { version = "2.3.5", features = ["serde"] }
 gnss-qc = { git = "https://github.com/rtk-rs/gnss-qc", branch = "main", features = ["sp3"] } 
 
-sp3 = { git = "https://github.com/rtk-rs/sp3", branch = "main", features = ["processing", "anise", "flate2", "serde"] }
+sp3 = { version = "1.1.2", features = ["processing", "anise", "flate2", "serde"] }
 
 rinex = { git = "https://github.com/rtk-rs/rinex", branch = "main",  features = ["obs", "nav", "ionex", "antex", "clock", "flate2", "processing", "serde"] }
 
 gnss-rtk = { git = "https://github.com/rtk-rs/gnss-rtk", branch = "nav_x4", features = ["serde"] }
 # gnss-rtk = { path = "../gnss-rtk", features = ["serde"] }
 
-cggtts = { version = "4.2.0", features = ["serde", "scheduler"], optional = true }
+cggtts = { git = "https://github.com/rtk-rs/cggtts", features = ["serde", "scheduler", "tracker"], optional = true }

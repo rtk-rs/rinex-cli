@@ -173,21 +173,24 @@ impl ReportContent {
             elev_plot: {
                 let mut plot =
                     Plot::timedomain_plot("elev_plot", "Elevation", "Elevation [°]", true);
+
                 for sv in summary.satellites.iter() {
                     let x = solutions
                         .iter()
                         .filter_map(|trk| if trk.sv == *sv { Some(trk.epoch) } else { None })
                         .collect::<Vec<_>>();
+
                     let y = solutions
                         .iter()
                         .filter_map(|trk| {
                             if trk.sv == *sv {
-                                Some(trk.elevation)
+                                Some(trk.elevation_deg)
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let trace = Plot::timedomain_chart(
                         &sv.to_string(),
                         Mode::Markers,
@@ -203,11 +206,13 @@ impl ReportContent {
             ionod_plot: {
                 let mut plot =
                     Plot::timedomain_plot("ionod_plot", "Ionospheric Delay", "Delay [s]", true);
+
                 for sv in summary.satellites.iter() {
                     let x = solutions
                         .iter()
                         .filter_map(|trk| if trk.sv == *sv { Some(trk.epoch) } else { None })
                         .collect::<Vec<_>>();
+
                     let y = solutions
                         .iter()
                         .filter_map(|trk| {
@@ -218,6 +223,7 @@ impl ReportContent {
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let trace = Plot::timedomain_chart(
                         &format!("{}(mdio)", sv),
                         Mode::Markers,
@@ -226,6 +232,7 @@ impl ReportContent {
                         y,
                         true,
                     );
+
                     plot.add_trace(trace);
 
                     let x = solutions
@@ -238,6 +245,7 @@ impl ReportContent {
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let y = solutions
                         .iter()
                         .filter_map(|trk| {
@@ -249,6 +257,7 @@ impl ReportContent {
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let trace = Plot::timedomain_chart(
                         &format!("{}(mdio)", sv),
                         Mode::Markers,
@@ -264,11 +273,13 @@ impl ReportContent {
             tropod_plot: {
                 let mut plot =
                     Plot::timedomain_plot("tropod_plot", "Tropospheric Delay", "Delay [s]", true);
+
                 for sv in summary.satellites.iter() {
                     let x = solutions
                         .iter()
                         .filter_map(|trk| if trk.sv == *sv { Some(trk.epoch) } else { None })
                         .collect::<Vec<_>>();
+
                     let y = solutions
                         .iter()
                         .filter_map(|trk| {

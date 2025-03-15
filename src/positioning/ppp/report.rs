@@ -422,6 +422,7 @@ impl ReportContent {
                     long,
                     false,
                 );
+
                 plot.add_trace(trace);
                 plot
             },

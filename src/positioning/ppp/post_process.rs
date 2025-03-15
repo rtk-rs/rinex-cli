@@ -66,6 +66,7 @@ pub fn post_process(
 
         let (lat_rad, long_rad) = (lat_deg.to_radians(), long_deg.to_radians());
         let (hdop, vdop, tdop) = (solution.hdop, solution.vdop, solution.tdop);
+
         writeln!(
             fd,
             "{:?}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}",
