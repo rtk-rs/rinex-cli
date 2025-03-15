@@ -127,7 +127,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                                     panic!("internal error: missing SV information")
                                 });
 
-<<<<<<< HEAD
                             let ref_observable = match contrib.signal {
                                 Signal::Single(lhs) | Signal::Dual((lhs, _)) => {
                                     ref_rinex_observable(method == Method::PPP, lhs)
