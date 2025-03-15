@@ -23,7 +23,6 @@ RTK_CONF=examples/CONFIG/CPP/basic.json
 #   -o: custom name
 ./target/release/rinex-cli \
     -f \
-    -q \
     -P $PIPELINE \
     -P "$TIMEFRAME" \
     -o "BRDC-GPS-CPP" \
