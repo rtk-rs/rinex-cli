@@ -173,7 +173,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                 }
             }
         } else {
-            // new SV
             match signal.observable {
                 Observable::PhaseRange(_) => {
                     sv_observations.insert(

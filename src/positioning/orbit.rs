@@ -1,37 +1,27 @@
 use crate::{cli::Context, positioning::EphemerisSource};
-
+use gnss_rtk::prelude::{Epoch, Frame, Orbit, OrbitSource, SV};
 use std::cell::RefCell;
 
-use gnss_rtk::prelude::{
-    Almanac, Epoch, Frame, Orbit, OrbitSource, Vector3, EARTH_J2000, SUN_J2000, SV,
-};
-
-use anise::errors::AlmanacError;
-
 pub struct Orbits<'a, 'b> {
-    eos: bool,
-    has_precise: bool,
     eph: &'a RefCell<EphemerisSource<'b>>,
     // buff: HashMap<SV, Buffer<(f64, f64, f64)>>,
     // iter: Box<dyn Iterator<Item = (Epoch, SV, (f64, f64, f64))> + 'a>,
 }
 
-fn sun_unit_vector(almanac: &Almanac, t: Epoch) -> Result<Vector3<f64>, AlmanacError> {
-    let earth_sun = almanac.transform(EARTH_J2000, SUN_J2000, t, None)?;
-    Ok(Vector3::new(
-        earth_sun.radius_km.x * 1000.0,
-        earth_sun.radius_km.y * 1000.0,
-        earth_sun.radius_km.z * 1000.0,
-    ))
-}
+// fn sun_unit_vector(almanac: &Almanac, t: Epoch) -> Result<Vector3<f64>, AlmanacError> {
+//     let earth_sun = almanac.transform(EARTH_J2000, SUN_J2000, t, None)?;
+//     Ok(Vector3::new(
+//         earth_sun.radius_km.x * 1000.0,
+//         earth_sun.radius_km.y * 1000.0,
+//         earth_sun.radius_km.z * 1000.0,
+//     ))
+// }
 
 impl<'a, 'b> Orbits<'a, 'b> {
     pub fn new(ctx: &'a Context, eph: &'a RefCell<EphemerisSource<'b>>) -> Self {
-        let has_precise = ctx.data.sp3().is_some();
+        // let has_precise = ctx.data.sp3().is_some();
         let s = Self {
             eph,
-            has_precise,
-            eos: true,
             // buff: HashMap::with_capacity(16),
             // iter: {
             //     if let Some(sp3) = ctx.data.sp3() {

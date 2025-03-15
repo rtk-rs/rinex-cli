@@ -205,9 +205,7 @@ fn rtk_reference_carrier(carrier: RTKCarrier) -> bool {
 //    }
 //}
 
-/*
- * Grabs nearest KB model (in time)
- */
+/// Returns a [KbModel]
 pub fn kb_model(nav: &Rinex, t: Epoch) -> Option<KbModel> {
     let (nav_key, model) = nav
         .nav_klobuchar_models_iter()
