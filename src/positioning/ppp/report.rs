@@ -2,14 +2,7 @@ use crate::cli::Context;
 use std::collections::BTreeMap;
 
 use gnss_rtk::prelude::{
-    Config as NaviConfig,
-    Duration,
-    Epoch,
-    //Filter as NaviFilter,
-    Method as NaviMethod,
-    PVTSolution,
-    TimeScale,
-    SV,
+    Config as NaviConfig, Duration, Epoch, Method as NaviMethod, PVTSolution, TimeScale, SV,
 };
 
 use gnss_qc::{
@@ -67,7 +60,7 @@ struct Summary {
     satellites: Vec<SV>,
     timescale: TimeScale,
     final_err_m: (f64, f64, f64),
-    lat_long_alt_ddeg_ddeg_km: (f64, f64, f64),
+    lat_long_alt_ddeg_ddeg_m: (f64, f64, f64),
 }
 
 impl Render for Summary {
@@ -93,6 +86,7 @@ impl Render for Summary {
                         }
                         tr {
                             th class="is-info" {
+                                "Orbit"
                             }
                             td {
                                 (self.orbit)
@@ -159,13 +153,13 @@ impl Render for Summary {
                                             "WGS84"
                                         }
                                         td {
-                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_km.0))
+                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_m.0))
                                         }
                                         td {
-                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_km.1))
+                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_m.1))
                                         }
                                         td {
-                                            (format!("alt={:.3E}m", self.lat_long_alt_ddeg_ddeg_km.2 * 1.0E3))
+                                            (format!("alt={:.3E}m", self.lat_long_alt_ddeg_ddeg_m.2))
                                         }
                                     }
                                     tr {
@@ -207,11 +201,11 @@ impl Summary {
         let (mut first_epoch, mut last_epoch) = (Epoch::default(), Epoch::default());
 
         let mut final_err_m = (0.0_f64, 0.0_f64, 0.0_f64);
-        let (mut lat_ddeg, mut long_ddeg, mut alt_km) = (0.0_f64, 0.0_f64, 0.0_f64);
+        let (mut lat_ddeg, mut long_ddeg, mut alt_m) = (0.0_f64, 0.0_f64, 0.0_f64);
 
         let satellites = solutions
             .values()
-            .map(|pvt_sol| pvt_sol.sv.keys().map(|sv| *sv))
+            .map(|pvt_sol| pvt_sol.sv.iter().map(|contrib| contrib.sv))
             .fold(vec![], |mut list, svnn| {
                 for sv in svnn {
                     list.push(sv);
@@ -228,28 +222,23 @@ impl Summary {
                 first_epoch = *t;
             }
 
-            let posvel = sol.state.to_cartesian_pos_vel();
-            (lat_ddeg, long_ddeg, alt_km) = sol
-                .state
-                .latlongalt()
-                .unwrap_or_else(|e| panic!("latlongalt: physical error {}", e));
-
-            let (x_m, y_m, z_m) = (posvel[0] * 1.0E3, posvel[1] * 1.0E3, posvel[2] * 1.0E3);
-
+            let (x_m, y_m, z_m) = sol.pos_m;
             let (err_x, err_y, err_z) = (x_m - x0_m, y_m - y0_m, z_m - z0_m);
 
+            (lat_ddeg, long_ddeg, alt_m) = sol.lat_long_alt_deg_deg_m;
             final_err_m = (err_x, err_y, err_z);
 
             last_epoch = *t;
             timescale = sol.timescale;
         }
+
         Self {
             first_epoch,
             last_epoch,
             timescale,
             satellites,
             final_err_m,
-            lat_long_alt_ddeg_ddeg_km: (lat_ddeg, long_ddeg, alt_km),
+            lat_long_alt_ddeg_ddeg_m: (lat_ddeg, long_ddeg, alt_m),
             orbit: {
                 if ctx.data.has_sp3() {
                     "SP3".to_string()
@@ -307,11 +296,10 @@ impl ReportContent {
         let pos_vel = rx_orbit.to_cartesian_pos_vel();
 
         let (x0_km, y0_km, z0_km) = (pos_vel[0], pos_vel[1], pos_vel[2]);
+
         let (lat0_ddeg, lon0_ddeg, _) = rx_orbit
             .latlongalt()
             .unwrap_or_else(|e| panic!("latlongalt() physical error: {}", e));
-
-        let (lat0_rad, lon0_rad) = (lat0_ddeg.to_radians(), lon0_ddeg.to_radians());
 
         let summary = Summary::new(cfg, ctx, solutions, (x0_km, y0_km, z0_km));
 
@@ -325,6 +313,7 @@ impl ReportContent {
                     18,
                     true,
                 );
+
                 let apriori = Plot::mapbox(
                     vec![lat0_ddeg],
                     vec![lon0_ddeg],
@@ -335,7 +324,9 @@ impl ReportContent {
                     1.0,
                     true,
                 );
+
                 map_proj.add_trace(apriori);
+
                 let mut prev_pct = 0;
                 for (index, (_, sol_i)) in solutions.iter().enumerate() {
                     let pct = index * 100 / nb_solutions;
@@ -347,10 +338,7 @@ impl ReportContent {
                             (format!("Solver: {:02}%", pct), false)
                         };
 
-                        let (lat_ddeg, long_ddeg, _) = sol_i
-                            .state
-                            .latlongalt()
-                            .unwrap_or_else(|e| panic!("latlongalt: physical error: {}", e));
+                        let (lat_ddeg, long_ddeg, _) = sol_i.lat_long_alt_deg_deg_m;
 
                         let scatter = Plot::mapbox(
                             vec![lat_ddeg],
@@ -375,14 +363,18 @@ impl ReportContent {
                     let epochs = solutions
                         .iter()
                         .filter_map(|(t, sol)| {
-                            if sol.sv.keys().contains(sv) {
+                            let sv_list =
+                                sol.sv.iter().map(|contrib| contrib.sv).collect::<Vec<_>>();
+                            if sv_list.contains(sv) {
                                 Some(*t)
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let prn = epochs.iter().map(|_| sv.prn).collect::<Vec<_>>();
+
                     let trace = Plot::timedomain_chart(
                         &sv.to_string(),
                         Mode::Markers,
@@ -391,6 +383,7 @@ impl ReportContent {
                         prn,
                         true,
                     );
+
                     plot.add_trace(trace);
                 }
                 plot
@@ -402,10 +395,7 @@ impl ReportContent {
                 let ddeg = solutions
                     .iter()
                     .map(|(_, sol)| {
-                        let (lat_ddeg, long_ddeg, _) = sol
-                            .state
-                            .latlongalt()
-                            .unwrap_or_else(|e| panic!("latlongalt: physical error: {}", e));
+                        let (lat_ddeg, long_ddeg, _) = sol.lat_long_alt_deg_deg_m;
                         (lat_ddeg, long_ddeg)
                     })
                     .collect::<Vec<_>>();
@@ -421,7 +411,9 @@ impl ReportContent {
                     lati,
                     true,
                 );
+
                 plot.add_trace(trace);
+
                 let trace = Plot::timedomain_chart(
                     "longitude",
                     Mode::Markers,
@@ -430,22 +422,21 @@ impl ReportContent {
                     long,
                     false,
                 );
+
                 plot.add_trace(trace);
                 plot
             },
             altitude_plot: {
                 let mut plot =
                     Plot::timedomain_plot("altitude_plot", "Altitude", "Altitude [m]", true);
+
                 let alt_m = solutions
                     .iter()
                     .map(|(_, sol)| {
-                        let (_, _, alt_km) = sol
-                            .state
-                            .latlongalt()
-                            .unwrap_or_else(|e| panic!("latlongalt: physical error: {}", e));
-                        alt_km * 1.0E3
+                        let alt_m = sol.lat_long_alt_deg_deg_m.2;
                     })
                     .collect::<Vec<_>>();
+
                 let trace = Plot::timedomain_chart(
                     "altitude",
                     Mode::Markers,
@@ -454,24 +445,29 @@ impl ReportContent {
                     alt_m,
                     true,
                 );
+
                 plot.add_trace(trace);
                 plot
             },
             vel_plot: {
                 let mut plot =
                     Plot::timedomain_plot("vel_plot", "Velocity", "Velocity [m/s]", true);
+
                 let vel_x = solutions
                     .iter()
-                    .map(|(_, sol)| sol.state.to_cartesian_pos_vel()[3] * 1.0E3)
+                    .map(|(_, sol)| sol.vel_m_s.0)
                     .collect::<Vec<_>>();
+
                 let vel_y = solutions
                     .iter()
-                    .map(|(_, sol)| sol.state.to_cartesian_pos_vel()[4] * 1.0E3)
+                    .map(|(_, sol)| sol.vel_m_s.1)
                     .collect::<Vec<_>>();
+
                 let vel_z = solutions
                     .iter()
-                    .map(|(_, sol)| sol.state.to_cartesian_pos_vel()[5] * 1.0E3)
+                    .map(|(_, sol)| sol.vel_m_s.2)
                     .collect::<Vec<_>>();
+
                 let trace = Plot::timedomain_chart(
                     "vel_x",
                     Mode::Markers,
@@ -480,7 +476,9 @@ impl ReportContent {
                     vel_x,
                     true,
                 );
+
                 plot.add_trace(trace);
+
                 let trace = Plot::timedomain_chart(
                     "vel_y",
                     Mode::Markers,
@@ -489,7 +487,9 @@ impl ReportContent {
                     vel_y,
                     true,
                 );
+
                 plot.add_trace(trace);
+
                 let trace = Plot::timedomain_chart(
                     "vel_z",
                     Mode::Markers,
@@ -498,36 +498,45 @@ impl ReportContent {
                     vel_z,
                     true,
                 );
+
                 plot.add_trace(trace);
                 plot
             },
             tropod_plot: {
                 let mut plot =
                     Plot::timedomain_plot("tropo", "Troposphere Bias", "Error [m]", true);
+
                 for sv in summary.satellites.iter() {
                     let x = solutions
                         .iter()
                         .filter_map(|(t, sol)| {
-                            if sol.sv.keys().contains(sv) {
+                            let sv_list =
+                                sol.sv.iter().map(|contrib| contrib.sv).collect::<Vec<_>>();
+                            if sv_list.contains(sv) {
                                 Some(*t)
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let y = solutions
                         .iter()
                         .filter_map(|(_, sol)| {
-                            if let Some(value) =
-                                sol.sv.iter().filter(|(s, _)| *s == sv).reduce(|k, _| k)
+                            if let Some(value) = sol
+                                .sv
+                                .iter()
+                                .filter(|contrib| contrib.sv == *sv)
+                                .reduce(|k, _| k)
                             {
-                                let bias = value.1.tropo_bias?;
+                                let bias = value.tropo_bias?;
                                 Some(bias)
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let trace = Plot::timedomain_chart(
                         &sv.to_string(),
                         Mode::Markers,
@@ -546,26 +555,33 @@ impl ReportContent {
                     let x = solutions
                         .iter()
                         .filter_map(|(t, sol)| {
-                            if sol.sv.keys().contains(sv) {
+                            let sv_list =
+                                sol.sv.iter().map(|contrib| contrib.sv).collect::<Vec<_>>();
+                            if sv_list.contains(sv) {
                                 Some(*t)
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let y = solutions
                         .iter()
                         .filter_map(|(_, sol)| {
-                            if let Some(value) =
-                                sol.sv.iter().filter(|(s, _)| *s == sv).reduce(|k, _| k)
+                            if let Some(value) = sol
+                                .sv
+                                .iter()
+                                .filter(|contrib| contrib.sv == *sv)
+                                .reduce(|k, _| k)
                             {
-                                let bias = value.1.iono_bias?;
+                                let bias = value.iono_bias?;
                                 Some(bias)
                             } else {
                                 None
                             }
                         })
                         .collect::<Vec<_>>();
+
                     let trace = Plot::timedomain_chart(
                         &sv.to_string(),
                         Mode::Markers,
@@ -694,6 +710,7 @@ impl ReportContent {
             },
             coords_err_plot: {
                 let mut plot = Plot::timedomain_plot("xy_plot", "X/Y/Z Error", "Error [m]", true);
+
                 let trace = Plot::timedomain_chart(
                     "x err",
                     Mode::Markers,
@@ -701,11 +718,13 @@ impl ReportContent {
                     &epochs,
                     solutions
                         .values()
-                        .map(|sol| sol.state.to_cartesian_pos_vel()[0] - x0_km)
+                        .map(|sol| sol.pos_m.0 / 1.0E3 - x0_km)
                         .collect(),
                     true,
                 );
+
                 plot.add_trace(trace);
+
                 let trace = Plot::timedomain_chart(
                     "y err",
                     Mode::Markers,
@@ -713,11 +732,13 @@ impl ReportContent {
                     &epochs,
                     solutions
                         .values()
-                        .map(|sol| sol.state.to_cartesian_pos_vel()[1] - y0_km)
+                        .map(|sol| sol.pos_m.1 / 1.0E3 - y0_km)
                         .collect(),
                     true,
                 );
+
                 plot.add_trace(trace);
+
                 let trace = Plot::timedomain_chart(
                     "z err",
                     Mode::Markers,
@@ -725,10 +746,11 @@ impl ReportContent {
                     &epochs,
                     solutions
                         .values()
-                        .map(|sol| sol.state.to_cartesian_pos_vel()[2] - z0_km)
+                        .map(|sol| sol.pos_m.2 / 1.0E3 - z0_km)
                         .collect(),
                     true,
                 );
+
                 plot.add_trace(trace);
                 plot
             },
@@ -741,6 +763,7 @@ impl ReportContent {
                     "Z Error [m]",
                     true,
                 );
+
                 let trace = Plot::chart_3d(
                     "Error",
                     Mode::Markers,
@@ -748,15 +771,15 @@ impl ReportContent {
                     &epochs,
                     solutions
                         .values()
-                        .map(|sol| sol.state.to_cartesian_pos_vel()[0] - x0_km)
+                        .map(|sol| sol.pos_m.0 / 1.0E3 - x0_km)
                         .collect(),
                     solutions
                         .values()
-                        .map(|sol| sol.state.to_cartesian_pos_vel()[1] - y0_km)
+                        .map(|sol| sol.pos_m.1 / 1.0E3 - y0_km)
                         .collect(),
                     solutions
                         .values()
-                        .map(|sol| sol.state.to_cartesian_pos_vel()[2] - z0_km)
+                        .map(|sol| sol.pos_m.2 / 1.0E3 - z0_km)
                         .collect(),
                 );
                 plot.add_trace(trace);

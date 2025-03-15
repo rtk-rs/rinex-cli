@@ -1,31 +1,32 @@
 #!/bin/sh
 
-# Application   : Ephemeris radio broadcast
+# Application   : CGGTTS solutions using radio navigation
 # Station       : ESBJERG (DNK) 
 # Surveying     : 24hr
 # Constellation : GPS
-# Technique     : CPP (L1+L2)
+# Technique     : SPP (L1)
 
 # Preprocessing
-# This will select GPS (L1+L2) pseudo range (mask filter)
+# This will select GPS + Single frequency pseudo range
+# L1 pseudo range selection (mask filter)
 # PRN filter example
-PIPELINE="GPS;C1C,C2W;>G01"
+PIPELINE="GPS;C1C;>G01"
 
 # Discard the first two hours of that day (another example)
-TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T09:30:00 GPST"
-TIMEFRAME=">=2020-06-25T02:10:00 GPST;<2020-06-25T04:02:00 GPST"
+TIMEFRAME=">=2020-06-25T00:00:00 GPST;<2020-06-25T00:08:00 GPST"
 
-# CPP basic configuratio
-RTK_CONF=examples/CONFIG/CPP/basic.json
+# SPP basic configuratio
+RTK_CONF=examples/CONFIG/SPP/basic.json
 
-# Analysis + ppp solutions
+# Analysis +cggtts solutions
 #   -f: force new report synthesis
 #   -o: custom name
 ./target/release/rinex-cli \
+    -q \
     -f \
     -P $PIPELINE \
     -P "$TIMEFRAME" \
-    -o "BRDC-GPS-CPP" \
+    -o "BRDC-GPS-SPP" \
     --fp data/CRNX/V3/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz \
     --fp data/NAV/V3/ESBC00DNK_R_20201770000_01D_MN.rnx.gz \
-    ppp -c $RTK_CONF
+    ppp -c $RTK_CONF --cggtts

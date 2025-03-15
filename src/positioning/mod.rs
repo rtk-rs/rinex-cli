@@ -42,10 +42,23 @@ use rinex::{
 use gnss_qc::prelude::QcExtraPage;
 
 use gnss_rtk::prelude::{
-    Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel, Method, Solver,
+    Bias, BiasRuntime, Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel,
+    Method, Solver, TroposphereModel,
 };
 
 use thiserror::Error;
+
+struct BiasModel {}
+
+impl Bias for BiasModel {
+    fn ionosphere_bias_m(&self, _: &BiasRuntime) -> f64 {
+        0.0
+    }
+
+    fn troposphere_bias_m(&self, rtm: &BiasRuntime) -> f64 {
+        TroposphereModel::Niel.bias_m(rtm)
+    }
+}
 
 #[derive(Debug, Error)]
 pub enum Error {
@@ -192,9 +205,7 @@ fn rtk_reference_carrier(carrier: RTKCarrier) -> bool {
 //    }
 //}
 
-/*
- * Grabs nearest KB model (in time)
- */
+/// Returns a [KbModel]
 pub fn kb_model(nav: &Rinex, t: Epoch) -> Option<KbModel> {
     let (nav_key, model) = nav
         .nav_klobuchar_models_iter()
@@ -351,6 +362,8 @@ If your dataset does not describe one, you can manually describe one, see --help
         }
     }
 
+    let bias_model = BiasModel {};
+
     let apriori = ctx.rx_orbit;
 
     let apriori_ecef_m = match apriori {
@@ -366,6 +379,7 @@ If your dataset does not describe one, you can manually describe one, see --help
         ctx.data.almanac.clone(),
         ctx.data.earth_cef,
         orbits,
+        bias_model,
         apriori_ecef_m,
     );
 

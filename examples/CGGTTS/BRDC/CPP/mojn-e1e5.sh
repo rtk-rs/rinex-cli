@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Application   : Ephemeris radio broadcast
+# Application   : CGGTTS solutions using radio navigation
 # Station       : MOJN (DNK) 
 # Surveying     : 24hr
 # Constellation : Galileo
@@ -18,10 +18,11 @@ TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T09:30:00 GPST"
 # CPP basic configuratio
 RTK_CONF=examples/CONFIG/CPP/basic.json
 
-# Analysis + ppp solutions
+# Analysis +cggtts solutions
 #   -f: force new report synthesis
 #   -o: custom name
 ./target/release/rinex-cli \
+    -q \
     -f \
     -P $PIPELINE \
     -P "$TIMEFRAME" \

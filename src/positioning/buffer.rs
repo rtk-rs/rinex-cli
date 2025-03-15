@@ -10,6 +10,7 @@ impl<T> Buffer<T> {
             inner: Vec::with_capacity(malloc),
         }
     }
+
     pub fn contains(&self, x: &Epoch) -> Option<&T> {
         self.inner
             .iter()
@@ -17,9 +18,11 @@ impl<T> Buffer<T> {
             .reduce(|k, _| k)
             .map(|(_, y)| y)
     }
+
     pub fn push(&mut self, x: Epoch, y: T) {
         self.inner.push((x, y));
     }
+
     pub fn feasible(&self, t: Epoch, order: usize) -> bool {
         if self.inner.len() < order + 2 {
             return false;
@@ -31,21 +34,25 @@ impl<T> Buffer<T> {
             false
         }
     }
+
     pub fn discard(&mut self, t: Epoch, order: usize) {
         if let Some(center) = self.central_index(t) {
             if center > order + 2 {}
         }
     }
+
     fn central_t(&self, t: Epoch) -> Option<&Epoch> {
         self.inner
             .iter()
             .min_by_key(|(t_i, _)| (*t_i - t).abs())
             .and_then(|(t, _)| Some(t))
     }
+
     fn central_index(&self, t: Epoch) -> Option<usize> {
         let t_c = self.central_t(t)?;
         self.inner.iter().position(|(t_i, _)| t_i == t_c)
     }
+
     /// Will panic if .feasible() is not respected
     pub fn interpolate<F: Fn(&[(Epoch, T)]) -> T>(&self, t: Epoch, order: usize, interp: F) -> T {
         let center = self.central_index(t).unwrap();

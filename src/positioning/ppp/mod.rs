@@ -1,14 +1,7 @@
 //! PPP solver
 use crate::{
     cli::Context,
-    positioning::{
-        //bd_model,
-        cast_rtk_carrier,
-        kb_model,
-        //ng_model,
-        ClockStateProvider,
-        EphemerisSource,
-    },
+    positioning::{cast_rtk_carrier, ClockStateProvider, EphemerisSource},
 };
 
 use std::{
@@ -26,23 +19,13 @@ pub use report::Report;
 
 pub mod post_process;
 
-use gnss_rtk::prelude::{
-    Candidate,
-    Epoch,
-    // IonoComponents,
-    Observation,
-    OrbitSource,
-    PVTSolution,
-    Solver,
-    // TropoComponents,
-};
+use gnss_rtk::prelude::{Bias, Candidate, Epoch, Observation, OrbitSource, PVTSolution, Solver};
 
-pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
+pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
     ctx: &Context,
     eph: &'a RefCell<EphemerisSource<'b>>,
     mut clock: CK,
-    mut solver: Solver<O>,
-    // rx_lat_ddeg: f64,
+    mut solver: Solver<O, B>,
 ) -> BTreeMap<Epoch, PVTSolution> {
     let mut past_epoch = Option::<Epoch>::None;
 
@@ -190,7 +173,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource>(
                 }
             }
         } else {
-            // new SV
             match signal.observable {
                 Observable::PhaseRange(_) => {
                     sv_observations.insert(
