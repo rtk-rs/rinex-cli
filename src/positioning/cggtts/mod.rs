@@ -1,5 +1,6 @@
 //! CGGTTS special resolution opmoode.
 use clap::ArgMatches;
+use plotly::common::Calendar;
 
 use std::{cell::RefCell, collections::HashMap, str::FromStr};
 
@@ -20,7 +21,8 @@ use gnss_rtk::prelude::{
 };
 
 use cggtts::prelude::{
-    CommonViewCalendar, CommonViewClass, Observation as FitObservation, SVTracker, Track,
+    CommonViewCalendar, CommonViewClass, FittedData, Observation as FitObservation, SVTracker,
+    Track,
 };
 
 use crate::{
@@ -125,6 +127,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                                     panic!("internal error: missing SV information")
                                 });
 
+<<<<<<< HEAD
                             let ref_observable = match contrib.signal {
                                 Signal::Single(lhs) | Signal::Dual((lhs, _)) => {
                                     ref_rinex_observable(method == Method::PPP, lhs)
