@@ -1,6 +1,5 @@
 //! CGGTTS special resolution opmoode.
 use clap::ArgMatches;
-use plotly::common::Calendar;
 
 use std::{cell::RefCell, collections::HashMap, str::FromStr};
 
@@ -191,6 +190,8 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                         },
                     }
                 } // for each sv
+
+                sv_observations.clear();
             } // collecting
         } // new epoch
 
