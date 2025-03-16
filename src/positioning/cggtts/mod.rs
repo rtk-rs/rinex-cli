@@ -1,4 +1,4 @@
-//! CGGTTS special resolution opmoode.
+//! CGGTTS special resolution opmode.
 use clap::ArgMatches;
 
 use std::{cell::RefCell, collections::HashMap, str::FromStr};
@@ -11,7 +11,7 @@ pub use report::Report;
 
 use rinex::{
     carrier::Carrier,
-    prelude::{Observable, SV},
+    prelude::{Constellation, Observable, SV},
 };
 
 use gnss_rtk::prelude::{
@@ -31,22 +31,28 @@ use crate::{
     },
 };
 
-fn ref_rinex_observable(ppp: bool, rtk_carrier: RTKCarrier) -> Observable {
-    let mut string = if ppp {
+fn rinex_ref_observable(ppp: bool, observations: &[Observation]) -> String {
+    let prefix = if ppp {
         "L".to_string()
     } else {
         "C".to_string()
     };
 
-    let carrier = rtk_carrier.to_string();
-    string.push_str(&carrier); // TODO: this is wrong
+    for observation in observations.iter() {
+        match observation.carrier {
+            RTKCarrier::L1 | RTKCarrier::E1 | RTKCarrier::B1aB1c => {
+                // TODO: not if a prefered signal is selected
+                return format!("{}1C", prefix);
+            },
+            carrier => {
+                // TODO: possibly select a prefered signal
+                let formatted = carrier.to_string();
+                return format!("{}{}C", prefix, &formatted[1..2]);
+            },
+        }
+    }
 
-    Observable::from_str(&string).unwrap_or_else(|e| {
-        panic!(
-            "Signal identification issue: non supported constellation? - {}",
-            e
-        )
-    })
+    "C1C".to_string()
 }
 
 /// Resolves CGGTTS tracks from input context
@@ -83,9 +89,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
 
     let mut tracks = Vec::<Track>::new();
 
-    let mut trackers = HashMap::<(SV, Observable), SVTracker>::with_capacity(16);
-
-    let mut sv_reference = HashMap::<SV, Observable>::new();
+    let mut trackers = HashMap::<(SV, String), SVTracker>::with_capacity(16);
     let mut sv_observations = HashMap::<SV, Vec<Observation>>::new();
 
     info!(
@@ -103,6 +107,8 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                 // solving attempt
                 for (sv, observations) in sv_observations.iter() {
                     let mut cd = Candidate::new(*sv, past_t, observations.clone());
+
+                    let ref_observable = rinex_ref_observable(method == Method::PPP, &observations);
 
                     match clock.next_clock_at(past_t, *sv) {
                         Some(dt) => cd.set_clock_correction(dt),
@@ -125,12 +131,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                                 .unwrap_or_else(|| {
                                     panic!("internal error: missing SV information")
                                 });
-
-                            let ref_observable = match contrib.signal {
-                                Signal::Single(lhs) | Signal::Dual((lhs, _)) => {
-                                    ref_rinex_observable(method == Method::PPP, lhs)
-                                },
-                            };
 
                             let refsys = pvt.clock_offset.to_seconds();
                             let refsv =
@@ -297,7 +297,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
 
                                 let data = 0; // TODO
                                 let class = CommonViewClass::SingleChannel; // TODO
-                                let new_track = fitted.to_track(class, data, &sv_ref.to_string());
+                                let new_track = fitted.to_track(class, data, &sv_ref);
 
                                 tracks.push(new_track);
                             },

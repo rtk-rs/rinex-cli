@@ -10,7 +10,7 @@
 # This will select Galileo + Single frequency pseudo range
 # L1 pseudo range selection (mask filter)
 # PRN filter example
-PIPELINE="Gal;C1C;E03"
+PIPELINE="Gal;C5Q;E03,E15"
 
 # Discard the first two hours of that day (another example)
 TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T09:30:00 GPST"

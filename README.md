@@ -98,10 +98,15 @@ by substracting one from the other
 Dive into the world of precise navigation:
 
 - [Introduction to the PPP (Post Processed Positioning) opmode](./documentation/PPP.md)
-
-- [Focus on the PPP +cggtts special option](./documentation/CGGTTS.md)
-
+- [PPP with special +cggtts option](./documentation/CGGTTS.md)
 - [Many examples](./examples/README.md) are provided, spanning many applications
+
+Demos
+=====
+
+- [Zero Repair (-z) to obtain valid PVT solutions](./demos)
+- [Apriori knowledge and PVT solution solving](./demos)
+- [RINEX to CSV export](./demos)
 
 Special Thanks
 ==============
