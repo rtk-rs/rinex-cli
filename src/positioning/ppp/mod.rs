@@ -74,6 +74,10 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
 
                 match solver.resolve(t, &candidates) {
                     Ok((t, pvt)) => {
+                        info!(
+                            "{} : new pvt solution {:?} dt={}",
+                            t, pvt.pos_m, pvt.clock_offset
+                        );
                         solutions.insert(t, pvt);
                     },
                     Err(e) => warn!("{} : pvt solver error \"{}\"", t, e),

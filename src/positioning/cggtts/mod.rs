@@ -132,16 +132,16 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                                     panic!("internal error: missing SV information")
                                 });
 
+                            let (azim_deg, elev_deg) = (contrib.azimuth, contrib.elevation);
+
                             let refsys = pvt.clock_offset.to_seconds();
+
                             let refsv =
                                 refsys + contrib.clock_correction.unwrap_or_default().to_seconds();
 
-                            let elev_deg = contrib.elevation;
-                            let azim_deg = contrib.azimuth;
-
                             // tracker
                             info!(
-                                "({} ({}) : new pvt solution (elev={:.2}°, azim={:.2}°, refsv={:.3E}, refsys={:.3E})",
+                                "{} ({}) : new pvt solution (elev={:.2}°, azim={:.2}°, refsv={:.3E}, refsys={:.3E})",
                                 past_t, signal.sv, elev_deg, azim_deg, refsv, refsys,
                             );
 
