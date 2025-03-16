@@ -159,7 +159,7 @@ impl Render for Summary {
                                             (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_m.1))
                                         }
                                         td {
-                                            (format!("alt={:.3E}m", self.lat_long_alt_ddeg_ddeg_m.2))
+                                            (format!("alt={:.3}m", self.lat_long_alt_ddeg_ddeg_m.2))
                                         }
                                     }
                                     tr {
@@ -432,9 +432,7 @@ impl ReportContent {
 
                 let alt_m = solutions
                     .iter()
-                    .map(|(_, sol)| {
-                        let alt_m = sol.lat_long_alt_deg_deg_m.2;
-                    })
+                    .map(|(_, sol)| sol.lat_long_alt_deg_deg_m.2)
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(
