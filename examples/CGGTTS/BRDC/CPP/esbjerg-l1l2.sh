@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Application   : CGGTTS solutions using radio navigation 
+# Application   : CGGTTS using radio navigation
 # Station       : ESBJERG (DNK) 
 # Surveying     : 24hr
 # Constellation : GPS
@@ -9,16 +9,15 @@
 # Preprocessing
 # This will select GPS (L1+L2) pseudo range (mask filter)
 # PRN filter example
-PIPELINE="GPS;C1C,C2W;>G01"
+PIPELINE="GPS;C1C,C2W;G15"
 
 # Discard the first two hours of that day (another example)
-TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T09:30:00 GPST"
-TIMEFRAME=">=2020-06-25T02:10:00 GPST;<2020-06-25T04:02:00 GPST"
+TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T23:00:00 GPST"
 
 # CPP basic configuratio
 RTK_CONF=examples/CONFIG/CPP/basic.json
 
-# Analysis +cggtts solutions
+# Analysis + ppp solutions
 #   -f: force new report synthesis
 #   -o: custom name
 ./target/release/rinex-cli \
