@@ -99,10 +99,9 @@ impl<'a> EphemerisSource<'a> {
                 return Some((toc_i, toe_i, eph_i.clone()));
             } else {
                 self.consume_one();
-                attempt += 1;
-            }
-            if attempt == 10 {
-                return None;
+                if self.eos {
+                    return None;
+                }
             }
         }
     }

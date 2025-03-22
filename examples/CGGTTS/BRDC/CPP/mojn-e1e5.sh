@@ -10,10 +10,10 @@
 # This will select Galileo + Single frequency pseudo range
 # L1 pseudo range selection (mask filter)
 # PRN filter example
-PIPELINE="Gal;C1C,C5Q;E03,E15"
+PIPELINE="Gal;C1C,C5Q;>E01"
 
 # Discard the first two hours of that day (another example)
-TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T09:30:00 GPST"
+TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T12:30:00 GPST"
 
 # CPP basic configuration
 RTK_CONF=examples/CONFIG/CPP/basic.json
@@ -22,7 +22,6 @@ RTK_CONF=examples/CONFIG/CPP/basic.json
 #   -f: force new report synthesis
 #   -o: custom name
 ./target/release/rinex-cli \
-    -q \
     -f \
     -P $PIPELINE \
     -P "$TIMEFRAME" \

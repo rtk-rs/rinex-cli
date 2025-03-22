@@ -297,6 +297,8 @@ impl ReportContent {
 
         let (x0_km, y0_km, z0_km) = (pos_vel[0], pos_vel[1], pos_vel[2]);
 
+        let (x0_m, y0_m, z0_m) = (x0_km * 1.0E3, y0_km * 1.0E3, z0_km * 1.0E3);
+
         let (lat0_ddeg, lon0_ddeg, _) = rx_orbit
             .latlongalt()
             .unwrap_or_else(|e| panic!("latlongalt() physical error: {}", e));
@@ -714,10 +716,7 @@ impl ReportContent {
                     Mode::Markers,
                     MarkerSymbol::Cross,
                     &epochs,
-                    solutions
-                        .values()
-                        .map(|sol| sol.pos_m.0 / 1.0E3 - x0_km)
-                        .collect(),
+                    solutions.values().map(|sol| sol.pos_m.0 - x0_m).collect(),
                     true,
                 );
 
@@ -728,10 +727,7 @@ impl ReportContent {
                     Mode::Markers,
                     MarkerSymbol::Cross,
                     &epochs,
-                    solutions
-                        .values()
-                        .map(|sol| sol.pos_m.1 / 1.0E3 - y0_km)
-                        .collect(),
+                    solutions.values().map(|sol| sol.pos_m.1 - y0_m).collect(),
                     true,
                 );
 
@@ -742,10 +738,7 @@ impl ReportContent {
                     Mode::Markers,
                     MarkerSymbol::Cross,
                     &epochs,
-                    solutions
-                        .values()
-                        .map(|sol| sol.pos_m.2 / 1.0E3 - z0_km)
-                        .collect(),
+                    solutions.values().map(|sol| sol.pos_m.2 - z0_m).collect(),
                     true,
                 );
 
@@ -767,18 +760,9 @@ impl ReportContent {
                     Mode::Markers,
                     MarkerSymbol::Cross,
                     &epochs,
-                    solutions
-                        .values()
-                        .map(|sol| sol.pos_m.0 / 1.0E3 - x0_km)
-                        .collect(),
-                    solutions
-                        .values()
-                        .map(|sol| sol.pos_m.1 / 1.0E3 - y0_km)
-                        .collect(),
-                    solutions
-                        .values()
-                        .map(|sol| sol.pos_m.2 / 1.0E3 - z0_km)
-                        .collect(),
+                    solutions.values().map(|sol| sol.pos_m.0 - x0_m).collect(),
+                    solutions.values().map(|sol| sol.pos_m.1 - y0_m).collect(),
+                    solutions.values().map(|sol| sol.pos_m.2 - z0_m).collect(),
                 );
                 plot.add_trace(trace);
                 plot

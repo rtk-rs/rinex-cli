@@ -21,9 +21,6 @@ mod cggtts; // CGGTTS special solver
 #[cfg(feature = "cggtts")]
 use cggtts::{post_process as cggtts_post_process, Report as CggttsReport};
 
-#[cfg(feature = "cggtts")]
-use gnss_rtk::prelude::PVTSolutionType;
-
 // mod rtk;
 // pub use rtk::RemoteRTKReference;
 
@@ -265,10 +262,6 @@ pub fn precise_positioning(
             /*
              * CGGTTS special case
              */
-            #[cfg(feature = "cggtts")]
-            if matches.get_flag("cggtts") {
-                cfg.solution = PVTSolutionType::TimeOnly;
-            }
             #[cfg(not(feature = "cggtts"))]
             if matches.get_flag("cggtts") {
                 panic!("--cggtts option not available: compile with cggtts option");
@@ -284,10 +277,6 @@ pub fn precise_positioning(
             /*
              * CGGTTS special case
              */
-            #[cfg(feature = "cggtts")]
-            if matches.get_flag("cggtts") {
-                cfg.solution = PVTSolutionType::TimeOnly;
-            }
             #[cfg(not(feature = "cggtts"))]
             if matches.get_flag("cggtts") {
                 panic!("--cggtts option not available: compile with cggtts option");

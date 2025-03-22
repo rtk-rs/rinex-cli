@@ -87,9 +87,13 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
     let mut next_period_start = cv_calendar.next_period_start_after(t0);
     let mut next_collection_start = cv_calendar.next_data_collection_after(t0);
 
+    let mut candidates = Vec::<Candidate>::with_capacity(4);
+
     let mut tracks = Vec::<Track>::new();
 
+    let c1c_ref_observable = "C1C".to_string();
     let mut trackers = HashMap::<(SV, String), SVTracker>::with_capacity(16);
+
     let mut sv_observations = HashMap::<SV, Vec<Observation>>::new();
 
     info!(
@@ -104,12 +108,13 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
         if index > 0 && t > past_t {
             if collecting {
                 info!("{} - new epoch", past_t);
-                // solving attempt
                 for (sv, observations) in sv_observations.iter() {
+                    // create new candidate
                     let mut cd = Candidate::new(*sv, past_t, observations.clone());
 
-                    let ref_observable = rinex_ref_observable(method == Method::PPP, &observations);
+                    // ref_observable = rinex_ref_observable(method == Method::PPP, &observations);
 
+                    // fixup and customizations
                     match clock.next_clock_at(past_t, *sv) {
                         Some(dt) => cd.set_clock_correction(dt),
                         None => error!("{} ({}) - no clock correction available", past_t, *sv),
@@ -122,31 +127,28 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                         }
                     }
 
-                    match solver.resolve(past_t, &[cd]) {
-                        Ok((_, pvt)) => {
-                            let contrib = pvt
-                                .sv
-                                .iter()
-                                .find(|contrib| contrib.sv == *sv)
-                                .unwrap_or_else(|| {
-                                    panic!("internal error: missing SV information")
-                                });
+                    candidates.push(cd);
+                }
+
+                match solver.resolve(past_t, &candidates) {
+                    Ok((_, pvt)) => {
+                        for sv_contrib in pvt.sv.iter() {
+                            let (azim_deg, elev_deg) = (sv_contrib.azimuth, sv_contrib.elevation);
 
                             let refsys = pvt.clock_offset.to_seconds();
-                            let refsv =
-                                refsys + contrib.clock_correction.unwrap_or_default().to_seconds();
 
-                            let elev_deg = contrib.elevation;
-                            let azim_deg = contrib.azimuth;
+                            let refsv = refsys
+                                + sv_contrib.clock_correction.unwrap_or_default().to_seconds();
 
                             // tracker
                             info!(
-                                "({} ({}) : new pvt solution (elev={:.2}°, azim={:.2}°, refsv={:.3E}, refsys={:.3E})",
+                                "{} ({}) : new pvt solution (elev={:.2}°, azim={:.2}°, refsv={:.3E}, refsys={:.3E})",
                                 past_t, signal.sv, elev_deg, azim_deg, refsv, refsys,
                             );
 
                             // tropod model
-                            let mdtr = contrib.tropo_bias.unwrap_or_default() / SPEED_OF_LIGHT_M_S;
+                            let mdtr =
+                                sv_contrib.tropo_bias.unwrap_or_default() / SPEED_OF_LIGHT_M_S;
 
                             // ionod
                             let mdio = 0.0;
@@ -173,24 +175,27 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                                 elevation: elev_deg,
                             };
 
-                            if let Some(tracker) = trackers.get_mut(&(*sv, ref_observable.clone()))
+                            if let Some(tracker) =
+                                trackers.get_mut(&(sv_contrib.sv, c1c_ref_observable.clone()))
                             {
                                 tracker.new_observation(data);
                             } else {
-                                let mut tracker =
-                                    SVTracker::new(*sv).with_gap_tolerance(sampling_period);
+                                let mut tracker = SVTracker::new(sv_contrib.sv)
+                                    .with_gap_tolerance(sampling_period);
 
                                 tracker.new_observation(data);
-                                trackers.insert((*sv, ref_observable.clone()), tracker);
+                                trackers
+                                    .insert((sv_contrib.sv, c1c_ref_observable.clone()), tracker);
                             }
-                        },
-                        Err(e) => {
-                            // any PVT solution failure will introduce a gap in the track fitter
-                            error!("{} - solver error: {}", past_t, e);
-                        },
-                    }
-                } // for each sv
+                        }
+                    },
+                    Err(e) => {
+                        // any PVT solution failure will introduce a gap in the track fitter
+                        error!("{} - solver error: {}", past_t, e);
+                    },
+                }
 
+                candidates.clear();
                 sv_observations.clear();
             } // collecting
         } // new epoch
