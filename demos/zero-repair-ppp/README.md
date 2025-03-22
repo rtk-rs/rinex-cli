@@ -1,5 +1,5 @@
-Zero repair (-z) and PPP opmode
-===============================
+Zero repair (-z) to obtain valid PVT solutions
+==============================================
 
 One application of the `-z` zero repair flag is to correct invalid observations
 produced incorrectly by low quality setups or receivers.
@@ -17,6 +17,9 @@ rinex-cli \
 	--fp data/CRNX/V3/NYA100NOR_S_20241280000_01D_30S_MO.crx.gz \
 	--fp data/NAV/V3/NYA100NOR_S_20241280000_01D_GN.rnx.gz \
 	ppp -c examples/CONFIG/SPP/basic.json
+
+[...]
+panic: Physical non sense - rx=2024-05-07T12:30:30 GPST prior tx=2024-05-07T12:30:30.000123693 GPST
 ```
 
 Or any dual signal technique involving `C5X`, for example `C1C+C5X CPP`:
@@ -28,9 +31,12 @@ rinex-cli \
 	--fp data/CRNX/V3/NYA100NOR_S_20241280000_01D_30S_MO.crx.gz \
 	--fp data/NAV/V3/NYA100NOR_S_20241280000_01D_GN.rnx.gz \
 	ppp -c examples/CONFIG/CPP/basic.json
+
+[...]
+panic: Physical non sense - rx=2024-05-07T12:30:30 GPST prior tx=2024-05-07T12:30:30.000171848 GPST
 ```
 
-You can also see that `C1C SPP` gives correct results, because that signal is correctly encoded:
+You can also see that `C1C SPP` gives correct results, because that signal was correctly encoded:
 
 ```bash
 rinex-cli \
