@@ -104,7 +104,7 @@ Dive into the world of precise navigation:
 Demos
 =====
 
-- [Zero Repair (-z) to obtain valid PVT solutions](./demos)
+- [Zero Repair (-z) to obtain valid PVT solutions](./demos/zero-repair-ppp)
 - [Apriori knowledge and PVT solution solving](./demos)
 - [RINEX to CSV export](./demos)
 
