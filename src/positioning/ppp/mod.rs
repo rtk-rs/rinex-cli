@@ -50,7 +50,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
         let rtk_carrier = cast_rtk_carrier(carrier);
 
         if let Some(past_t) = past_epoch {
-            if t != past_t {
+            if t > past_t {
                 // New epoch: solving attempt
                 for (sv, observations) in sv_observations.iter() {
                     // Create new candidate
@@ -72,15 +72,15 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                     candidates.push(cd);
                 }
 
-                match solver.resolve(t, &candidates) {
-                    Ok((t, pvt)) => {
+                match solver.resolve(past_t, &candidates) {
+                    Ok((new_t, pvt)) => {
                         info!(
                             "{} : new pvt solution {:?} dt={}",
-                            t, pvt.pos_m, pvt.clock_offset
+                            new_t, pvt.pos_m, pvt.clock_offset
                         );
-                        solutions.insert(t, pvt);
+                        solutions.insert(new_t, pvt);
                     },
-                    Err(e) => warn!("{} : pvt solver error \"{}\"", t, e),
+                    Err(e) => warn!("{} : pvt solver error \"{}\"", past_t, e),
                 }
 
                 candidates.clear();
