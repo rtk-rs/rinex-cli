@@ -16,6 +16,9 @@ categories = [
 edition = "2021"
 readme = "README.md"
 rust-version = "1.64"
+exclude = [
+    "data/*",
+]
 
 [features]
 default = []
