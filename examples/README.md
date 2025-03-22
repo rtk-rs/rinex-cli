@@ -9,4 +9,6 @@ Command line and applications, per opmode.
 
 ## Demos
 
-- [Zero Repair (-z) to obtain valid PVT solutions](../demos/zero-repair")
+We have a demo folder that is here to illustrate specific topics:
+
+- [Zero Repair (-z) to obtain valid PVT solutions](../demos/zero-repair-ppp")

@@ -13,7 +13,7 @@
 PIPELINE="Gal;C1C,C5Q;>E01"
 
 # Discard the first two hours of that day (another example)
-TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T12:30:00 GPST"
+TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T23:30:00 GPST"
 
 # CPP basic configuration
 RTK_CONF=examples/CONFIG/CPP/basic.json
