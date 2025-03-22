@@ -1,5 +1,5 @@
 use crate::{cli::Context, positioning::EphemerisSource};
-use gnss_rtk::prelude::{Epoch, Frame, Orbit, OrbitSource, SV};
+use gnss_rtk::prelude::{Duration, Epoch, Frame, Orbit, OrbitSource, SV};
 use std::cell::RefCell;
 
 pub struct Orbits<'a, 'b> {
@@ -163,7 +163,11 @@ impl OrbitSource for Orbits<'_, '_> {
             let (x_km, y_km, z_km) = (state[0], state[1], state[2]);
             debug!(
                 "{}({}) keplerian state (ECEF): x={}km,y={}km,z={}km",
-                t, sv, x_km, y_km, z_km
+                t.round(Duration::from_milliseconds(1.0)),
+                sv,
+                x_km,
+                y_km,
+                z_km
             );
             Some(orbit)
         } else {
