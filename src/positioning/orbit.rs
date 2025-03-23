@@ -13,6 +13,7 @@ use gnss_rtk::prelude::{
 use std::{cell::RefCell, collections::HashMap};
 
 const INTERP_ORDER: usize = 11;
+const BUFFER_SIZE: usize = INTERP_ORDER + 1;
 const INTERP_ORDER_X2: usize = INTERP_ORDER * 2;
 
 pub struct Orbits<'a, 'b> {
@@ -21,7 +22,7 @@ pub struct Orbits<'a, 'b> {
     sampling_period: Duration,
     eph: &'a RefCell<EphemerisSource<'b>>,
     sv_buffers: HashMap<SV, Buffer<Coords3d>>,
-    sv_snapshots: HashMap<SV, CenteredSnapshot<INTERP_ORDER, Coords3d>>,
+    sv_snapshots: HashMap<SV, CenteredSnapshot<BUFFER_SIZE, Coords3d>>,
     iter: Box<dyn Iterator<Item = (Epoch, SV, (f64, f64, f64))> + 'a>,
 }
 
@@ -36,7 +37,7 @@ fn sun_unit_vector(almanac: &Almanac, t: Epoch) -> Result<Vector3<f64>, AlmanacE
 
 impl<'a, 'b> Orbits<'a, 'b> {
     pub fn new(ctx: &'a Context, eph: &'a RefCell<EphemerisSource<'b>>) -> Self {
-        Self {
+        let mut s = Self {
             eph,
             eos: false,
             sampling_period: if let Some(sp3) = ctx.data.sp3() {
@@ -94,12 +95,21 @@ impl<'a, 'b> Orbits<'a, 'b> {
                     Box::new([].into_iter())
                 }
             },
+        };
+
+        if s.has_precise {
+            // fill in buffer
+            s.consume_many(BUFFER_SIZE);
         }
+
+        s
     }
 
     fn consume_one(&mut self) {
         if let Some((t, sv, (x_km, y_km, z_km))) = self.iter.next() {
             let coords = Coords3d::new(x_km, y_km, z_km);
+
+            debug!("SP3_sv={} | t={}", sv, t);
 
             if let Some(buf) = self.sv_buffers.get_mut(&sv) {
                 buf.push(t, coords);
@@ -126,28 +136,30 @@ impl<'a, 'b> Orbits<'a, 'b> {
     }
 
     fn next_precise_at(&mut self, _: usize, t: Epoch, sv: SV, frame: Frame) -> Option<Orbit> {
-        let last_t = t + INTERP_ORDER as f64 * self.sampling_period;
+        let min_t = t - ((INTERP_ORDER + 1) / 2) as f64 * self.sampling_period;
+        let max_t = t + ((INTERP_ORDER + 1) / 2) as f64 * self.sampling_period;
 
         while !self.eos {
             self.consume_many(INTERP_ORDER_X2);
 
             if let Some(buffer) = self.sv_buffers.get(&sv) {
-                if buffer.last_t >= last_t {
+                if buffer.last_t >= max_t {
                     break;
                 }
             }
         }
 
+        // centered buffer
         if self.sv_snapshots.get(&sv).is_none() {
             self.sv_snapshots.insert(sv, CenteredSnapshot::new());
         }
 
         let sv_snapshot = self.sv_snapshots.get_mut(&sv).unwrap();
-
         let sv_buffer = self.sv_buffers.get(&sv)?;
-        sv_buffer.centered_snapshot(t, sv_snapshot);
 
-        if !sv_snapshot.centered(t) {
+        sv_buffer.centered_snapshot(t, self.sampling_period, sv_snapshot);
+
+        if !sv_snapshot.centered(t, self.sampling_period) {
             return None;
         }
 

@@ -1,16 +1,17 @@
-use hifitime::{Epoch, Unit};
+use hifitime::{Duration, Epoch};
 
 pub trait CenteredDataPoints<T> {
     fn zero() -> T;
 }
 
 pub struct CenteredSnapshot<const M: usize, T: Copy + CenteredDataPoints<T>> {
-    size: usize,
+    pub size: usize,
     inner: [(Epoch, T); M],
 }
 
 impl<const M: usize, T: Copy + CenteredDataPoints<T>> CenteredSnapshot<M, T> {
     pub fn new() -> Self {
+        assert!(M % 2 == 0, "only odd interpolation orders supported");
         Self {
             size: 0,
             inner: [(Epoch::default(), T::zero()); M],
@@ -18,7 +19,6 @@ impl<const M: usize, T: Copy + CenteredDataPoints<T>> CenteredSnapshot<M, T> {
     }
 
     pub fn rotate(&mut self) {
-        self.size -= 1;
         self.inner.rotate_right(1);
     }
 
@@ -34,13 +34,15 @@ impl<const M: usize, T: Copy + CenteredDataPoints<T>> CenteredSnapshot<M, T> {
         }
     }
 
-    pub fn centered(&self, x: Epoch) -> bool {
+    pub fn centered(&self, x: Epoch, dt: Duration) -> bool {
         if !self.valid() {
             return false;
         }
-        let x_i = self.inner[M / 2].0;
+        let x_i = self.inner[M / 2 - 1].0;
+        debug!("x_i={} | target={}", x_i, x);
+
         let dt_i = (x - x_i).abs();
-        dt_i < 2.0 * Unit::Nanosecond
+        dt_i < dt
     }
 
     pub fn interpolate<F: Fn(&[(Epoch, T); M]) -> T>(&self, interp: F) -> T {

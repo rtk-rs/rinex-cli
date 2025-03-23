@@ -48,7 +48,7 @@ use gnss_rtk::prelude::{
 
 use thiserror::Error;
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy)]
 pub struct Coords3d {
     pub x: f64,
     pub y: f64,
@@ -282,7 +282,7 @@ pub fn precise_positioning(
             let content = read_to_string(fp)
                 .unwrap_or_else(|e| panic!("failed to read configuration: {}", e));
 
-            let mut cfg: Config = serde_json::from_str(&content)
+            let cfg: Config = serde_json::from_str(&content)
                 .unwrap_or_else(|e| panic!("failed to parse configuration: {}", e));
 
             /*
@@ -298,7 +298,7 @@ pub fn precise_positioning(
         },
         None => {
             let method = Method::default();
-            let mut cfg = Config::static_ppp_preset(method);
+            let cfg = Config::static_ppp_preset(method);
 
             /*
              * CGGTTS special case
