@@ -1,5 +1,5 @@
-SPP
-===
+Final SPP
+=========
 
 The SPP navigation technique uses a single pseudo range code for each SV in sight.
 
@@ -11,6 +11,6 @@ The SPP navigation technique uses a single pseudo range code for each SV in sigh
   - [Using E1](./mojn-e1.sh)
   - [Using E5](./mojn-e5.sh)
 
-## What's next
+## What next
 
 Continue your learning journey by moving to the [CPP Dual Pseudo Range examples](../CPP)
