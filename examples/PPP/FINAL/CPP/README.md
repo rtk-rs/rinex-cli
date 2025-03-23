@@ -1,5 +1,5 @@
-CPP
-===
+Final CPP
+=========
 
 The CPP navigation technique uses two pseudo range codes to cancel ionospheric bias.  
 Once two signals (two carrier frequencies) have been sampled for a single SV, any ionosphere modeling
@@ -11,4 +11,3 @@ and other cancellation option is automatically disabled: we always prefer phyisi
 - MOJN (Denmark) static station surveying
   - [Using L1+L2](./mojn-l1l2.sh)
   - [Using E1+E5](./mojn-e1e5.sh)
-  - [Using GPS + Galileo](./mojn-gps-gal.sh)

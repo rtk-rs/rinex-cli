@@ -9,10 +9,10 @@
 # Preprocessing
 # This will select GPS (L1+L2) pseudo range (mask filter)
 # PRN filter example
-PIPELINE="GPS;C1C,C2W;>G01"
+PIPELINE="GPS;C1C,C2W"
 
 # Discard the first two hours of that day (another example)
-TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T06:05:00 GPST"
+TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T12:00:00 GPST"
 
 # CPP basic configuratio
 RTK_CONF=examples/CONFIG/CPP/basic.json

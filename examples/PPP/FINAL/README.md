@@ -14,15 +14,22 @@ providing one of those files. The command lines are 99% identical to the BRDC ca
 From the user perspective, this scenario is a little more complex because it requires
 one more input. Yet it is easier to deploy than RTK which requires much more input.
 
-Notes on Clock profiles
-=======================
+Notes on time frame
+===================
+
+The same basic requirements from the simple BRDC use case applies.  
+The SP3 time frame will now limit the signal observations that may contribute to your solutions. Like Navigation, ideally your signal observations are more than covered (timewise) by your SP3 data set.
+
+Notes on Clock data
+===================
 
 The toolbox accepts clock profiles (also refered to High Precision Clock products)
 in the form of both SP3 or special RINEX. If you provide both, that will work.
 SP3 allows describing everything in a single file, which makes it easier to deploy,
 we have examples of that scenario as well.
 
-## Examples
+Examples
+========
 
 We divide our examples according to the navigation technique being used:
 
