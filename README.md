@@ -39,7 +39,7 @@ cargo install rinex-cli
 Download the version you are interested in:
 
 ```bash
-git clone --recurse-submodules https://github.com/rtk-rs/rinex-cli
+git clone https://github.com/rtk-rs/rinex-cli
 ```
 
 If you're interested in running one of the demos, you will need the data submodule:
