@@ -51,16 +51,14 @@ pub fn preprocess(ctx: &mut QcContext, cli: &Cli) {
 
     for filt_str in cli.preprocessing() {
         // Apply other -P filter specs
-        if let Ok(filter) = Filter::from_str(filt_str) {
-            ctx.filter_mut(&filter);
-            trace!("applied filter \"{}\"", filt_str);
-        } else {
-            error!("invalid filter description \"{}\"", filt_str);
-        }
+        let filter = Filter::from_str(filt_str)
+            .unwrap_or_else(|e| panic!("Invalid filter specs: \"{}\"", filt_str));
+        ctx.filter_mut(&filter);
+        trace!("Applied \"{}\" filter", filt_str);
     }
 
     if cli.zero_repair() {
-        info!("repairing zero values..");
+        info!("Repairing zero values..");
         ctx.repair_mut(Repair::Zero);
     }
 }
