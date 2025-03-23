@@ -109,8 +109,6 @@ impl<'a, 'b> Orbits<'a, 'b> {
         if let Some((t, sv, (x_km, y_km, z_km))) = self.iter.next() {
             let coords = Coords3d::new(x_km, y_km, z_km);
 
-            debug!("SP3_sv={} | t={}", sv, t);
-
             if let Some(buf) = self.sv_buffers.get_mut(&sv) {
                 buf.push(t, coords);
             } else {
@@ -119,10 +117,7 @@ impl<'a, 'b> Orbits<'a, 'b> {
                 self.sv_buffers.insert(sv, buf);
             }
         } else {
-            if !self.eos {
-                info!("Consumed all precise coordinates.");
-            }
-
+            info!("Consumed all precise coordinates.");
             self.eos = true;
         }
     }
