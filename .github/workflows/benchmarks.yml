@@ -9,6 +9,11 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  RUST_BACKTRACE: 1
+  RUST_LOG: trace
+  CARGO_TERM_COLOR: always
+
 jobs:
   benchmarking:
     name: Daily Results
