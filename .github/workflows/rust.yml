@@ -21,9 +21,12 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 0
+    
     - name: Build
       run: cargo build
+    
     - name: Build (all features)
       run: cargo build --all-features
+    
     - name: Coding style
       run: cargo fmt --all -- --check

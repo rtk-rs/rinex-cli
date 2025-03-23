@@ -1,4 +1,5 @@
 CGGTTS: high precision timing solutions
 =======================================
 
-- [Broadcast (BRDC) Navigation applications](./BRDC)
+- [Timing solutions using Broadcast (BRDC) Navigation](./BRDC)
+- [High precision Timing solutions, 3 weeks after sampling](./FINAL)

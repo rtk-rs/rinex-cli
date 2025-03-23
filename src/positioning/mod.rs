@@ -6,6 +6,9 @@ use std::fs::read_to_string;
 mod buffer;
 pub use buffer::Buffer;
 
+mod snapshot;
+pub use snapshot::{CenteredDataPoints, CenteredSnapshot};
+
 mod eph;
 use eph::EphemerisSource;
 
@@ -44,6 +47,29 @@ use gnss_rtk::prelude::{
 };
 
 use thiserror::Error;
+
+#[derive(Debug, Default, Clone, Copy)]
+pub struct Coords3d {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+}
+
+impl Coords3d {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Self { x, y, z }
+    }
+}
+
+impl CenteredDataPoints<Coords3d> for Coords3d {
+    fn zero() -> Coords3d {
+        Coords3d {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
+    }
+}
 
 struct BiasModel {}
 
@@ -256,7 +282,7 @@ pub fn precise_positioning(
             let content = read_to_string(fp)
                 .unwrap_or_else(|e| panic!("failed to read configuration: {}", e));
 
-            let mut cfg: Config = serde_json::from_str(&content)
+            let cfg: Config = serde_json::from_str(&content)
                 .unwrap_or_else(|e| panic!("failed to parse configuration: {}", e));
 
             /*
@@ -272,7 +298,7 @@ pub fn precise_positioning(
         },
         None => {
             let method = Method::default();
-            let mut cfg = Config::static_ppp_preset(method);
+            let cfg = Config::static_ppp_preset(method);
 
             /*
              * CGGTTS special case

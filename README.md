@@ -7,7 +7,20 @@ RINEX-Cli
 
 [![License](https://img.shields.io/badge/license-MPL_2.0-orange?style=for-the-badge&logo=mozilla)](https://github.com/rtk-rs/rinex-cli/blob/main/LICENSE)
 
-`rinex-cli` is a command line tool to post process RINEX + SP3 data.
+`rinex-cli` is a command line tool to post process RINEX + SP3 data.  
+
+Since RINEX and SP3 cover many applications, so does `rinex-cli`. You can use
+this toolbox for
+
+- Analysis and high level report synthesis
+- Data patching and fixing
+- Data synthesis (RINEX, CSV)
+- Post processed navigation and PVT solutions solving
+- High precision PVT solutions solving 
+- Timing solutions solving
+
+<img src="plots/errors-3d.png" alt="3D Errors" style="display: inline-block; width=100px" />
+<img src="plots/errors-coords.png" alt="3D Errors" style="display: inline-block; width=100px" />
 
 ## Download the tool
 
@@ -27,6 +40,12 @@ Download the version you are interested in:
 
 ```bash
 git clone https://github.com/rtk-rs/rinex-cli
+```
+
+If you're interested in running one of the demos, you will need the data submodule:
+
+```bash
+git clone --recurse-submodules https://github.com/rtk-rs/rinex-cli
 ```
 
 This will build and install the stripped binary to `${HOME}/.cargo/bin`, which
