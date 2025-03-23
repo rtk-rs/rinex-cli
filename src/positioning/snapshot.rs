@@ -39,8 +39,6 @@ impl<const M: usize, T: Copy + CenteredDataPoints<T>> CenteredSnapshot<M, T> {
             return false;
         }
         let x_i = self.inner[M / 2 - 1].0;
-        debug!("x_i={} | target={}", x_i, x);
-
         let dt_i = (x - x_i).abs();
         dt_i < dt
     }
