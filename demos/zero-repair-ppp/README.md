@@ -47,16 +47,17 @@ rinex-cli \
 	ppp -c examples/CONFIG/SPP/basic.json
 ```
 
-To fix that, we can request the zero repair preprocessing operation, with `-z`, and obtain
-PVT solutions. The `C5X` signal is quite often lost, so we also add a narrow timeframe
+To fix that, simply request the zero repair operation with `-z`. 
+We now obtain valid PVT solutions. The `C5X` signal is quite often lost, so we also add a narrow timeframe
 to illustrate we can now obtain valid solutions (other problem that is out of scope here): 
 
 ```bash
 rinex-cli \
+    -z \
 	-P GPS \
 	-P C1C,C5X \
 	-P ">2024-05-07T12:30:00 GPST" \
-	-P "<2024-05-07T16:20:00 GPST" \
+	-P "<2024-05-07T13:15:00 GPST" \
 	--fp data/CRNX/V3/NYA100NOR_S_20241280000_01D_30S_MO.crx.gz \
 	--fp data/NAV/V3/NYA100NOR_S_20241280000_01D_GN.rnx.gz \
 	ppp -c examples/CONFIG/CPP/basic.json
