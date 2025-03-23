@@ -7,7 +7,20 @@ RINEX-Cli
 
 [![License](https://img.shields.io/badge/license-MPL_2.0-orange?style=for-the-badge&logo=mozilla)](https://github.com/rtk-rs/rinex-cli/blob/main/LICENSE)
 
-`rinex-cli` is a command line tool to post process RINEX + SP3 data.
+`rinex-cli` is a command line tool to post process RINEX + SP3 data.  
+It offers many options and possibilities:
+
+- Analys report synthesis
+- Data patching, reworking
+- Data synthesis (RINEX, CSV)
+
+- Post processed navigation and PVT solutions solving
+<img src="plots/errors-3d.png" alt="3D Errors" width="100" />
+
+- High precision PVT solutions solving 
+<img src="plots/errors-coords.png" alt="3D Errors" width="100" />
+
+- Timing solutions solving
 
 ## Download the tool
 
