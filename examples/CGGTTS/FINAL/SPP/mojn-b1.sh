@@ -1,6 +1,6 @@
 #!/bin/sh
 
-# Application   : Ephemeris radio broadcast
+# Application   : Final CGGTTS
 # Station       : MOJN (DNK) 
 # Surveying     : 24hr
 # Constellation : BeiDou
@@ -26,7 +26,8 @@ RTK_CONF=examples/CONFIG/SPP/basic.json
     -f \
     -P $PIPELINE \
     -P "$TIMEFRAME" \
-    -o "BRDC-BDS-SPP" \
+    -o "Final-BDS-SPP" \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
-    ppp -c $RTK_CONF
+    --fp data/SP3/D/Sta21114.sp3.gz \
+    ppp --cggtts -c $RTK_CONF

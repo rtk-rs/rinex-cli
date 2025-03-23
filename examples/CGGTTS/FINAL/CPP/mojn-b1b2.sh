@@ -3,14 +3,14 @@
 # Application   : Final CGGTTS
 # Station       : MOJN (DNK) 
 # Surveying     : 24hr
-# Constellation : Galileo
-# Technique     : SPP (E5)
+# Constellation : BeiDou
+# Technique     : CPP (C2I+C7I)
 
 # Preprocessing
-# This will select Galileo + Single frequency pseudo range
+# This will select BeiDou + Single frequency pseudo range
 # L1 pseudo range selection (mask filter)
 # PRN filter example
-PIPELINE="Gal;C5Q;>E01"
+PIPELINE="BDS;C2I,C7I;>C01"
 
 # Discard the first two hours of that day (another example)
 TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T12:00:00 GPST"
@@ -25,8 +25,8 @@ RTK_CONF=examples/CONFIG/SPP/basic.json
     -f \
     -P $PIPELINE \
     -P "$TIMEFRAME" \
-    -o "Final-Gal-SPP" \
-    --fp data/CRNX/V3/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz \
-    --fp data/NAV/V3/ESBC00DNK_R_20201770000_01D_MN.rnx.gz \
-    --fp data/SP3/C/GRG0MGXFIN_20201770000_01D_15M_ORB.SP3.gz \
+    -o "Final-BDS-CPP" \
+    --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
+    --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
+    --fp data/SP3/D/Sta21114.sp3.gz \
     ppp --cggtts -c $RTK_CONF

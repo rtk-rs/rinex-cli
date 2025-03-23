@@ -11,4 +11,4 @@ and other cancellation option is automatically disabled: we always prefer phyisi
 - MOJN (Denmark) static station surveying
   - [Using L1+L2](./mojn-l1l2.sh)
   - [Using E1+E5](./mojn-e1e5.sh)
-  - [Using GPS + Galileo](./mojn-gps-gal.sh)
+  - [Using B1+B2](./mojn-b1b2.sh)
