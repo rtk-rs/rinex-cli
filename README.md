@@ -15,10 +15,10 @@ It offers many options and possibilities:
 - Data synthesis (RINEX, CSV)
 
 - Post processed navigation and PVT solutions solving
-<img src="plots/errors-3d.png" alt="3D Errors" width="250" />
+<img src="plots/errors-3d.png" alt="3D Errors" style="display: inline-block; width=100px" />
 
 - High precision PVT solutions solving 
-<img src="plots/errors-coords.png" alt="3D Errors" width="250" />
+<img src="plots/errors-coords.png" alt="3D Errors" style="display: inline-block; width=100px" />
 
 - Timing solutions solving
 
