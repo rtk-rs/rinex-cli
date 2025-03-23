@@ -1,0 +1,8 @@
+{
+    "method": "PPP",
+    "timescale": "GPST",
+    "min_sv_elev": 10.0,
+    "solver": {
+        "gdop_threshold": 10.0
+    }
+}
