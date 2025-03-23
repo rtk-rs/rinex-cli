@@ -6,6 +6,9 @@ use std::fs::read_to_string;
 mod buffer;
 pub use buffer::Buffer;
 
+mod snapshot;
+pub use snapshot::{CenteredDataPoints, CenteredSnapshot};
+
 mod eph;
 use eph::EphemerisSource;
 
@@ -44,6 +47,29 @@ use gnss_rtk::prelude::{
 };
 
 use thiserror::Error;
+
+#[derive(Debug, Clone, Copy)]
+pub struct Coords3d {
+    pub x: f64,
+    pub y: f64,
+    pub z: f64,
+}
+
+impl Coords3d {
+    pub fn new(x: f64, y: f64, z: f64) -> Self {
+        Self { x, y, z }
+    }
+}
+
+impl CenteredDataPoints<Coords3d> for Coords3d {
+    fn zero() -> Coords3d {
+        Coords3d {
+            x: 0.0,
+            y: 0.0,
+            z: 0.0,
+        }
+    }
+}
 
 struct BiasModel {}
 
