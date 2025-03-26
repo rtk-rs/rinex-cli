@@ -16,7 +16,7 @@ TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T09:30:00 GPST"
 TIMEFRAME=">=2020-06-25T02:10:00 GPST;<2020-06-25T09:30:00 GPST"
 
 # CPP basic configuratio
-RTK_CONF=examples/CONFIG/CPP/basic.json
+RTK_CONF=examples/CONFIG/Static/gpst_cpp.json
 
 # Analysis + ppp solutions
 #   -f: force new report synthesis

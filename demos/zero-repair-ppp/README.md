@@ -16,7 +16,7 @@ rinex-cli \
 	-P C5X \
 	--fp data/CRNX/V3/NYA100NOR_S_20241280000_01D_30S_MO.crx.gz \
 	--fp data/NAV/V3/NYA100NOR_S_20241280000_01D_GN.rnx.gz \
-	ppp -c examples/CONFIG/Static/SPP/basic.json
+	ppp -c examples/CONFIG/Static/gpst_spp.json
 
 [...]
 panic: Physical non sense - rx=2024-05-07T12:30:30 GPST prior tx=2024-05-07T12:30:30.000123693 GPST
@@ -30,7 +30,7 @@ rinex-cli \
 	-P C1C,C5X \
 	--fp data/CRNX/V3/NYA100NOR_S_20241280000_01D_30S_MO.crx.gz \
 	--fp data/NAV/V3/NYA100NOR_S_20241280000_01D_GN.rnx.gz \
-	ppp -c examples/CONFIG/Static/CPP/basic.json
+	ppp -c examples/CONFIG/Static/gpst_cpp.json
 
 [...]
 panic: Physical non sense - rx=2024-05-07T12:30:30 GPST prior tx=2024-05-07T12:30:30.000171848 GPST
@@ -44,7 +44,7 @@ rinex-cli \
 	-P C1C \
 	--fp data/CRNX/V3/NYA100NOR_S_20241280000_01D_30S_MO.crx.gz \
 	--fp data/NAV/V3/NYA100NOR_S_20241280000_01D_GN.rnx.gz \
-	ppp -c examples/CONFIG/Static/SPP/basic.json
+	ppp -c examples/CONFIG/Static/gpst_spp.json
 ```
 
 To fix that, simply request the zero repair operation with `-z`. 
@@ -60,5 +60,5 @@ rinex-cli \
 	-P "<2024-05-07T13:15:00 GPST" \
 	--fp data/CRNX/V3/NYA100NOR_S_20241280000_01D_30S_MO.crx.gz \
 	--fp data/NAV/V3/NYA100NOR_S_20241280000_01D_GN.rnx.gz \
-	ppp -c examples/CONFIG/Static/CPP/basic.json
+	ppp -c examples/CONFIG/Static/gpst_cpp.json
 ```

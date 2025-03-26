@@ -1,5 +1,11 @@
-Single Point Positioning Presets
-================================
+Configuration presets
+=====================
+
+## Timescale
+
+The selected timescale will have PVT solutions expressed with respect to that timescale.
+
+## SPP presets
 
 In SPP, we navigate using a single signal in sight. 
 With this framework, it [does not have to L1, as demonstrated in this example]().
@@ -17,4 +23,10 @@ As learning experience, you can activate advanced compensations while still usin
 SPP technique, to see that it has no impact, because your accuracy is mostly limited by the
 ionospheric bias.
 
+## CPP preset
 
+Dual pseudo range navigation technique. Gives much higher accuracy as comparsed to SPP.
+
+## PPP preset
+
+Dual pseudo range + phase range navigation technique. Gives the highest accuracy.

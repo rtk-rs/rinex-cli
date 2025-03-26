@@ -22,5 +22,5 @@ rinex-cli \
     -P Gal \
     --fp data/CRNX/V3/AJAC00FRA_R_20242090000_01D_30S_MO.crx.gz \
     --fp data/NAV/V3/GRAS00FRA_R_20242090000_01D_EN.rnx.gz \
-    ppp -c examples/CONFIG/Static/PPP/basic.json
+    ppp -c examples/CONFIG/Static/gpst_ppp.json
 ```

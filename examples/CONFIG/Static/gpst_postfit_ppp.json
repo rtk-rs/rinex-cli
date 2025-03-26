@@ -1,6 +1,7 @@
 {
     "method": "PPP",
     "timescale": "GPST",
-    "profile": "Static",
-    "code_smoothing": 15
+    "solver": {
+        "postfit_kf": true
+    }
 }

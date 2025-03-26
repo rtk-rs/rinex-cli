@@ -1,8 +1,0 @@
-{
-    "method": "PPP",
-    "timescale": "GPST",
-    "profile": "Static",
-    "solver": {
-        "postfit_kf": true
-    }
-}
