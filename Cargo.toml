@@ -59,7 +59,7 @@ sp3 = { version = "1.1.2", features = ["processing", "anise", "flate2", "serde"]
 
 rinex = { version = "0.17.0", features = ["obs", "nav", "ionex", "antex", "clock", "flate2", "processing", "serde"] }
 
-# gnss-rtk = { path = "../gnss-rtk", features = ["serde"] }
-gnss-rtk = { git = "https://github.com/rtk-rs/gnss-rtk", branch = "main", features = ["serde"] }
+# gnss-rtk = { path = "../gnss-rtk", features = ["serde", "embed_ephem"] }
+gnss-rtk = { git = "https://github.com/rtk-rs/gnss-rtk", branch = "main", features = ["serde", "embed_ephem"] }
 
 cggtts = { git = "https://github.com/rtk-rs/cggtts", features = ["serde", "scheduler", "tracker"], optional = true }
