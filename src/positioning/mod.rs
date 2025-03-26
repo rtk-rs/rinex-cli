@@ -278,7 +278,7 @@ pub fn precise_positioning(
         },
         None => {
             let method = Method::default();
-            let cfg = Config::static_ppp_preset(method);
+            let cfg = Config::static_preset(method);
 
             /*
              * CGGTTS special case
