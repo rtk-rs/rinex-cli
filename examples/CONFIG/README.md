@@ -6,6 +6,10 @@ that allows advanced tuning.
 
 The Complete [Configuration documentation can be found here](https://github.com/rtk-rs).
 
-- Configurations that are designed for the [SPP Navigation Technique/Strategy](./SPP) 
-- Configurations that are designed for the [CPP (Dual Pseudo Range) Navigation Technique/Strategy](./CPP) 
-- Configurations that are designed for the [PPP (Dual Pseudo Range + Phase) Navigation Technique/Strategy](./PPP) 
+- [Static presets](./STATIC)
+  - [SPP Technique Presets](./SPP) 
+  - [CPP (Dual Pseudo Range) Technique Presets](./CPP) 
+  - [PPP (Dual Pseudo Range + Phase) Technique Presets](./PPP) 
+
+- [Dynamic (Roaming) low velocity (pedestrian profile)](./Pedestrian)
+  - WIP 

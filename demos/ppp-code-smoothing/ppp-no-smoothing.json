@@ -1,5 +1,6 @@
 {
     "method": "PPP",
     "timescale": "GPST",
-    "profile": "Static"
+    "profile": "Static",
+    "code_smoothing": 0
 }
