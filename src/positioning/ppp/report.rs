@@ -2,7 +2,8 @@ use crate::cli::Context;
 use std::collections::BTreeMap;
 
 use gnss_rtk::prelude::{
-    Config as NaviConfig, Duration, Epoch, Method as NaviMethod, PVTSolution, TimeScale, SV,
+    Config as NaviConfig, Duration, Epoch, Method as NaviMethod, PVTSolution,
+    Profile as NaviProfile, TimeScale, SV,
 };
 
 use gnss_qc::{
@@ -27,32 +28,9 @@ impl Render for ReportTab {
     }
 }
 
-enum Technique {
-    GeodeticSurvey,
-}
-
-impl std::fmt::Display for Technique {
-    fn fmt(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
-        match self {
-            Self::GeodeticSurvey => write!(f, "Geodetic Survey"),
-        }
-    }
-}
-
-impl Technique {
-    fn tooltip(&self) -> String {
-        match self {
-            Self::GeodeticSurvey => {
-                "Static Geodetic survey (fixed point coordinates evaluation)".to_string()
-            },
-        }
-    }
-}
-
 struct Summary {
-    technique: Technique,
     method: NaviMethod,
-    // filter: NaviFilter,
+    profile: NaviProfile,
     orbit: String,
     first_epoch: Epoch,
     last_epoch: Epoch,
@@ -71,14 +49,15 @@ impl Render for Summary {
                     tbody {
                         tr {
                             th class="is-info" {
-                                button aria-label=(self.technique.tooltip()) data-balloon-pos="right" {
-                                    (self.technique.to_string())
-                                }
+                                "Profile"
+                            }
+                            td {
+                                (self.profile.to_string())
                             }
                         }
                         tr {
                             th class="is-info" {
-                                "Navigation method"
+                                "Technique"
                             }
                             td {
                                 (self.method.to_string())
@@ -107,7 +86,7 @@ impl Render for Summary {
                                 "First solution"
                             }
                             td {
-                                (self.first_epoch.to_string())
+                                (self.first_epoch.round(Duration::from_seconds(1.0)).to_string())
                             }
                         }
                         tr {
@@ -115,7 +94,7 @@ impl Render for Summary {
                                 "Last solution"
                             }
                             td {
-                                (self.last_epoch.to_string())
+                                (self.last_epoch.round(Duration::from_seconds(1.0)).to_string())
                             }
                         }
                         tr {
@@ -247,9 +226,9 @@ impl Summary {
                 }
             },
             method: cfg.method,
+            profile: cfg.profile,
             // filter: cfg.solver.filter,
             duration: last_epoch - first_epoch,
-            technique: Technique::GeodeticSurvey,
         }
     }
 }
@@ -331,16 +310,19 @@ impl ReportContent {
 
                 let mut prev_pct = 0;
                 for (index, (_, sol_i)) in solutions.iter().enumerate() {
+                    let (lat_ddeg, long_ddeg, _) = sol_i.lat_long_alt_deg_deg_m;
+
+                    let modulo = if cfg.profile.is_static() { 10 } else { 3 };
                     let pct = index * 100 / nb_solutions;
 
-                    if pct % 10 == 0 && index > 0 && pct != prev_pct || index == nb_solutions - 1 {
+                    if pct % modulo == 0 && index > 0 && pct != prev_pct
+                        || index == nb_solutions - 1
+                    {
                         let (name, visible) = if index == nb_solutions - 1 {
                             ("FINAL".to_string(), true)
                         } else {
                             (format!("Solver: {:02}%", pct), false)
                         };
-
-                        let (lat_ddeg, long_ddeg, _) = sol_i.lat_long_alt_deg_deg_m;
 
                         let scatter = Plot::mapbox(
                             vec![lat_ddeg],
@@ -355,6 +337,7 @@ impl ReportContent {
 
                         map_proj.add_trace(scatter);
                     }
+
                     prev_pct = pct;
                 }
                 map_proj

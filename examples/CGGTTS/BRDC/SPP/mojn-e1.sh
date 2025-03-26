@@ -16,7 +16,7 @@ PIPELINE="Gal;C5Q;E03,E15"
 TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T09:30:00 GPST"
 
 # SPP basic configuratio
-RTK_CONF=examples/CONFIG/SPP/basic.json
+RTK_CONF=examples/CONFIG/Static/gpst_spp.json
 
 # Analysis +cggtts solutions
 #   -f: force new report synthesis
