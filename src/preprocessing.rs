@@ -1,4 +1,3 @@
-use log::error;
 use std::str::FromStr;
 
 use crate::Cli;
@@ -49,11 +48,13 @@ pub fn preprocess(ctx: &mut QcContext, cli: &Cli) {
         ctx.filter_mut(&filter);
     }
 
+    // apply other filter specs
     for filt_str in cli.preprocessing() {
-        // Apply other -P filter specs
         let filter = Filter::from_str(filt_str)
-            .unwrap_or_else(|e| panic!("Invalid filter specs: \"{}\"", filt_str));
+            .unwrap_or_else(|e| panic!("Failed to apply filter \"{}\" - {}", filt_str, e));
+
         ctx.filter_mut(&filter);
+
         trace!("Applied \"{}\" filter", filt_str);
     }
 
