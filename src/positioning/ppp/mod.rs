@@ -42,12 +42,34 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
 
     for (t, signal) in obs_data.signal_observations_sampling_ok_iter() {
         let carrier = Carrier::from_observable(signal.sv.constellation, &signal.observable);
+
         if carrier.is_err() {
+            error!(
+                "{}({}/{}) - unknown signal {:?}",
+                t,
+                signal.sv.constellation,
+                signal.observable,
+                carrier.err().unwrap()
+            );
             continue;
         }
 
         let carrier = carrier.unwrap();
+
         let rtk_carrier = cast_rtk_carrier(carrier);
+
+        if rtk_carrier.is_err() {
+            error!(
+                "{}({}/{}) - unknown frequency: {}",
+                t,
+                signal.sv.constellation,
+                signal.observable,
+                rtk_carrier.err().unwrap()
+            );
+            continue;
+        }
+
+        let rtk_carrier = rtk_carrier.unwrap();
 
         if let Some(past_t) = past_epoch {
             if t > past_t {
