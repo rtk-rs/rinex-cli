@@ -282,7 +282,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
             {
                 match signal.observable {
                     Observable::PhaseRange(_) => {
-                        observation.ambiguity = None;
                         observation.phase_range_m = Some(signal.value);
                     },
                     Observable::PseudoRange(_) => {

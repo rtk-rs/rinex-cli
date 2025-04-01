@@ -536,7 +536,7 @@ impl Report {
     pub fn new(ctx: &Context, solutions: &Vec<Track>) -> Self {
         Self {
             tab: ReportTab {},
-            content: ReportContent::new(ctx, solutions),
+            content: ReportContent::new(solutions),
         }
     }
 }
