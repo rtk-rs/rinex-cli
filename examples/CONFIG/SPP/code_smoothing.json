@@ -1,0 +1,9 @@
+{
+    "method": "SPP",
+    "timescale": "GPST",
+    "min_sv_elev": 10.0,
+    "code_smoothing": true,
+    "solver": {
+        "gdop_threshold": 10.0
+    }
+}

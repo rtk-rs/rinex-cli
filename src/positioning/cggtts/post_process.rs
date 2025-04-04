@@ -1,11 +1,10 @@
 //! CGGTTS track formation and post processing
 use crate::cli::Context;
 use clap::ArgMatches;
-use std::io::Write;
 
 use itertools::Itertools;
 
-use cggtts::prelude::{Hardware, Header, ReferenceTime, Track, CGGTTS};
+use cggtts::prelude::{Header, Track, CGGTTS};
 
 /// CGGTTS solutions post processing
 pub fn post_process(

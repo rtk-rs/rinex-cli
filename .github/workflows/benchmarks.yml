@@ -51,7 +51,7 @@ jobs:
                 -P "Gal;C1C,C5Q" \
                 --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
                 --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
-                ppp -c examples/CONFIG/Static/CPP/basic.json |
+                ppp -c examples/CONFIG/Static/gpst_cpp.json |
                 tee /tmp/logs/ppp/brdc_cpp_mojn_e1e5.logs
       
       - name: Galileo BRDC (+CPP) (+CGGTTS)
@@ -61,7 +61,7 @@ jobs:
                 -P "Gal;C1C,C5Q" \
                 --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
                 --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
-                ppp --cggtts -c examples/CONFIG/Static/CPP/basic.json |
+                ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json |
                 tee /tmp/logs/cggtts/brdc_cpp_mojn_e1e5.logs
 
       - name: Galileo Ultra (+CPP)
@@ -73,7 +73,7 @@ jobs:
                 --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
                 --fp data/SP3/C/GRG0MGXFIN_20201770000_01D_15M_ORB.SP3.gz \
                 --fp data/CLK/V3/GRG0MGXFIN_20201770000_01D_30S_CLK.CLK.gz \
-                ppp -c examples/CONFIG/Static/CPP/basic.json |
+                ppp -c examples/CONFIG/Static/gpst_cpp.json |
                 tee /tmp/logs/ppp/ultra_cpp_mojn_e1e5.logs
       
       - name: Galileo Ultra (+CPP) (+CGGTTS)
@@ -85,7 +85,7 @@ jobs:
                 --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
                 --fp data/SP3/C/GRG0MGXFIN_20201770000_01D_15M_ORB.SP3.gz \
                 --fp data/CLK/V3/GRG0MGXFIN_20201770000_01D_30S_CLK.CLK.gz \
-                ppp --cggtts -c examples/CONFIG/Static/CPP/basic.json |
+                ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json |
                 tee /tmp/logs/cggtts/ultra_cpp_mojn_e1e5.logs
       
       - name: Galileo Ultra (+PPP)
@@ -97,7 +97,7 @@ jobs:
                 --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
                 --fp data/SP3/C/GRG0MGXFIN_20201770000_01D_15M_ORB.SP3.gz \
                 --fp data/CLK/V3/GRG0MGXFIN_20201770000_01D_30S_CLK.CLK.gz \
-                ppp -c examples/CONFIG/Static/PPP/basic.json |
+                ppp -c examples/CONFIG/Static/gpst_cpp.json |
                 tee /tmp/logs/ppp/ultra_ppp_mojn_e1e5.logs
       
       - name: Galileo Ultra (+PPP) (+CGGTTS)
@@ -109,16 +109,5 @@ jobs:
                 --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
                 --fp data/SP3/C/GRG0MGXFIN_20201770000_01D_15M_ORB.SP3.gz \
                 --fp data/CLK/V3/GRG0MGXFIN_20201770000_01D_30S_CLK.CLK.gz \
-                ppp --cggtts -c examples/CONFIG/Static/PPP/basic.json |
+                ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json |
                 tee /tmp/logs//cggtts/ultra_ppp_mojn_e1e5.logs
-      
-      - name: Compress results
-        run: |
-            zip -r $ARCHIVE.zip /tmp/logs
-    
-      - name: Upload results
-        uses: actions/upload-artifact@v4
-        with:
-          name: ${{ env.ASSET }}
-          path: |
-            ${{ env.ASSET }}

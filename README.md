@@ -65,8 +65,8 @@ ${HOME}/.cargo/bin/rinex-cli
 
 `rinex-cli` supports 
 
-- all formats & revisions supported by [the RINEX parser](https://github.com/georust/tree/main/rinex)
-- all revisions supported by [the SP3 parser](https://github.com/georust/tree/main/sp3)
+- all formats & revisions supported by [the RINEX parser](https://github.com/rtk-rs/rinex)
+- all revisions supported by [the SP3 parser](https://github.com/rtk-rs/sp3)
 
 Summary:
 

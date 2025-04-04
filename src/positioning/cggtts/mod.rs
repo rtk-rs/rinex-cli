@@ -1,7 +1,5 @@
 //! CGGTTS special resolution opmode.
-use clap::ArgMatches;
-
-use std::{cell::RefCell, collections::HashMap, str::FromStr};
+use std::{cell::RefCell, collections::HashMap};
 
 mod post_process;
 pub use post_process::post_process;
@@ -15,13 +13,12 @@ use rinex::{
 };
 
 use gnss_rtk::prelude::{
-    Bias, Candidate, Carrier as RTKCarrier, Method, Observation, OrbitSource, Signal, Solver,
+    Bias, Candidate, Carrier as RTKCarrier, Method, Observation, OrbitSource, Solver,
     SPEED_OF_LIGHT_M_S,
 };
 
 use cggtts::prelude::{
-    CommonViewCalendar, CommonViewClass, FittedData, Observation as FitObservation, SVTracker,
-    Track,
+    CommonViewCalendar, CommonViewClass, Observation as FitObservation, SVTracker, Track,
 };
 
 use crate::{
@@ -31,28 +28,57 @@ use crate::{
     },
 };
 
-fn rinex_ref_observable(ppp: bool, observations: &[Observation]) -> String {
-    let prefix = if ppp {
-        "L".to_string()
+fn rinex_ref_observable(
+    ppp: bool,
+    constellation: Constellation,
+    observations: &[Observation],
+) -> String {
+    let l1_observation = observations
+        .iter()
+        .filter(|obs: &&Observation| obs.carrier == RTKCarrier::L1)
+        .reduce(|k, _| k);
+
+    let observable = if let Some(l1_observation) = l1_observation {
+        if ppp {
+            Observable::from_phase_range_frequency_mega_hz(
+                constellation,
+                l1_observation.carrier.frequency_mega_hz(),
+            )
+        } else {
+            Observable::from_pseudo_range_frequency_mega_hz(
+                constellation,
+                l1_observation.carrier.frequency_mega_hz(),
+            )
+        }
     } else {
-        "C".to_string()
+        let carrier = observations
+            .iter()
+            .map(|obs| obs.carrier)
+            .reduce(|k, _| k)
+            .expect("internal error: no carrier signals found");
+
+        if ppp {
+            Observable::from_phase_range_frequency_mega_hz(
+                constellation,
+                carrier.frequency_mega_hz(),
+            )
+        } else {
+            Observable::from_pseudo_range_frequency_mega_hz(
+                constellation,
+                carrier.frequency_mega_hz(),
+            )
+        }
     };
 
-    for observation in observations.iter() {
-        match observation.carrier {
-            RTKCarrier::L1 | RTKCarrier::E1 | RTKCarrier::B1aB1c => {
-                // TODO: not if a prefered signal is selected
-                return format!("{}1C", prefix);
-            },
-            carrier => {
-                // TODO: possibly select a prefered signal
-                let formatted = carrier.to_string();
-                return format!("{}{}C", prefix, &formatted[1..2]);
-            },
+    if let Ok(observable) = observable {
+        observable.to_string()
+    } else {
+        if ppp {
+            "L1C".to_string()
+        } else {
+            "C1C".to_string()
         }
     }
-
-    "C1C".to_string()
 }
 
 /// Resolves CGGTTS tracks from input context
@@ -62,7 +88,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
     mut clock: CK,
     mut solver: Solver<O, B>,
     method: Method,
-    matches: &ArgMatches,
 ) -> Result<Vec<Track>, PositioningError> {
     let obs_data = ctx
         .data
@@ -90,11 +115,9 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
     let mut candidates = Vec::<Candidate>::with_capacity(4);
 
     let mut tracks = Vec::<Track>::new();
-
-    let c1c_ref_observable = "C1C".to_string();
     let mut trackers = HashMap::<(SV, String), SVTracker>::with_capacity(16);
-
     let mut sv_observations = HashMap::<SV, Vec<Observation>>::new();
+    let mut sv_ref_observables = HashMap::<SV, String>::new();
 
     info!(
         "{} - CGGTTS mode deployed - {} until next tracking",
@@ -112,8 +135,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                     // create new candidate
                     let mut cd = Candidate::new(*sv, past_t, observations.clone());
 
-                    // ref_observable = rinex_ref_observable(method == Method::PPP, &observations);
-
                     // fixup and customizations
                     match clock.next_clock_at(past_t, *sv) {
                         Some(dt) => cd.set_clock_correction(dt),
@@ -128,6 +149,18 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                     }
 
                     candidates.push(cd);
+                }
+
+                // makes sure we have a reference observable
+                for (sv, observations) in sv_observations.iter() {
+                    if sv_ref_observables.get(&sv).is_none() {
+                        let ref_observable = rinex_ref_observable(
+                            method == Method::PPP,
+                            sv.constellation,
+                            observations,
+                        );
+                        sv_ref_observables.insert(*sv, ref_observable);
+                    }
                 }
 
                 match solver.resolve(past_t, &candidates) {
@@ -175,8 +208,16 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                                 elevation: elev_deg,
                             };
 
+                            let ref_observable =
+                                sv_ref_observables.get(&sv_contrib.sv).unwrap_or_else(|| {
+                                    panic!(
+                                        "internal error: no reference observable found for {}!",
+                                        sv_contrib.sv
+                                    )
+                                });
+
                             if let Some(tracker) =
-                                trackers.get_mut(&(sv_contrib.sv, c1c_ref_observable.clone()))
+                                trackers.get_mut(&(sv_contrib.sv, ref_observable.clone()))
                             {
                                 tracker.new_observation(data);
                             } else {
@@ -184,8 +225,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
                                     .with_gap_tolerance(sampling_period);
 
                                 tracker.new_observation(data);
-                                trackers
-                                    .insert((sv_contrib.sv, c1c_ref_observable.clone()), tracker);
+                                trackers.insert((sv_contrib.sv, ref_observable.clone()), tracker);
                             }
                         }
                     },
@@ -201,12 +241,34 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
         } // new epoch
 
         let carrier = Carrier::from_observable(signal.sv.constellation, &signal.observable);
+
         if carrier.is_err() {
+            error!(
+                "{}({}/{}) - unknown signal {:?}",
+                t,
+                signal.sv.constellation,
+                signal.observable,
+                carrier.err().unwrap()
+            );
             continue;
         }
 
         let carrier = carrier.unwrap();
+
         let rtk_carrier = cast_rtk_carrier(carrier);
+
+        if rtk_carrier.is_err() {
+            error!(
+                "{}({}/{}) - unknown frequency: {}",
+                t,
+                signal.sv.constellation,
+                signal.observable,
+                rtk_carrier.err().unwrap()
+            );
+            continue;
+        }
+
+        let rtk_carrier = rtk_carrier.unwrap();
 
         if let Some((_, observations)) = sv_observations
             .iter_mut()
@@ -220,7 +282,6 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
             {
                 match signal.observable {
                     Observable::PhaseRange(_) => {
-                        observation.ambiguity = None;
                         observation.phase_range_m = Some(signal.value);
                     },
                     Observable::PseudoRange(_) => {

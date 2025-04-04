@@ -312,7 +312,7 @@ impl ReportContent {
                 for (index, (_, sol_i)) in solutions.iter().enumerate() {
                     let (lat_ddeg, long_ddeg, _) = sol_i.lat_long_alt_deg_deg_m;
 
-                    let modulo = if cfg.profile.is_static() { 10 } else { 3 };
+                    let modulo = if cfg.profile.is_static() { 10 } else { 1 };
                     let pct = index * 100 / nb_solutions;
 
                     if pct % modulo == 0 && index > 0 && pct != prev_pct

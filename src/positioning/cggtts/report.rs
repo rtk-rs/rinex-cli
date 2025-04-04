@@ -30,7 +30,7 @@ struct Summary {
 }
 
 impl Summary {
-    fn new(ctx: &Context, solutions: &Vec<Track>) -> Self {
+    fn new(solutions: &Vec<Track>) -> Self {
         let mut trk_duration = Duration::default();
         let mut cv_class = CommonViewClass::default();
         let (mut first_epoch, mut last_epoch) = (Epoch::default(), Epoch::default());
@@ -143,9 +143,9 @@ struct ReportContent {
 }
 
 impl ReportContent {
-    pub fn new(ctx: &Context, solutions: &Vec<Track>) -> Self {
+    pub fn new(solutions: &Vec<Track>) -> Self {
         //let epochs = solutions.iter().map(|trk| trk.epoch).collect::<Vec<_>>();
-        let summary = Summary::new(ctx, solutions);
+        let summary = Summary::new(solutions);
         Self {
             sv_plot: {
                 let mut plot = Plot::timedomain_plot("sv_plot", "SV Plot", "PRN #", true);
@@ -536,7 +536,7 @@ impl Report {
     pub fn new(ctx: &Context, solutions: &Vec<Track>) -> Self {
         Self {
             tab: ReportTab {},
-            content: ReportContent::new(ctx, solutions),
+            content: ReportContent::new(solutions),
         }
     }
 }

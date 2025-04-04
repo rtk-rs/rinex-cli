@@ -75,59 +75,39 @@ pub enum Error {
     PPPPost(#[from] PPPPostError),
 }
 
-/*
- * Converts `RTK Carrier` into compatible struct
- */
+/// Converts [RTKCarrier] to [Carrier]
 pub fn rtk_carrier_cast(carrier: RTKCarrier) -> Carrier {
     match carrier {
-        RTKCarrier::L2 => Carrier::L2,
-        RTKCarrier::L5 => Carrier::L5,
-        RTKCarrier::L6 => Carrier::L6,
-        RTKCarrier::E1 => Carrier::E1,
-        RTKCarrier::E5 => Carrier::E5,
-        RTKCarrier::E6 => Carrier::E6,
-        RTKCarrier::E5A => Carrier::E5a,
-        RTKCarrier::E5B => Carrier::E5b,
-        RTKCarrier::B1I => Carrier::B1I,
-        RTKCarrier::B2 => Carrier::B2,
+        RTKCarrier::B1 => Carrier::B1,
         RTKCarrier::B3 => Carrier::B3,
-        RTKCarrier::B2A => Carrier::B2A,
-        RTKCarrier::B2iB2b => Carrier::B2I,
-        RTKCarrier::B1aB1c => Carrier::B1A,
+        RTKCarrier::E5a5b => Carrier::E5a5b,
         RTKCarrier::L1 => Carrier::L1,
+        RTKCarrier::G1 => Carrier::G1(None),
+        RTKCarrier::G2 => Carrier::G2(None),
+        RTKCarrier::G3 => Carrier::G3,
+        RTKCarrier::E5b => Carrier::E5b,
+        RTKCarrier::E6Lex => Carrier::E6,
+        RTKCarrier::G1a => Carrier::G1a,
+        RTKCarrier::G2a => Carrier::G2a,
+        RTKCarrier::L5 => Carrier::L5,
+        RTKCarrier::L2 => Carrier::L2,
+        RTKCarrier::S => Carrier::S,
     }
 }
 
-/*
- * Converts `Carrier` into RTK compatible struct
- */
-pub fn cast_rtk_carrier(carrier: Carrier) -> RTKCarrier {
-    match carrier {
-        Carrier::L2 => RTKCarrier::L2,
-        Carrier::L5 => RTKCarrier::L5,
-        Carrier::L6 => RTKCarrier::L6,
-        Carrier::E1 => RTKCarrier::E1,
-        Carrier::E5 => RTKCarrier::E5,
-        Carrier::E6 => RTKCarrier::E6,
-        Carrier::E5a => RTKCarrier::E5A,
-        Carrier::E5b => RTKCarrier::E5B,
-        Carrier::B1I => RTKCarrier::B1I,
-        Carrier::B2 => RTKCarrier::B2,
-        Carrier::B3 | Carrier::B3A => RTKCarrier::B3,
-        Carrier::B2A => RTKCarrier::B2A,
-        Carrier::B2I | Carrier::B2B => RTKCarrier::B2iB2b,
-        Carrier::B1A | Carrier::B1C => RTKCarrier::B1aB1c,
-        Carrier::L1 | _ => RTKCarrier::L1,
-    }
+/// Converts [Carrier] to [RTKCarrier]
+pub fn cast_rtk_carrier(carrier: Carrier) -> Result<RTKCarrier, RTKError> {
+    let freq_mhz = carrier.frequency_mega_hz();
+    RTKCarrier::from_frequency_mega_hz(freq_mhz)
 }
 
-// helper in reference signal determination
-fn rtk_reference_carrier(carrier: RTKCarrier) -> bool {
-    matches!(
-        carrier,
-        RTKCarrier::L1 | RTKCarrier::E1 | RTKCarrier::B1aB1c | RTKCarrier::B1I
-    )
-}
+// // helper in reference signal determination
+// fn rtk_reference_carrier(carrier: RTKCarrier) -> bool {
+//     matches!(
+//         carrier,
+//         RTKCarrier::L1 | RTKCarrier::E1 | RTKCarrier::B1c | RTKCarrier::B1i
+//     )
+// }
 
 //use map_3d::{ecef2geodetic, rad2deg, Ellipsoid};
 
@@ -381,7 +361,7 @@ If your dataset does not describe one, you can manually describe one, see --help
     #[cfg(feature = "cggtts")]
     if matches.get_flag("cggtts") {
         //* CGGTTS special opmode */
-        let tracks = cggtts::resolve(ctx, &eph, clocks, solver, cfg.method, matches)?;
+        let tracks = cggtts::resolve(ctx, &eph, clocks, solver, cfg.method)?;
         if !tracks.is_empty() {
             cggtts_post_process(&ctx, &tracks, matches)?;
             let report = CggttsReport::new(&ctx, &tracks);
