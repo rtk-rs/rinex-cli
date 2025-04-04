@@ -1,6 +1,7 @@
 {
-    "method": "PPP",
+    "method": "CPP",
     "timescale": "GPST",
     "profile": "pedestrian",
-    "code_smoothing": 15
+    "code_smoothing": 0,
+    "postfit_kf": true
 }
