@@ -1,7 +1,7 @@
 use crate::Error;
 use csv::Writer;
 use rinex::prelude::Rinex;
-use std::path::Path;
+use std::{fs::File, io::Write, path::Path};
 
 use itertools::Itertools;
 
@@ -51,7 +51,7 @@ pub fn write_obs_rinex<P: AsRef<Path>>(rnx: &Rinex, path: P) -> Result<(), Error
     Ok(())
 }
 
-pub fn write_nav_rinex(obs: &Rinex, brdc: &Rinex, path: &Path) -> Result<(), Error> {
+pub fn write_joint_nav_obs_rinex(brdc: &Rinex, obs: &Rinex, path: &Path) -> Result<(), Error> {
     let mut orbit_w = Writer::from_path(path)?;
     orbit_w.write_record(&["Epoch", "SV", "x_ecef_km", "y_ecef_km", "z_ecef_km"])?;
 
@@ -92,5 +92,111 @@ pub fn write_nav_rinex(obs: &Rinex, brdc: &Rinex, path: &Path) -> Result<(), Err
             }
         }
     }
+    Ok(())
+}
+
+pub fn write_raw_nav_rinex(brdc: &Rinex, path: &Path) -> Result<(), Error> {
+    let mut fd = File::create(path)
+        .unwrap_or_else(|e| panic!("Failed to create file: {} - {}", path.display(), e));
+
+    let record = brdc.record.as_nav().unwrap();
+
+    for (k, v) in record.iter() {
+        let t = k.epoch;
+        let sv = k.sv;
+        let msgtype = k.msgtype;
+        let frmtype = k.frmtype;
+
+        if let Some(eph) = v.as_ephemeris() {
+            let (bias, drift, drift_r) = eph.sv_clock();
+
+            write!(fd, "{}, ", t)?;
+            write!(fd, "{}, ", sv)?;
+            write!(fd, "{}, ", msgtype)?;
+            write!(fd, "{}, ", frmtype)?;
+
+            write!(fd, "bias (s), {:.12E}, ", bias)?;
+            write!(fd, "drift (s/s), {:.12E}, ", drift)?;
+            write!(fd, "drift_r (s/s2), {:.12E}, ", drift_r)?;
+
+            write!(fd, "healthy, {}, ", eph.sv_healthy())?;
+
+            if let Some(tgd) = eph.tgd() {
+                write!(fd, "tgd, {}, ", tgd)?;
+            }
+
+            let num_orbits = eph.orbits.len();
+
+            for (num, (name, orbit)) in eph.orbits.iter().enumerate() {
+                if name != "tgd" {
+                    write!(fd, "{}, ", name)?;
+                }
+
+                match name.as_str() {
+                    "health" => {
+                        if let Some(health) = orbit.as_gps_qzss_l1l2l5_health_flag() {
+                            write!(fd, "{:?}", health)?;
+                        } else if let Some(health) = orbit.as_gps_qzss_l1c_health_flag() {
+                            write!(fd, "{:?}", health)?;
+                        } else if let Some(health) = orbit.as_glonass_health_flag() {
+                            write!(fd, "{:?}", health)?;
+                        } else if let Some(health) = orbit.as_galileo_health_flag() {
+                            write!(fd, "{:?}", health)?;
+                        } else if let Some(health) = orbit.as_bds_sat_h1_flag() {
+                            write!(fd, "{:?}", health)?;
+                        } else if let Some(health) = orbit.as_bds_health_flag() {
+                            write!(fd, "{:?}", health)?;
+                        } else {
+                            write!(fd, "{:.14E}", orbit.as_f64())?;
+                        }
+                    },
+                    "health2" => {
+                        if let Some(health) = orbit.as_glonass_health2_flag() {
+                            write!(fd, "{:?}", health)?;
+                        } else {
+                            write!(fd, "{:.14E}", orbit.as_f64())?;
+                        }
+                    },
+                    "source" => {
+                        write!(fd, "{:.14E}", orbit.as_f64())?;
+                    },
+                    "satType" => {
+                        if let Some(sat_type) = orbit.as_bds_satellite_type() {
+                            write!(fd, "{:?}", sat_type)?;
+                        } else {
+                            write!(fd, "{:.14E}", orbit.as_f64())?;
+                        }
+                    },
+                    "integrity" => {
+                        if let Some(integrity) = orbit.as_bds_b1c_integrity() {
+                            write!(fd, "{:?}", integrity)?;
+                        } else if let Some(integrity) = orbit.as_bds_b2a_b1c_integrity() {
+                            write!(fd, "{:?}", integrity)?;
+                        } else if let Some(integrity) = orbit.as_bds_b2b_integrity() {
+                            write!(fd, "{:?}", integrity)?;
+                        } else {
+                            write!(fd, "{:.14E}", orbit.as_f64())?;
+                        }
+                    },
+                    "status" => {
+                        if let Some(status) = orbit.as_glonass_status_mask() {
+                            write!(fd, "{:?}", status)?;
+                        } else {
+                            write!(fd, "{:.14E}", orbit.as_f64())?;
+                        }
+                    },
+                    "tgd" => {},
+                    _ => write!(fd, "{:.14E}", orbit.as_f64())?,
+                }
+
+                if num != num_orbits - 1 {
+                    write!(fd, ", ")?;
+                } else {
+                    write!(fd, "\n")?;
+                }
+            }
+        }
+    }
+
     Ok(())
 }

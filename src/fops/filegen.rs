@@ -6,9 +6,8 @@ use gnss_qc::prelude::ProductType;
 
 #[cfg(feature = "csv")]
 use crate::fops::csv::{
-    write_nav_rinex as write_nav_rinex_csv,
-    // write_sp3 as write_sp3_csv,
-    write_obs_rinex as write_obs_rinex_csv,
+    write_joint_nav_obs_rinex as write_joint_nav_obs_rinex_csv,
+    write_obs_rinex as write_obs_rinex_csv, write_raw_nav_rinex as write_raw_nav_rinex_csv,
 };
 
 /*
@@ -33,6 +32,8 @@ pub fn filegen(ctx: &Context, matches: &ArgMatches, submatches: &ArgMatches) -> 
 #[cfg(feature = "csv")]
 fn write_csv(ctx: &Context, matches: &ArgMatches, submatches: &ArgMatches) -> Result<(), Error> {
     let ctx_data = &ctx.data;
+
+    // OBS RINEX
     if let Some(rinex) = ctx_data.rinex(ProductType::Observation) {
         ctx.workspace.create_subdir("OBSERVATIONS");
 
@@ -43,6 +44,7 @@ fn write_csv(ctx: &Context, matches: &ArgMatches, submatches: &ArgMatches) -> Re
             .root
             .join("OBSERVATIONS")
             .join(output_filename(rinex, matches, submatches, prod));
+
         write_obs_rinex_csv(rinex, &output)?;
 
         info!(
@@ -50,16 +52,32 @@ fn write_csv(ctx: &Context, matches: &ArgMatches, submatches: &ArgMatches) -> Re
             ProductType::Observation,
             output.display()
         );
+    }
 
-        if let Some(brdc) = ctx_data.rinex(ProductType::BroadcastNavigation) {
-            ctx.workspace.create_subdir("BRDC");
-            let prod = custom_prod_attributes(brdc, submatches);
-            let output = ctx
-                .workspace
-                .root
-                .join("BRDC")
-                .join(output_filename(brdc, matches, submatches, prod));
-            write_nav_rinex_csv(rinex, brdc, &output)?;
+    // NAV RINEX
+    if let Some(brdc) = ctx_data.rinex(ProductType::BroadcastNavigation) {
+        ctx.workspace.create_subdir("BRDC");
+
+        let prod = custom_prod_attributes(brdc, submatches);
+        let output_name = output_filename(brdc, matches, submatches, prod);
+
+        let output = ctx.workspace.root.join("BRDC").join(&output_name);
+
+        write_raw_nav_rinex_csv(brdc, &output)?;
+
+        info!(
+            "{} dumped in {}",
+            ProductType::BroadcastNavigation,
+            output.display()
+        );
+
+        if let Some(obs) = ctx_data.rinex(ProductType::Observation) {
+            ctx.workspace.create_subdir("BRDC+OBS");
+
+            let output = ctx.workspace.root.join("BRDC+OBS").join(&output_name);
+
+            write_joint_nav_obs_rinex_csv(brdc, obs, &output)?;
+
             info!(
                 "{} dumped in {}",
                 ProductType::BroadcastNavigation,
@@ -67,11 +85,7 @@ fn write_csv(ctx: &Context, matches: &ArgMatches, submatches: &ArgMatches) -> Re
             );
         }
     }
-    if let Some(_) = ctx_data.sp3() {
-        // TODO
-        // write_sp3_csv(rinex, &output)?;
-        // info!("{} dumped in {}", ProductType::HighPrecisionOrbit, output);
-    }
+
     Ok(())
 }
 
