@@ -88,11 +88,7 @@ fn custom_prod_attributes(rinex: &Rinex, matches: &ArgMatches) -> ProductionAttr
     opts
 }
 
-/*
- * Returns output filename to be generated, for this kind of Product
- * TODO: some customization might impact the Header section
- *       that we should slightly rework, to be 100% correct
- */
+/// Returns output filename to be generated, for this kind of product.
 fn output_filename(
     rinex: &Rinex,
     matches: &ArgMatches,
@@ -101,32 +97,31 @@ fn output_filename(
 ) -> String {
     // Parse possible custom opts
     let short = submatches.get_flag("short");
-    let gzip = if submatches.get_flag("gzip") {
-        Some(".gz")
-    } else {
-        None
-    };
-
     let csv = submatches.get_flag("csv");
 
-    // When manual definition is set, we use the User input
-    // otherwise, we use smart determination
-    if let Some(custom) = matches.get_one::<String>("output-name") {
-        if gzip.is_some() {
-            if csv {
-                format!("{}.csv.gz", custom)
-            } else {
-                format!("{}.gz", custom)
-            }
+    let suffix = if csv {
+        if submatches.get_flag("gzip") {
+            Some(".csv.gz")
         } else {
-            if csv {
-                format!("{}.csv", custom)
-            } else {
-                custom.to_string()
-            }
+            Some(".csv")
+        }
+    } else {
+        if submatches.get_flag("gzip") {
+            Some(".gz")
+        } else {
+            None
+        }
+    };
+
+    // Prefer manual user input, otherwise, use smart determination.
+    if let Some(custom) = matches.get_one::<String>("output-name") {
+        if let Some(suffix) = suffix {
+            format!("{}{}", custom, suffix)
+        } else {
+            custom.to_string()
         }
     } else {
         debug!("{:?}", prod);
-        rinex.standard_filename(short, gzip, Some(prod))
+        rinex.standard_filename(short, suffix, Some(prod))
     }
 }
