@@ -51,10 +51,10 @@ rinex-cli \
     filegen --csv
 ```
 
-Once again, the content you will obtain depends on the input products
+Once again, the content you obtain depends on the input products
 
-| Input Product           | CSV                                                              |
-|-------------------------|------------------------------------------------------------------|
-| Observation RINEX       | Extracted signals, per date, time, SV, constellation and physics |
-| Navigation RINEX        | Extracted and interpreted Navigation messages                    |
-| OBS+NAV RINEX           | Joint file with orbital attitude resolved @ sampling epoch       |
+| Input Product           | CSV                                                                           |
+|-------------------------|-------------------------------------------------------------------------------|
+| Observation RINEX       | Extracted signals, per date, time, SV, constellation and physics              |
+| Navigation RINEX        | Extracted and interpreted Navigation messages                                 |
+| OBS+NAV RINEX           | Joint (1) + (2) + orbital attitude and clock states resolved @ sampling epoch |
