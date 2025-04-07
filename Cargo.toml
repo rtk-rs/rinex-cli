@@ -56,8 +56,7 @@ gnss-rs = { version = "2.3.5", features = ["serde"] }
 gnss-qc = { git = "https://github.com/rtk-rs/gnss-qc", branch = "main", features = ["sp3"] } 
 
 sp3 = { version = "1.1.2", features = ["processing", "anise", "flate2", "serde"] }
-
-rinex = { git = "https://github.com/rtk-rs/rinex", branch = "main", features = ["obs", "nav", "ionex", "antex", "clock", "flate2", "processing", "serde"] }
+rinex = { version = "0.17.1", features = ["obs", "nav", "ionex", "antex", "clock", "flate2", "processing", "serde"] }
 
 # gnss-rtk = { path = "../gnss-rtk", features = ["serde", "embed_ephem"] }
 gnss-rtk = { git = "https://github.com/rtk-rs/gnss-rtk", branch = "main", features = ["serde", "embed_ephem"] }
