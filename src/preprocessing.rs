@@ -1,7 +1,7 @@
 use std::str::FromStr;
 
 use crate::Cli;
-use gnss_qc::prelude::{Filter, QcContext, Repair};
+use gnss_qc::prelude::{Filter, NavFilter, QcContext, Repair};
 
 pub fn preprocess(ctx: &mut QcContext, cli: &Cli) {
     // GNSS filters
@@ -54,7 +54,15 @@ pub fn preprocess(ctx: &mut QcContext, cli: &Cli) {
             .unwrap_or_else(|e| panic!("Failed to apply filter \"{}\" - {}", filt_str, e));
 
         ctx.filter_mut(&filter);
+        trace!("Applied \"{}\" filter", filt_str);
+    }
 
+    // apply NAV filter specs
+    for filt_str in cli.nav_filters() {
+        let filter = NavFilter::from_str(filt_str)
+            .unwrap_or_else(|e| panic!("Failed to apply filter \"{}\" - {}", filt_str, e));
+
+        ctx.nav_filter_mut(&filter);
         trace!("Applied \"{}\" filter", filt_str);
     }
 

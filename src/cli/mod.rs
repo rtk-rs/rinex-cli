@@ -269,6 +269,17 @@ This has no effect on applications compiled without plot and statistical options
                 .value_delimiter(';')
                 .action(ArgAction::Append)
                 .help("Filter designer. Refer to []."))
+            .arg(Arg::new("nav")
+                .long("nav")
+                .action(ArgAction::Append)
+                .help("Deploy one of the navigation condition. See --help")
+                .long_help("Use --nav= to apply or select particular navigation conditions.
+We support the following: 
+   1. --nav=healthy          retain healthy (suitable for NAV) SV only
+   2. --nav=unhealthy        retain unhealthy (non suitable for NAV) SV only
+   3. --nav=testing          retain in-testing (usually non suitable for NAV) SV only
+   4. --nav=gps:healthy      apply (1) to GPS only
+   5. --nav=bds,gps:testing  apply (3) to BDS+GPS"))
             .next_help_heading("RINEX Repair")
                 .arg(Arg::new("zero-repair")
                     .short('z')
@@ -357,7 +368,8 @@ Otherwise it gets automatically picked up."))
             _ => Vec::new(),
         }
     }
-    /// Returns preproc ops
+
+    /// Returns list of preprocessing operations
     pub fn preprocessing(&self) -> Vec<&String> {
         if let Some(filters) = self.matches.get_many::<String>("preprocessing") {
             filters.collect()
@@ -365,6 +377,16 @@ Otherwise it gets automatically picked up."))
             Vec::new()
         }
     }
+
+    /// Returns list of NAV filters
+    pub fn nav_filters(&self) -> Vec<&String> {
+        if let Some(filters) = self.matches.get_many::<String>("nav") {
+            filters.collect()
+        } else {
+            Vec::new()
+        }
+    }
+
     pub fn gps_filter(&self) -> bool {
         self.matches.get_flag("gps-filter")
     }
