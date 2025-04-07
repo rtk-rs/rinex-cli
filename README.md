@@ -102,17 +102,20 @@ generate, based on your input products
 
 Then, continue your learning journey with:
 
-- [The Merge operation](./documentation/Merge.md): to merge RINEX files together,
+- [`merge` mode](./documentation/Merge.md): to merge RINEX files together,
 which is particularly useful in Data production context & files management
 
-- [The Split operation](./documentation/Split.md): demonstrates how to
+- [`split` mode](./documentation/Split.md): demonstrates how to
 split one RINEX file into two
 
-- [Time Binning operation](./documentation/Tbin.md): allows creating a batch of RINEX
+- [`tbin` mode](./documentation/Tbin.md): allows creating a batch of RINEX
 from a single one (basically, dividing into sub-parts)
 
-- [The differentiation operation](./documentation/Diff.md): to create a special RINEX
+- [`diff` mode](./documentation/Diff.md): to create a special RINEX
 by substracting one from the other
+
+- [`filegen` mode](./documentation/Filegen.md) to generate text data, whether it is
+RINEX, SP3 or CSV. Patch data using the preprocessor. Perform RINEX to CSV export etc..
 
 Dive into the world of precise navigation:
 
