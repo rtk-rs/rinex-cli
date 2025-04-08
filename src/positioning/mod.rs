@@ -12,6 +12,9 @@ pub use snapshot::{CenteredDataPoints, CenteredSnapshot};
 mod eph;
 use eph::EphemerisSource;
 
+mod time;
+use time::Time;
+
 mod ppp; // precise point positioning
 use ppp::{
     post_process::{post_process as ppp_post_process, Error as PPPPostError},
@@ -321,7 +324,9 @@ pub fn precise_positioning(
 
     // create data providers
     let eph = RefCell::new(EphemerisSource::from_ctx(ctx));
+
     let clocks = Clock::new(&ctx, &eph);
+    let time = Time::new();
     let orbits = Orbits::new(&ctx, &eph);
 
     // let mut rtk_reference = RemoteRTKReference::from_ctx(&ctx);
@@ -354,6 +359,7 @@ If your dataset does not describe one, you can manually describe one, see --help
         ctx.data.almanac.clone(),
         ctx.data.earth_cef,
         orbits,
+        time,
         bias_model,
         apriori_ecef_m,
     );
