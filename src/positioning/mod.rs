@@ -326,7 +326,7 @@ pub fn precise_positioning(
     let eph = RefCell::new(EphemerisSource::from_ctx(ctx));
 
     let clocks = Clock::new(&ctx, &eph);
-    let time = Time::new();
+    let time = Time::new(&ctx);
     let orbits = Orbits::new(&ctx, &eph);
 
     // let mut rtk_reference = RemoteRTKReference::from_ctx(&ctx);
