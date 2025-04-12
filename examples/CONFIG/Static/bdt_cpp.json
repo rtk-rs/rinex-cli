@@ -1,4 +1,7 @@
 {
     "method": "CPP",
-    "timescale": "BDT"
+    "timescale": "BDT",
+    "solver": {
+        "postfit_denoising": 1000
+    }
 }

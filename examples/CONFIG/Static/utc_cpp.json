@@ -1,4 +1,7 @@
 {
     "method": "CPP",
-    "timescale": "UTC"
+    "timescale": "UTC",
+    "solver": {
+        "postfit_denoising": 1000
+    }
 }

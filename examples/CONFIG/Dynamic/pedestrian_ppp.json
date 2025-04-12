@@ -2,6 +2,7 @@
     "method": "CPP",
     "timescale": "GPST",
     "profile": "pedestrian",
-    "code_smoothing": 0,
-    "postfit_kf": true
+    "solver": {
+        "postfit_denoising": 1000
+    }
 }
