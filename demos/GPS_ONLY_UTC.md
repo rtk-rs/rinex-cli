@@ -41,3 +41,18 @@ rinex-cli \
 That's it! all you need to do, is describe your prefered timescale in the configuration script. Obviously, in similar use cases, you are limited by your input data and what it allows to do.
 
 :warning: RINEXv3 is not very precise because it only allows to describe an offset or a perturbation for a 24h timeframe. This means that (3) applies for that entire day, which is far from perfect. You should upgrade to RINEXv4 for better results and improved precision. You can check some of our [RINEX v4 demos](../)
+
+:warning: accurate timescale transposition is only feasible if the `Modeling:sv_clock_bias` is compensated for (obviously):
+
+```json
+{
+    timescale: "UTC",
+    [..]
+    "modeling": Modeling {
+        [..]
+        "sv_clock_bias": true,
+        [..]
+    },
+    [..]
+}
+```
