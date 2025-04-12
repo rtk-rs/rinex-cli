@@ -11,6 +11,7 @@ Let's deploy the solver and request for GPST solutions
 
 ```bash
 rinex-cli \
+    -P GPS,C1C,C2W \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
     ppp -c examples/CONFIG/Static/gpst_cpp.json
@@ -34,6 +35,7 @@ Here we take advantage of (1) to express the temporal solution in GST timescale:
 
 ```bash
 rinex-cli \
+    -P GPS,C1C,C2W \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
     ppp -c examples/CONFIG/Static/gst_cpp.json
@@ -42,4 +44,7 @@ rinex-cli \
 That's it! all you need to do, is describe your prefered timescale in the configuration script. 
 Obviously, you are limited by what your input data allows to do.
 
-:warning: RINEXv3 is not very precise because it only allows to describe an offset or a perturbation for a 24h timeframe. This means that (3) applies for that entire day, which is far from perfect. You should upgrade to RINEXv4 for better results and improved precision. You can check some of our [RINEX v4 demos](../)
+:warning: RINEX V3 /V4
+======================
+
+RINEXv3 is not very precise because it only allows to describe an offset or a perturbation for a 24h timeframe. This means that (3) applies for that entire day, which is far from perfect. You should upgrade to RINEXv4 for better results and improved precision. You can check some of our [RINEX v4 demos](../)
