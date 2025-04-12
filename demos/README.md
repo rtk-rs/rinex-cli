@@ -3,12 +3,12 @@ Demos
 
 Serie of demonstrations using `rinex-cli` and our [GNSS framework](https://github.com/rtk-rs)
 
-- [Zero Repair (-z) to obtain valid PVT solutions](./zero-repair-ppp)
-- [Two 24H RINEX (=48h) surveying using static PPP technique](./static-ppp-48h)
-- [Code Smoothing combined to static PPP](./ppp-code-smoothing)
-- [Pedestrian profile (roaming) PPP](./pedestrian-ppp)
+- [Zero Repair (-z) to obtain valid PVT solutions](./ZERO_REPAIR_PPP.md)
+- [Two 24H RINEX (=48h) surveying using static PPP technique](./STATIC_PPP_48H.md)
+- [Code Smoothing combined to static PPP](./PPP_CODE_SMOOTHING.md)
+- [Pedestrian profile (roaming) PPP](./PPP_ROAMING_PEDESTRIAN.md)
 
 Timescales & Constellations Demos
 =================================
 
-- [GPS (only) and UTC timescale](./gpst/gpst-only-utc.md)
+- [GPS (only) and UTC timescale](./GPS_ONLY_UTC.md)
