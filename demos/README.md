@@ -14,14 +14,9 @@ Timescales & Constellations Demos
 
 Demonstrate Timescale support, absolute time correctness and constellations support
 
-- [GPS (only) to UTC timescale](./GPS_ONLY_UTC.md)
-- [GPS (only) to GST timescale (RINEXv3)](./GPS_ONLY_GST.md)
-- [GAL (only) to GPS timescale](./GAL_ONLY_GPST.md)
-- [GAL (only) to UTC timescale (RINEXv3)](./GAL_ONLY_UTC.md)
-- [GAL (only) to GST timescale (RINEXv3)](./GPS_ONLY_GST.md)
-- [BDS (only) to GPS timescale](./BDS_ONLY_GPST.md)
-- [BDS (only) to UTC timescale (RINEXv3)](./BDS_ONLY_UTC.md)
-- [BDS (only) to GST timescale (RINEXv3)](./BDS_ONLY_GST.md)
+- [GPS (only) to GPST/UTC and GST timescales (RINEXv3)](./GPS_ONLY.md)
+- [GAL (only) to GPST/UTC and GST timescale (RINEXv3)](./GAL_ONLY.md)
+- [GAL (only) to GPST/UTC and GST timescale (RINEXv3)](./BDS_ONLY.md)
 
 All these scripts apply to `CGGTTS` solutions, by simply adding the `--cggtts` option.
 
