@@ -93,7 +93,6 @@ impl<'a> EphemerisSource<'a> {
 
     /// [Ephemeris] selection at [Epoch] for [SV].
     pub fn select(&mut self, t: Epoch, sv: SV) -> Option<(Epoch, Epoch, Ephemeris)> {
-        let mut attempt = 0;
         loop {
             if let Some((toc_i, toe_i, eph_i)) = self.try_select(t, sv) {
                 return Some((toc_i, toe_i, eph_i.clone()));
