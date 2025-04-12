@@ -1,0 +1,7 @@
+{
+    "method": "CPP",
+    "timescale": "GPST",
+    "solver": {
+        "postfit_denoising": 1000
+    }
+}
