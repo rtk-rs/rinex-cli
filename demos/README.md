@@ -11,4 +11,6 @@ Serie of demonstrations using `rinex-cli` and our [GNSS framework](https://githu
 Timescales & Constellations Demos
 =================================
 
+Demonstrate Timescale support, absolute time correctness and constellations support
+
 - [GPS (only) and UTC timescale](./GPS_ONLY_UTC.md)
