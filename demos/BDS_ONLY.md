@@ -1,7 +1,8 @@
 BDS (Only) demonstrations
 =========================
 
-Topics:
 
-1. demonstrates support for BDS vehicles
-2. demonstrate support of GPST, GST and UTC prefered timescale settings
+| Topics         | - Illustrate support of BDS vehicles (correct navigation & spatial solutions)   |
+|                | - Demonstrate support of GPST, GST, UTC timescales (correct temporal solutions) |
+|----------------|---------------------------------------------------------------------------------|
+| Constellation  | BDS (only)                                                                      |
