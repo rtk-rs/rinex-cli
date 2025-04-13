@@ -1,6 +1,6 @@
 {
     "method": "CPP",
-    "timescale": "GPST",
+    "timescale": "UTC",
     "solver": {
         "postfit_denoising": 1000
     }

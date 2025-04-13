@@ -13,7 +13,7 @@ use rinex::{
 };
 
 use gnss_rtk::prelude::{
-    Bias, Candidate, Carrier as RTKCarrier, Method, Observation, OrbitSource, Solver,
+    Bias, Candidate, Carrier as RTKCarrier, Method, Observation, OrbitSource, Solver, Time,
     SPEED_OF_LIGHT_M_S,
 };
 
@@ -82,11 +82,11 @@ fn rinex_ref_observable(
 }
 
 /// Resolves CGGTTS tracks from input context
-pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias>(
+pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: Time>(
     ctx: &Context,
     eph: &'a RefCell<EphemerisSource<'b>>,
     mut clock: CK,
-    mut solver: Solver<O, B>,
+    mut solver: Solver<O, B, T>,
     method: Method,
 ) -> Result<Vec<Track>, PositioningError> {
     let obs_data = ctx
