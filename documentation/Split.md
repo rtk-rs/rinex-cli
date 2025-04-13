@@ -7,7 +7,7 @@ File Operation: split
 | Difficulty     | <span style="color:gold"> &#9733;</span>&#9734;&#9734;&#9734;&#9734; |
 | Constellations | Any                                                                  |
 | Input          | RINEX, SP3                                                           |
-| Output         | RINEX, SP3, CSV                                                      |
+| Output         | RINEX, SP3                                                           |
 
 The `split` mode allows splitting an input product into two, at a specific point in time.
 
@@ -23,20 +23,18 @@ Split signal observations at noon:
 
 ```bash
 rinex-cli \
+    --crx2rnx \
     --fp data/CRNX/V3/ESBC00DNK_R_20201770000_01D_MN.rnx.gz \
     split "2020-06-25T12:00:00 UTC"
 ```
 
-## Output format
+## Output file name
 
-By default, the tool generates (preserves) the input product format. But any file operations
-allows changing the format, for example by selecting `--csv`. In this example, we split a CRINEX file
-into two CSV files:
+The output file name follows standard naming conventions. Following previous example, we obtained:
 
 ```bash
-rinex-cli \
-    --fp data/CRNX/V3/ESBC00DNK_R_20201770000_01D_MN.rnx.gz \
-    split "2020-06-25T12:00:00 UTC" --csv
+"WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+"WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/ESBC01DNK_R_20201781200_01D_30S_MO.rnx" has been generated
 ```
 
 ## Advanced use
@@ -44,14 +42,14 @@ rinex-cli \
 Any preprocessing pipeline may apply, so you can perform several tasks at once. 
 For example, you can discard Constellations or SV your are not interested in, prior performing the temporal split.
 
+In this example we split at noon C1C+C5Q GPS observations:
+
 ```bash
 rinex-cli \
     -P GPS;C1C,C5Q \
     --fp data/CRNX/V3/ESBC00DNK_R_20201770000_01D_MN.rnx.gz \
-    split 2020-06-25T12:00:00 UTC
+    split "2020-06-25T12:00:00 UTC"
 ```
-
-Any valid `-P` pipeline applies here.
 
 Other options exist, for example `--crx2rnx` to request seamless CRINEX decompression, while working with
 CRINEX observations like in these examples. This would generate two readable RINEX files (decompressed) splitted at noon, 
