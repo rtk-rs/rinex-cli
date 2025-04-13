@@ -44,7 +44,7 @@ pub fn diff(ctx: &Context, cli: &Cli, submatches: &ArgMatches) -> Result<(), Err
 
     let input_name = rinex_a.standard_filename(forced_short_v2, None, None);
     let input_path = Path::new(&input_name);
+    dump_rinex_auto_generated_name(&ctx, input_path, &rinex_c, gzip, None);
 
-    dump_rinex_auto_generated_name(&ctx, input_path, &rinex_c, gzip);
     Ok(())
 }

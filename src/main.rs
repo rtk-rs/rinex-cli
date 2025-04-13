@@ -367,7 +367,7 @@ pub fn main() -> Result<(), Error> {
             return Ok(());
         },
         Some(("cbin", submatches)) => {
-            fops::constell_timescale_binning(&ctx, &cli.matches, submatches)?;
+            fops::constell_timescale_binning(&ctx, submatches)?;
             return Ok(());
         },
         Some(("diff", submatches)) => {

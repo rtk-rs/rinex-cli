@@ -84,8 +84,7 @@ pub fn merge(ctx: &Context, cli: &Cli, submatches: &ArgMatches) -> Result<(), Er
     };
 
     let input_path = Path::new(&origin_name);
-
-    dump_rinex_auto_generated_name(&ctx, &input_path, &rinex_c, gzip);
+    dump_rinex_auto_generated_name(&ctx, &input_path, &rinex_c, gzip, None);
 
     Ok(())
 }

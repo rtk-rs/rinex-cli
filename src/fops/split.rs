@@ -28,11 +28,11 @@ pub fn split(ctx: &Context, submatches: &ArgMatches) -> Result<(), Error> {
 
             let input_name = rinex_a.standard_filename(forced_short_v2, None, None);
             let input_path = Path::new(&input_name);
-            dump_rinex_auto_generated_name(&ctx, &input_path, &rinex_a, gzip);
+            dump_rinex_auto_generated_name(&ctx, &input_path, &rinex_a, gzip, None);
 
             let input_name = rinex_b.standard_filename(forced_short_v2, None, None);
             let input_path = Path::new(&input_name);
-            dump_rinex_auto_generated_name(&ctx, &input_path, &rinex_b, gzip);
+            dump_rinex_auto_generated_name(&ctx, &input_path, &rinex_b, gzip, None);
         }
     }
     Ok(())

@@ -24,6 +24,8 @@ use rinex::{
     prod::{DataSource, DetailedProductionAttributes, ProductionAttributes, FFU, PPU},
 };
 
+use sp3::SP3;
+
 use crate::Context;
 
 /// Shared method to parse a RINEX file
@@ -45,19 +47,28 @@ pub fn parse_rinex(path: &Path) -> Rinex {
 }
 
 /// Shared method to dump a RINEX file into the workspace
-pub fn dump_rinex_auto_generated_name(ctx: &Context, input_path: &Path, rinex: &Rinex, gzip: bool) {
+pub fn dump_rinex_auto_generated_name(
+    ctx: &Context,
+    input_path: &Path,
+    rinex: &Rinex,
+    gzip: bool,
+    custom_subdir: Option<String>,
+) {
     let suffix = input_path
         .file_name()
         .expect("failed to determine output filename")
         .to_string_lossy()
         .to_string();
 
-    let mut output_path = ctx
-        .workspace
-        .root
-        .join(suffix)
-        .to_string_lossy()
-        .to_string();
+    let mut output_path = ctx.workspace.root.clone();
+
+    if let Some(subdir) = custom_subdir {
+        output_path = output_path.join(subdir);
+    }
+
+    output_path = output_path.join(suffix);
+
+    let mut output_path = output_path.to_string_lossy().to_string();
 
     if gzip {
         output_path.push_str(".gz");

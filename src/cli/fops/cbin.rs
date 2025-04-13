@@ -5,7 +5,7 @@ use super::{SHARED_DATA_ARGS, SHARED_GENERAL_ARGS};
 
 pub fn subcommand() -> Command {
     Command::new("cbin")
-        .arg_required_else_help(true)
+        .arg_required_else_help(false)
         .about("Constellation / NAV binning. Split files into a batch of individual Constellation/Timescales.")
         .next_help_heading("Production Environment")
         .args(SHARED_GENERAL_ARGS.iter())

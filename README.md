@@ -106,8 +106,8 @@ Then, continue your learning journey with:
 which is particularly useful in Data production context & files management
 
 - [`split` mode](./documentation/Split.md): divide/split your input products at a specific point in time (`Epoch`)
-- [`cbin` (constellation/timescale binning) mode](./documentation/Cbin.md) create a batch (file series) of RINEX splitted by individual Constellation / Timescales 
-- [`tbin` (time binning) mode](./documentation/Tbin.md) create a batch (file series) of RINEX of equal duration
+- [`cbin` (constellation/timescale binning) mode](./documentation/CBin.md) create a batch (file series) of RINEX splitted by individual Constellation / Timescales 
+- [`tbin` (time binning) mode](./documentation/TBin.md) create a batch (file series) of RINEX of equal duration
 
 - [`diff` mode](./documentation/Diff.md): create a special RINEX=RINEX(A)-RINEX(B)
 by substracting two observation RINEX files together, per frequency and signal modulations
