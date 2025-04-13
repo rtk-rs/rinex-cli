@@ -223,13 +223,6 @@ This has no effect on file operations that do not synthesize a report."))
 the skyplot (compass) projection is only calculated from the SP3 coordinates (highest precision). 
 Use this option to also calculate it from radio messages (for comparison purposes for example).")
         )
-        .arg(
-            Arg::new("report-nostats")
-                .long("nostats")
-                .action(ArgAction::SetTrue)
-                .help("Hide statistical annotations that might be present in some plots.
-This has no effect on applications compiled without plot and statistical options.")
-        )
         .next_help_heading("Preprocessing")
             .arg(Arg::new("gps-filter")
                 .short('G')
@@ -318,6 +311,7 @@ Otherwise it gets automatically picked up."))
             matches: cmd.get_matches(),
         }
     }
+
     /// Recursive browser depth
     pub fn recursive_depth(&self) -> usize {
         if let Some(depth) = self.matches.get_one::<u8>("depth") {
@@ -326,6 +320,7 @@ Otherwise it gets automatically picked up."))
             5
         }
     }
+    
     /// Returns individual input ROVER -d
     pub fn rover_directories(&self) -> Vec<&String> {
         if let Some(dirs) = self.matches.get_many::<String>("directory") {
@@ -334,6 +329,7 @@ Otherwise it gets automatically picked up."))
             Vec::new()
         }
     }
+    
     /// Returns individual input ROVER -fp
     pub fn rover_files(&self) -> Vec<&String> {
         if let Some(fp) = self.matches.get_many::<String>("filepath") {
@@ -342,6 +338,7 @@ Otherwise it gets automatically picked up."))
             Vec::new()
         }
     }
+    
     /// Returns individual input BASE STATION -d
     pub fn base_station_directories(&self) -> Vec<&String> {
         match self.matches.subcommand() {

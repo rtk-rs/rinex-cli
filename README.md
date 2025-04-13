@@ -121,14 +121,16 @@ Dive into the world of precise navigation:
 
 - [Introduction to the PPP (Post Processed Positioning) opmode](./documentation/PPP.md)
 - [PPP with special +cggtts option](./documentation/CGGTTS.md)
-- [Many examples](./examples/README.md) are provided, spanning many applications
+
+Examples
+========
+
+[Many examples](./examples/README.md) are provided for each mode individually.
 
 Demos
 =====
 
-- [Zero Repair (-z) to obtain valid PVT solutions](./demos/zero-repair-ppp)
-- [Apriori knowledge and PVT solution solving](./demos)
-- [RINEX to CSV export](./demos)
+Our [Demo folder](./demos) hosts many illustrations and high level applications
 
 Special Thanks
 ==============
