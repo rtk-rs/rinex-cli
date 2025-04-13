@@ -1,12 +1,13 @@
 File Operation: split
 =====================
 
-| Topics         | - Illustrate the `split` mode |
-|----------------|-------------------------------|
-| Constellations | Any
-| CLI Modes      | `split`
-| Input          | RINEX
-| Output         | RINEX, CSV
+| Topics         | - Illustrate the `split` mode                                 |
+|----------------|---------------------------------------------------------------|
+| CLI Modes      | `split`                                                       |
+| Difficulty     | <span style='color:gold'> &#9733;&#9734;&#9734;&#9734;&#9734; |
+| Constellations | Any                                                           |
+| Input          | RINEX, SP3                                                    |
+| Output         | RINEX, SP3, CSV                                               |
 
 The `split` mode allows splitting an input product into two, at a specific point in time.
 
