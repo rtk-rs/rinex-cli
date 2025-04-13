@@ -4,7 +4,7 @@ File Operation: split
 | Topics         | - Illustrate the `split` mode                                        |
 |----------------|----------------------------------------------------------------------|
 | CLI Modes      | `split`                                                              |
-| Difficulty     | <span style='color:gold'> &#9733;&#9734;&#9734;&#9734;&#9734;</span> |
+| Difficulty     | <span style="color:gold"> &#9733;</span>&#9734;&#9734;&#9734;&#9734; |
 | Constellations | Any                                                                  |
 | Input          | RINEX, SP3                                                           |
 | Output         | RINEX, SP3, CSV                                                      |
