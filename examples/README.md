@@ -1,7 +1,7 @@
 Command line examples
 =====================
 
-Command line and applications, per opmode.
+This folder gives substantial examples of each command line option.
 
 - [Configuration scripts](./CONFIG) that our examples may use
 - [Post Processed Positioning (PPP) examples](./PPP)
@@ -9,9 +9,4 @@ Command line and applications, per opmode.
 
 ## Demos
 
-We have a demo folder that is here to illustrate specific topics:
-
-- [Zero Repair (-z) to obtain valid PVT solutions](../demos/zero-repair-ppp")
-- [48h Static PPP surveying, using two RINEX files](../demos/static-ppp-48h")
-- [Code smoothing to further improve PPP](../demos/ppp-code-smoothing)
-- [Pedestrian profile (roaming) PPP](../demos/pedestrian-ppp)
+Our [demo folder](../demos) wraps more general applications and illustrates many topics

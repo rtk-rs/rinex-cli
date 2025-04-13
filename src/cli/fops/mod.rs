@@ -1,8 +1,9 @@
+pub mod cbin;
 pub mod diff;
 pub mod filegen;
 pub mod merge;
 pub mod split;
-pub mod time_binning;
+pub mod tbin;
 
 use lazy_static::lazy_static;
 
@@ -10,10 +11,7 @@ use ::clap::{value_parser, Arg, ArgAction};
 
 use rinex::prod::{DataSource, FFU, PPU};
 
-/*
- * Arguments that are shared by all file operations.
- * Mainly [ProductionAttributes] (re)definition opts
- */
+/// Arguments (CLI options) that are shared by all file operations.
 #[cfg(not(feature = "csv"))]
 lazy_static! {
     pub static ref SHARED_GENERAL_ARGS : Vec<Arg> = vec![
@@ -38,10 +36,6 @@ Otherwise, this ecosystem prefers modern (longer) filenames that contain more in
             .action(ArgAction::SetTrue)
             .help("Force plain/readable file generation. By default, if input data is gzip compressed, we will preserve
 the input compression. Use this to bypass."),
-        Arg::new("csv")
-            .long("csv")
-            .action(ArgAction::SetTrue)
-            .help("[NOT AVAILABLE] requires `csv` compilation option"),
         Arg::new("agency")
             .short('a')
             .long("agency")

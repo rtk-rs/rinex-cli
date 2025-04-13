@@ -326,8 +326,6 @@ pub fn main() -> Result<(), Error> {
 
     // Prepare for output productes (on any FOPS)
     if cli.has_fops_output_product() {
-        ctx.workspace.create_subdir("OUTPUT");
-
         // possible seamless CRINEX/RINEX compression
         if cli.rnx2crnx() {
             if let Some(observation) = ctx.data.observation_mut() {

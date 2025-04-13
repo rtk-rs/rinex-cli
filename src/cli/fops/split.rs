@@ -1,4 +1,3 @@
-// Merge opmode
 use clap::{value_parser, Arg, ArgAction, Command};
 use rinex::prelude::Epoch;
 

@@ -105,22 +105,22 @@ Then, continue your learning journey with:
 - [`merge` mode](./documentation/Merge.md): to merge RINEX files together,
 which is particularly useful in Data production context & files management
 
-- [`split` mode](./documentation/Split.md): demonstrates how to
-split one RINEX file into two
+- [`split` mode](./documentation/Split.md): divide/split your input products at a specific point in time (`Epoch`)
+- [`cbin` (constellation/nav binning) mode](./documentation/Cbin.md) create a batch (file series) of RINEX on Constellation and Timescale basis
+- [`tbin` (time binning) mode](./documentation/Tbin.md) create a batch (file series) of RINEX of equal duration
 
-- [`tbin` mode](./documentation/Tbin.md): allows creating a batch of RINEX
-from a single one (basically, dividing into sub-parts)
+- [`diff` mode](./documentation/Diff.md): create a special RINEX=RINEX(A)-RINEX(B)
+by substracting two observation RINEX files together, per frequency and signal modulations
 
-- [`diff` mode](./documentation/Diff.md): to create a special RINEX
-by substracting one from the other
+- [`filegen` mode](./documentation/Filegen.md): generate output products (RINEX, SP3, CSV..)
+after a possible preprocessing pipeline. Use this to either reformat RINEX or perform a RINEX to CSV conversion.
 
-- [`filegen` mode](./documentation/Filegen.md) to generate text data, whether it is
-RINEX, SP3 or CSV. Patch data using the preprocessor. Perform RINEX to CSV export etc..
+## Post Processed Positioning
 
 Dive into the world of precise navigation:
 
-- [Introduction to the PPP (Post Processed Positioning) opmode](./documentation/PPP.md)
-- [PPP with special +cggtts option](./documentation/CGGTTS.md)
+- [`ppp` opmode introduction](./documentation/PPP.md)
+- [`ppp` with special `--cggtts` option](./documentation/CGGTTS.md)
 
 Examples
 ========

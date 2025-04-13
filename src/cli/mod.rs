@@ -24,7 +24,7 @@ mod workspace;
 
 pub use workspace::Workspace;
 
-use fops::{diff, filegen, merge, split, time_binning};
+use fops::{cbin, diff, filegen, merge, split, tbin};
 
 pub struct Cli {
     /// Arguments passed by user
@@ -306,7 +306,8 @@ Otherwise it gets automatically picked up."))
             .subcommand(positioning::rtk_subcommand())
             .subcommand(split::subcommand())
             .subcommand(diff::subcommand())
-            .subcommand(time_binning::subcommand());
+            .subcommand(cbin::subcommand())
+            .subcommand(tbin::subcommand());
         Self {
             matches: cmd.get_matches(),
         }
@@ -320,7 +321,7 @@ Otherwise it gets automatically picked up."))
             5
         }
     }
-    
+
     /// Returns individual input ROVER -d
     pub fn rover_directories(&self) -> Vec<&String> {
         if let Some(dirs) = self.matches.get_many::<String>("directory") {
@@ -329,7 +330,7 @@ Otherwise it gets automatically picked up."))
             Vec::new()
         }
     }
-    
+
     /// Returns individual input ROVER -fp
     pub fn rover_files(&self) -> Vec<&String> {
         if let Some(fp) = self.matches.get_many::<String>("filepath") {
@@ -338,7 +339,7 @@ Otherwise it gets automatically picked up."))
             Vec::new()
         }
     }
-    
+
     /// Returns individual input BASE STATION -d
     pub fn base_station_directories(&self) -> Vec<&String> {
         match self.matches.subcommand() {
@@ -472,6 +473,7 @@ Otherwise it gets automatically picked up."))
                 | Some(("merge", _))
                 | Some(("split", _))
                 | Some(("tbin", _))
+                | Some(("cbin", _))
                 | Some(("diff", _))
         )
     }

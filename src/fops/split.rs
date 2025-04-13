@@ -6,9 +6,7 @@ use rinex::prelude::Epoch;
 
 use rinex::prelude::processing::Split;
 
-/*
- * Splits input files at specified Time Instant
- */
+/// Splits input files at specified Time Instant
 pub fn split(ctx: &Context, matches: &ArgMatches) -> Result<(), Error> {
     let ctx_data = &ctx.data;
     let split_instant = matches

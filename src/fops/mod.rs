@@ -1,3 +1,4 @@
+mod cbin;
 mod diff;
 mod filegen;
 mod merge;
@@ -7,6 +8,7 @@ mod tbin;
 #[cfg(feature = "csv")]
 pub mod csv;
 
+pub use cbin::constell_timescale_binning;
 pub use diff::diff;
 pub use filegen::filegen;
 pub use merge::merge;
