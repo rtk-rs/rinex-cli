@@ -3,7 +3,7 @@ File Operation: split
 
 | Topics         | - Illustrate the `split` mode                                        |
 |----------------|----------------------------------------------------------------------|
-| CLI Modes      | `split`                                                              |
+| Modes          | `split`                                                              |
 | Difficulty     | <span style="color:gold"> &#9733;</span>&#9734;&#9734;&#9734;&#9734; |
 | Constellations | Any                                                                  |
 | Input          | RINEX, SP3                                                           |

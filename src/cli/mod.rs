@@ -466,7 +466,7 @@ Otherwise it gets automatically picked up."))
     }
 
     /// True if File Operations to generate data is being deployed
-    pub fn has_fops_output_product(&self) -> bool {
+    pub fn is_file_operation_run(&self) -> bool {
         matches!(
             self.matches.subcommand(),
             Some(("filegen", _))

@@ -8,8 +8,9 @@ mod positioning; // post processed positioning
 mod preprocessing; // preprocessing
 mod report; // custom reports
 
-use preprocessing::preprocess;
 use report::Report;
+
+use preprocessing::context_preprocessing;
 
 use gnss_qc::prelude::{QcContext, QcExtraPage};
 use rinex::prelude::{FormattingError as RinexFormattingError, ParsingError as RinexParsingError};
@@ -201,7 +202,7 @@ fn user_data_parsing(
     }
 
     // Preprocessing
-    preprocess(&mut ctx, cli);
+    context_preprocessing(&mut ctx, cli);
 
     match cli.matches.subcommand() {
         Some(("rtk", _)) => {
@@ -324,8 +325,8 @@ pub fn main() -> Result<(), Error> {
         },
     }
 
-    // Prepare for output productes (on any FOPS)
-    if cli.has_fops_output_product() {
+    // Prepare for file operation (output products)
+    if cli.is_file_operation_run() {
         // possible seamless CRINEX/RINEX compression
         if cli.rnx2crnx() {
             if let Some(observation) = ctx.data.observation_mut() {
@@ -333,6 +334,7 @@ pub fn main() -> Result<(), Error> {
                 observation.rnx2crnx_mut();
             }
         }
+
         if cli.crnx2rnx() {
             if let Some(observation) = ctx.data.observation_mut() {
                 info!("internal CRX2RNX decompression");
@@ -345,16 +347,15 @@ pub fn main() -> Result<(), Error> {
     let mut extra_pages = Vec::<QcExtraPage>::new();
 
     match cli.matches.subcommand() {
-        /*
-         *  File operations abort here and do not windup in analysis opmode.
-         *  Users needs to then deploy analysis mode on previously generated files.
-         */
+        // File operations abort here and do not continue to analysis opmode (special case).
+        // Users need to re-run (re execute) on previously generated data
+        // to perform their analysis.
         Some(("filegen", submatches)) => {
             fops::filegen(&ctx, &cli.matches, submatches)?;
             return Ok(());
         },
         Some(("merge", submatches)) => {
-            fops::merge(&ctx, submatches)?;
+            fops::merge(&ctx, &cli, submatches)?;
             return Ok(());
         },
         Some(("split", submatches)) => {
@@ -363,6 +364,10 @@ pub fn main() -> Result<(), Error> {
         },
         Some(("tbin", submatches)) => {
             fops::time_binning(&ctx, &cli.matches, submatches)?;
+            return Ok(());
+        },
+        Some(("cbin", submatches)) => {
+            fops::constell_timescale_binning(&ctx, &cli.matches, submatches)?;
             return Ok(());
         },
         Some(("diff", submatches)) => {

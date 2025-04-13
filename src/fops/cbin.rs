@@ -24,16 +24,6 @@ pub fn constell_timescale_binning(
             // create work dir
             ctx.workspace.create_subdir(dir);
 
-            // time frame determination
-            let (mut first, end) = (
-                rinex
-                    .first_epoch()
-                    .expect("failed to determine first epoch"),
-                rinex.last_epoch().expect("failed to determine last epoch"),
-            );
-
-            let mut last = first + *duration;
-
             // production attributes: initialize Batch counter
             let mut prod = custom_prod_attributes(rinex, submatches);
             if let Some(ref mut details) = prod.v3_details {
@@ -44,34 +34,7 @@ pub fn constell_timescale_binning(
                 prod.v3_details = Some(details);
             };
 
-            // run time binning algorithm
-            while last <= end {
-                let lower = Filter::lower_than(&last.to_string()).unwrap();
-                let greater = Filter::greater_equals(&first.to_string()).unwrap();
-
-                debug!("batch: {} < {}", first, last);
-                let batch = rinex.filter(&lower).filter(&greater);
-
-                // generate standardized name
-                let filename = output_filename(&batch, matches, submatches, prod.clone());
-
-                let output = ctx
-                    .workspace
-                    .root
-                    .join("OUTPUT")
-                    .join(&filename)
-                    .to_string_lossy()
-                    .to_string();
-
-                batch.to_file(&output)?;
-                info!("{} RINEX \"{}\" has been generated", product, output);
-
-                first += *duration;
-                last += *duration;
-                if let Some(ref mut details) = prod.v3_details {
-                    details.batch += 1;
-                }
-            }
+            // run binning algorithm
         }
     }
     Ok(())

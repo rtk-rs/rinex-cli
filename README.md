@@ -106,7 +106,7 @@ Then, continue your learning journey with:
 which is particularly useful in Data production context & files management
 
 - [`split` mode](./documentation/Split.md): divide/split your input products at a specific point in time (`Epoch`)
-- [`cbin` (constellation/nav binning) mode](./documentation/Cbin.md) create a batch (file series) of RINEX on Constellation and Timescale basis
+- [`cbin` (constellation/timescale binning) mode](./documentation/Cbin.md) create a batch (file series) of RINEX splitted by individual Constellation / Timescales 
 - [`tbin` (time binning) mode](./documentation/Tbin.md) create a batch (file series) of RINEX of equal duration
 
 - [`diff` mode](./documentation/Diff.md): create a special RINEX=RINEX(A)-RINEX(B)
@@ -119,8 +119,8 @@ after a possible preprocessing pipeline. Use this to either reformat RINEX or pe
 
 Dive into the world of precise navigation:
 
-- [`ppp` opmode introduction](./documentation/PPP.md)
-- [`ppp` with special `--cggtts` option](./documentation/CGGTTS.md)
+- [`ppp` opmode introduction](./documentation/PPP.md): resolve PVT solutions
+- [`ppp` with special `--cggtts` option](./documentation/CGGTTS.md): resolve CGGTTS solutions
 
 Examples
 ========

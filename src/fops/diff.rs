@@ -5,9 +5,7 @@ use gnss_qc::prelude::ProductType;
 use rinex::prelude::{Rinex, RinexType};
 use std::path::PathBuf;
 
-/*
- * Substract RINEX[A]-RINEX[B]
- */
+/// Substract and format RINEX=RINEX(A)-RINEX(B)
 pub fn diff(ctx: &Context, matches: &ArgMatches) -> Result<(), Error> {
     let ctx_data = &ctx.data;
 
