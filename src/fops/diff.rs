@@ -1,83 +1,50 @@
-use crate::cli::Context;
-use crate::Error;
 use clap::ArgMatches;
-use gnss_qc::prelude::ProductType;
-use rinex::prelude::{Rinex, RinexType};
-use std::path::PathBuf;
+use rinex::prelude::RinexType;
+
+use std::path::{Path, PathBuf};
+
+use crate::{
+    cli::{Cli, Context},
+    fops::{dump_rinex_auto_generated_name, parse_rinex},
+    preprocessing::rinex_preprocessing,
+    Error,
+};
 
 /// Substract and format RINEX=RINEX(A)-RINEX(B)
-pub fn diff(ctx: &Context, matches: &ArgMatches) -> Result<(), Error> {
+pub fn diff(ctx: &Context, cli: &Cli, submatches: &ArgMatches) -> Result<(), Error> {
     let ctx_data = &ctx.data;
 
-    let path_a = ctx_data
-        .files(ProductType::Observation)
-        .expect("diff only works on OBS RINEX currently")
-        .first()
-        .unwrap();
+    let rinex_a = ctx_data
+        .observation()
+        .expect("RINEX (A) - (B) requires OBS RINEX files");
 
-    let path_b = matches.get_one::<PathBuf>("file").unwrap();
+    let gzip = submatches.get_flag("gzip");
+    let forced_short_v2 = submatches.get_flag("short");
 
-    let extension_b = path_b
-        .extension()
-        .unwrap_or_else(|| panic!("Failed to determine file extension: {}", path_b.display()))
-        .to_string_lossy()
-        .to_string();
+    let path_b = submatches.get_one::<PathBuf>("file").unwrap();
+    let mut rinex_b = parse_rinex(&path_b);
 
-    let rinex_b = if extension_b == "gz" {
-        Rinex::from_gzip_file(&path_b)
-    } else {
-        Rinex::from_file(&path_b)
-    };
+    assert_eq!(
+        rinex_b.header.rinex_type,
+        RinexType::ObservationData,
+        "only applies to Observation RINEX!"
+    );
 
-    let rinex_b = rinex_b.unwrap_or_else(|e| panic!("{} parsing error: {}", path_b.display(), e));
-
-    let rinex_c = match rinex_b.header.rinex_type {
-        RinexType::ObservationData => {
-            let rinex_a = ctx_data
-                .observation()
-                .expect("RINEX (A) - (B) requires OBS RINEX files");
-
-            rinex_a.observation_substract(&rinex_b)
-        },
-        t => panic!("operation not feasible for {}", t),
-    };
-
-    let mut extension = String::new();
-
-    let filename = path_a
-        .file_stem()
-        .expect("failed to determine output file name")
-        .to_string_lossy()
-        .to_string();
-
-    if filename.contains('.') {
-        /* .crx.gz case */
-        let mut iter = filename.split('.');
-        let _filename = iter
-            .next()
-            .expect("failed to determine output file name")
-            .to_string();
-        extension.push_str(iter.next().expect("failed to determine output file name"));
-        extension.push('.');
+    if cli.matches.get_flag("rnx2crx") {
+        rinex_b.rnx2crnx_mut();
     }
 
-    let file_ext = path_a
-        .extension()
-        .expect("failed to determine output file name")
-        .to_string_lossy()
-        .to_string();
+    if cli.matches.get_flag("crx2rnx") {
+        rinex_b.crnx2rnx_mut();
+    }
 
-    extension.push_str(&file_ext);
+    rinex_preprocessing(&mut rinex_b, &cli);
 
-    let fullpath = ctx
-        .workspace
-        .root
-        .join(format!("DIFFERENCED.{}", extension))
-        .to_string_lossy()
-        .to_string();
+    let rinex_c = rinex_b.observation_substract(&rinex_a);
 
-    rinex_c.to_file(&fullpath)?;
+    let input_name = rinex_a.standard_filename(forced_short_v2, None, None);
+    let input_path = Path::new(&input_name);
 
-    info!("OBS RINEX \"{}\" has been generated", fullpath);
+    dump_rinex_auto_generated_name(&ctx, input_path, &rinex_c, gzip);
     Ok(())
 }

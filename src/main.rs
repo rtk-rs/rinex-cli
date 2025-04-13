@@ -371,7 +371,7 @@ pub fn main() -> Result<(), Error> {
             return Ok(());
         },
         Some(("diff", submatches)) => {
-            fops::diff(&ctx, submatches)?;
+            fops::diff(&ctx, &cli, submatches)?;
             return Ok(());
         },
         Some(("ppp", submatches)) => {

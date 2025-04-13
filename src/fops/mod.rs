@@ -52,12 +52,16 @@ pub fn dump_rinex_auto_generated_name(ctx: &Context, input_path: &Path, rinex: &
         .to_string_lossy()
         .to_string();
 
-    let output_path = ctx
+    let mut output_path = ctx
         .workspace
         .root
         .join(suffix)
         .to_string_lossy()
         .to_string();
+
+    if gzip {
+        output_path.push_str(".gz");
+    }
 
     if gzip {
         rinex
