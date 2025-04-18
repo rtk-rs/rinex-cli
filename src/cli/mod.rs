@@ -46,20 +46,26 @@ pub struct RemoteReferenceSite {
 pub struct Context {
     /// Quiet option
     pub quiet: bool,
+
     /// Data context defined by user.
     /// In differential opmode, this is the ROVER.
     pub data: QcContext,
+
     /// Remote reference site (secondary dataset) defined by User.
     /// Serves as reference point in differential techniques.
     pub reference_site: Option<RemoteReferenceSite>,
+
     /// Context name is derived from the primary file loaded in Self,
     /// and mostly used in output products generation.
     pub name: String,
+
     /// Workspace is the place where this session will generate data.
     /// By default it is set to $WORKSPACE/$PRIMARYFILE.
     /// $WORKSPACE is either manually definedd by CLI or we create it (as is).
     /// $PRIMARYFILE is determined from the most major file contained in the dataset.
     pub workspace: Workspace,
+
+    #[cfg(feature = "ppp")]
     /// (RX) [Orbit] to use, whether is was automatically picked up,
     /// or manually overwritten.
     pub rx_orbit: Option<Orbit>,
@@ -78,6 +84,7 @@ impl Context {
             .expect("failed to determine a context name")
             .to_str()
             .expect("failed to determine a context name");
+
         /*
          * In case $FILENAME.RNX.gz gz compressed, we extract "$FILENAME".
          * Can use .file_name() once https://github.com/rust-lang/rust/issues/86319  is stabilized
