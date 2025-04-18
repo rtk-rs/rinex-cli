@@ -4,9 +4,11 @@
 
 mod cli; // command line interface
 mod fops; // file operations
-mod positioning; // post processed positioning
 mod preprocessing; // preprocessing
 mod report; // custom reports
+
+#[cfg(feature = "ppp")]
+mod positioning; // post processed positioning
 
 use report::Report;
 
@@ -56,11 +58,12 @@ pub enum Error {
     MissingMeteoRinex,
     #[error("missing Clock RINEX")]
     MissingClockRinex,
-    #[error("positioning solver error")]
-    PositioningSolverError(#[from] positioning::Error),
     #[cfg(feature = "csv")]
     #[error("csv export error")]
     CsvError(#[from] CsvError),
+    #[cfg(feature = "ppp")]
+    #[error("positioning solver error")]
+    PositioningSolverError(#[from] positioning::Error),
 }
 
 /// Parses and preprepocess all files passed by User
@@ -71,8 +74,13 @@ fn user_data_parsing(
     max_depth: usize,
     is_rover: bool,
 ) -> QcContext {
-    let mut ctx = QcContext::new(cli.jpl_bpc_update())
-        .unwrap_or_else(|e| panic!("failed to initialize a context: {}", e));
+
+    let mut ctx = QcContext::new();
+    
+    if cli.jpl_bpc_update() {
+        ctx.with_jpl_bpc()
+            .unwrap_or_else(|e| panic!("Upgrade to high precision context failed: {}", e));
+    }
 
     // recursive dir loader
     for dir in directories.iter() {
@@ -90,54 +98,36 @@ fn user_data_parsing(
                     .to_string();
 
                 if extension == "gz" {
-                    if let Ok(rinex) = Rinex::from_gzip_file(path) {
-                        let loading = ctx.load_rinex(path, rinex);
-                        if loading.is_ok() {
-                            info!("Loading RINEX file \"{}\"", path.display());
-                        } else {
-                            warn!(
-                                "failed to load RINEX file \"{}\": {}",
-                                path.display(),
-                                loading.err().unwrap()
-                            );
-                        }
-                    } else if let Ok(sp3) = SP3::from_gzip_file(path) {
-                        let loading = ctx.load_sp3(path, sp3);
-                        if loading.is_ok() {
-                            info!("Loading SP3 file \"{}\"", path.display());
-                        } else {
-                            warn!(
-                                "failed to load SP3 file \"{}\": {}",
-                                path.display(),
-                                loading.err().unwrap()
-                            );
-                        }
-                    } else {
-                        warn!("non supported file format \"{}\"", path.display());
+                    match ctx.load_gzip_rinex_file(path) {
+                        Ok(_) => {
+                            info!("RINEX file loaded: \"{}\"", path.display());
+                        },
+                        Err(_) => {
+                            match ctx.load_gzip_sp3_file(path) {
+                                Ok(_) => {
+                                    info!("SP3 file loaded: \"{}\"", path.display());
+                                },
+                                Err(_) => {
+                                    panic!("File format not recognized!");
+                                },
+                            }
+                        },
                     }
                 } else {
-                    if let Ok(rinex) = Rinex::from_file(path) {
-                        let loading = ctx.load_rinex(path, rinex);
-                        if loading.is_ok() {
-                            info!("Loading RINEX file \"{}\"", path.display());
-                        } else {
-                            warn!(
-                                "failed to load RINEX file \"{}\": {}",
-                                path.display(),
-                                loading.err().unwrap()
-                            );
-                        }
-                    } else if let Ok(sp3) = SP3::from_file(path) {
-                        let loading = ctx.load_sp3(path, sp3);
-                        if loading.is_ok() {
-                            info!("Loading SP3 file \"{}\"", path.display());
-                        } else {
-                            warn!(
-                                "failed to load SP3 file \"{}\": {}",
-                                path.display(),
-                                loading.err().unwrap()
-                            );
-                        }
+                    match ctx.load_rinex_file(path) {
+                        Ok(_) => {
+                            info!("RINEX file loaded: \"{}\"", path.display());
+                        },
+                        Err(_) => {
+                            match ctx.load_sp3_file(path) {
+                                Ok(_) => {
+                                    info!("SP3 file loaded: \"{}\"", path.display());
+                                },
+                                Err(_) => {
+                                    panic!("File format not recognized!");
+                                },
+                            }
+                        },
                     }
                 }
             }
@@ -374,10 +364,12 @@ pub fn main() -> Result<(), Error> {
             fops::diff(&ctx, &cli, submatches)?;
             return Ok(());
         },
+        #[cfg(feature = "ppp")]
         Some(("ppp", submatches)) => {
             let chapter = positioning::precise_positioning(&cli, &ctx, false, submatches)?;
             extra_pages.push(chapter);
         },
+        #[cfg(feature = "ppp")]
         Some(("rtk", submatches)) => {
             let chapter = positioning::precise_positioning(&cli, &ctx, true, submatches)?;
             extra_pages.push(chapter);
