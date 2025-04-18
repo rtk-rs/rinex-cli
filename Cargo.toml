@@ -9,16 +9,17 @@ repository = "https://github.com/rtk-rs/rinex-cli"
 keywords = ["geo", "gps", "rinex", "galileo", "timing"]
 categories = [
     "science",
-    "science::geo",
     "command-line-interface",
     "command-line-utilities",
 ]
 edition = "2021"
 readme = "README.md"
-rust-version = "1.64"
 exclude = [
     "data/*",
 ]
+
+[package.metadata]
+msrv = "1.81"
 
 [features]
 # PPP and PPP+CGGTTS are not supported by default, because they are quite heavy.
