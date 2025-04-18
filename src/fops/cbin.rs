@@ -21,10 +21,10 @@ pub fn constell_timescale_binning(
     let forced_short_v2 = submatches.get_flag("short");
     let gzip = submatches.get_flag("gzip");
 
-    let ts_binning = submatches.get_flag("ts");
+    let ts_binning = submatches.get_flag("tsbin");
 
-    let prefered_ts = if let Some(ts) = matches.get_one::<TimeScale>("timescale") {
-        Some(ts)
+    let prefered_ts = if let Some(ts) = submatches.get_one::<&TimeScale>("timescale") {
+        Some(*ts)
     } else {
         None
     };

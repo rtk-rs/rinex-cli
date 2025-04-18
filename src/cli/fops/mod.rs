@@ -116,7 +116,12 @@ This code should represent where the Agency is located."),
             .value_parser(value_parser!(DataSource))
             .help("Define the data source.
 In RINEX standards, we use \"RCVR\" when data was sampled from a hardware receiver.
-Use \"STREAM\" for other stream data source, like RTCM for example.")
+Use \"STREAM\" for other stream data source, like RTCM for example."),
+Arg::new("timescale")
+.long("timescale")
+.required(false)
+.value_parser(value_parser!(TimeScale))
+.help("Temporal shift and re-expression into desired Timescale"),
     ];
 }
 
