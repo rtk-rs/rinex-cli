@@ -125,7 +125,7 @@ which is particularly useful in Data production context & files management
 
 - [`tbin` (time) binning mode](./documentation/TBin.md) create a batch (file series) of RINEX of equal duration
 
-- [`cbin` (Constellation /Timescale) binning mode](./documentation/CBin.md) to split Multi-GNSS RINEX into individual
+- [`cbin` (Constellation /Timescale) binning mode](./demos/CBIN.md) to split Multi-GNSS RINEX into individual
 Constellations, with possible Timescale re-expression
 
 - [`diff` mode](./documentation/Diff.md): create a special RINEX=RINEX(A)-RINEX(B)
