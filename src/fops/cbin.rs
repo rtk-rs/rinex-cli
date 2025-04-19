@@ -17,8 +17,8 @@ pub fn constell_timescale_binning(ctx: &Context, submatches: &ArgMatches) -> Res
 
     let ts_binning = submatches.get_flag("tsbin");
 
-    let prefered_ts = if let Some(ts) = submatches.get_one::<&TimeScale>("timescale") {
-        Some(*ts)
+    let prefered_ts = if let Some(ts) = submatches.get_one::<TimeScale>("timescale") {
+        Some(ts)
     } else {
         None
     };
