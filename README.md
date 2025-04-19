@@ -128,7 +128,7 @@ which is particularly useful in Data production context & files management
 - [`cbin` (Constellation /Timescale) binning mode](./demos/CBIN.md) to split Multi-GNSS RINEX into individual
 Constellations, with possible Timescale re-expression
 
-- [`diff` mode](./documentation/Diff.md): create a special RINEX=RINEX(A)-RINEX(B)
+- [`diff` mode](./demos/DIFF.md): create a special RINEX=RINEX(A)-RINEX(B)
 by substracting two observation RINEX files together, per frequency and signal modulations
 
 - [`filegen` mode](./documentation/Filegen.md): generate output products (RINEX, SP3, CSV..)

@@ -1,20 +1,29 @@
-=====================
+File Operation: `diff`
+======================
 
 | Topics         | - Illustrate the `diff` mode                                         |
 |----------------|----------------------------------------------------------------------|
+| Category       | `File Operation`                                                     |
 | Modes          | `diff`                                                               |
 | Difficulty     | <span style="color:gold"> &#9733;</span>&#9734;&#9734;&#9734;&#9734; |
 | Constellations | Any                                                                  |
 | Input          | Observation RINEX                                                    |
 | Output         | Observation RINEX                                                    |
 
-The `diff` mode allows differentiating signal observations, provided in Observation RINEX format, per frequency and signal modulations, and formatting this exotic output still in standard RINEX. Thefore, like `merge` and other operations, `diff` requires two input products (Observation RINEX here).
+The `diff` mode allows differentiating signal observations, provided in Observation RINEX files.  
+Like `merge` and other similar operations, `diff` requires a first input product and a secondary (as reference).
 
-The differentiation is applied in very precise manner, where only identical physics (also referred to as _Observables_ in RINEX 
-terminology) are differentiated to one another.  For example, if `C1C` is measured on both sites, `C1C(a-b) = C1C(a) - C1C(b)` is
-formatted. Any observation that is not made on both site is not formatted.
+The differentiation is applied in very precise manner, by only substracting identical signals, physics and modulations.  
+Those are described by _Observables_ in RINEX terminology. In other words, we only substract identical Observables to each other.
 
-The output product is still valid RINEX yet represents something that is illegal as per the RINEX standards.
+For example, if `C1C` was measured on both sites, `C1C(a-b) = C1C(a) - C1C(b)` is formatted. 
+Any observation that was made only on one site is left out.
+
+The output product is still valid RINEX yet represents something that is illegal as per the RINEX standards, so you should
+use it with care.
+
+This operation was designed to output `RINEX` to `CSV` for precise clock comparison, by means of dual Pseudo Range
+or dual Phase Range observations, by two devices that share the same sampling clock.
 
 ## Input product and command line
 
