@@ -122,8 +122,11 @@ Then, continue your learning journey with:
 which is particularly useful in Data production context & files management
 
 - [`split` mode](./documentation/Split.md): divide/split your input products at a specific point in time (`Epoch`)
-- [`cbin` (constellation/timescale binning) mode](./documentation/CBin.md) create a batch (file series) of RINEX splitted by individual Constellation / Timescales 
-- [`tbin` (time binning) mode](./documentation/TBin.md) create a batch (file series) of RINEX of equal duration
+
+- [`tbin` (time) binning mode](./documentation/TBin.md) create a batch (file series) of RINEX of equal duration
+
+- [`cbin` (Constellation /Timescale) binning mode](./documentation/CBin.md) to split Multi-GNSS RINEX into individual
+Constellations, with possible Timescale re-expression
 
 - [`diff` mode](./documentation/Diff.md): create a special RINEX=RINEX(A)-RINEX(B)
 by substracting two observation RINEX files together, per frequency and signal modulations
