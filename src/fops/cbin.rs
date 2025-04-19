@@ -3,19 +3,13 @@ use std::path::Path;
 
 use gnss_qc::prelude::{
     Filter as QcFilter, FilterItem as QcFilterItem, MaskOperand as QcMaskOperand, Preprocessing,
-    ProductType, TimeScale,
+    ProductType, TimeScale, Timeshift,
 };
-
-use rinex::prelude::processing::Timeshift;
 
 use crate::{cli::Context, fops::dump_rinex_auto_generated_name, Error};
 
 /// Constellation / timescale batch creation
-pub fn constell_timescale_binning(
-    ctx: &Context,
-    matches: &ArgMatches,
-    submatches: &ArgMatches,
-) -> Result<(), Error> {
+pub fn constell_timescale_binning(ctx: &Context, submatches: &ArgMatches) -> Result<(), Error> {
     let ctx_data = &ctx.data;
 
     let forced_short_v2 = submatches.get_flag("short");

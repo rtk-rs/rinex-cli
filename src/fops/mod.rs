@@ -24,8 +24,6 @@ use rinex::{
     prod::{DataSource, DetailedProductionAttributes, ProductionAttributes, FFU, PPU},
 };
 
-use sp3::SP3;
-
 use crate::Context;
 
 /// Shared method to parse a RINEX file

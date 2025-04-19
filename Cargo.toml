@@ -40,6 +40,22 @@ cggtts = [
     "gnss-qc/navigation",
 ]
 
+[dependencies.rinex]
+git = "https://github.com/rtk-rs/rinex"
+branch = "main"
+features = [
+    "qc", 
+    "processing", 
+    "obs", 
+    "nav", 
+    "ut1", 
+    "meteo", 
+    "clock", 
+    "ionex", 
+    "antex", 
+    "serde",
+]
+
 [dependencies]
 log = "0.4"
 walkdir = "2.4.0"

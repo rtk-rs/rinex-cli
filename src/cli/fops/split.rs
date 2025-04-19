@@ -1,5 +1,5 @@
 use clap::{value_parser, Arg, ArgAction, Command};
-use rinex::prelude::Epoch;
+use gnss_qc::prelude::Epoch;
 
 use super::{SHARED_DATA_ARGS, SHARED_GENERAL_ARGS};
 

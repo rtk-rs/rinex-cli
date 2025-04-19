@@ -1,6 +1,6 @@
-// tbin opmode
 use clap::{value_parser, Arg, ArgAction, Command};
-use rinex::prelude::Duration;
+
+use gnss_qc::prelude::Duration;
 
 use super::{SHARED_DATA_ARGS, SHARED_GENERAL_ARGS};
 
