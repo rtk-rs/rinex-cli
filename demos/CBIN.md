@@ -5,7 +5,7 @@ File Operation: `cbin`
 |----------------|-----------------------------------------------------------------------|
 | Category       | `File Operation`                                                      |
 | Modes          | `cbin`                                                                |
-| Difficulty     | <span style="color:gold"> &#9733; &#9733;</span>&#9734;&#9734;&#9734; |
+| Difficulty     | <span style="color:gold"> &#9733;&#9733;</span>&#9734;&#9734;&#9734; |
 | Constellations | Any                                                                   |
 | Input          | RINEX                                                                 |
 | Output         | RINEX batch                                                           |

@@ -18,16 +18,12 @@ The most important being:
   - splitting: create a batch of files
   - transposing: to a single timescale, into a batch of timescales
   - reformat: export to CSV
-
 - Analysis 
   - generate high level reports
-
 - Synthesis
   - generate RINEX (and soon SP3) from provided products
-
 - Post processed navigation (`ppp` mode) because it integrates a complete
 PVT solver (on `ppp` feature only)
-
 - CGGTTS solutions solver (`ppp --cggtts` mode) by combining the `ppp` **and** `cggtts` options
 
 <img src="plots/errors-3d.png" alt="3D Errors" style="display: inline-block; width=100px" />
