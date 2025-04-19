@@ -127,7 +127,7 @@ rinex-cli \
     --fp WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GAL/ESBC00DNK_R_20201770017_01D_30S_MO.crx
 ```
 
-:warning: remember that `SBAS` is expressed in `GPST` in RINEX by default. 
+:warning: remember that `SBAS` is expressed in `GPST` in RINEX by default.  
 
 Prefered timescale synthesis
 ============================
