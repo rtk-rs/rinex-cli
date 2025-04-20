@@ -21,14 +21,20 @@ rinex-cli \
     --fp data/CRNX/V3/ESBC00DNK_R_20201770000_01D_30S_MO.crx.gz \
     cbin
 
-[2025-04-19T08:16:41Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GPS/ESBC00DNK_R_20201770000_01D_30S_MO.crx" has been generated
-[2025-04-19T08:16:41Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GAL/ESBC00DNK_R_20201770017_01D_30S_MO.crx" has been generated
+[2025-04-20T11:33:22Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GPS/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:22Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GLO/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/BDS/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/QZSS/ESBC00DNK_R_20201770117_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GAL/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/EGNOS/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/BDSBAS/ESBC00DNK_R_20201770030_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/SDCM/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
 ```
 
 We can see that we synthesized output products for each constellations that were declared.  
 
 This framework has precise knowledge of any SBAS vehicle if it is declared in the [core library](https://github.com/rtk-rs/gnss).
-Therefore, you can see that some vehicles were recognized as `WASS` and `EGNOS` vehicles.
+Therefore, you can see that some vehicles were recognized as `EGNOS` and others, which proves convenient.
 
 If you open the `GPS` observations, you can see that it remains expressed in `GPST`:
 
@@ -107,10 +113,14 @@ rinex-cli \
     --fp data/NAV/V3/ESBC00DNK_R_20201770000_01D_MN.rnx.gz \
     cbin --tsbin
 
-[2025-04-19T08:22:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GPS/ESBC00DNK_R_20201770000_01D_30S_MO.crx" has been generated
-[2025-04-19T08:22:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GAL/ESBC00DNK_R_20201770000_01D_30S_MO.crx" has been generated
-[2025-04-19T08:22:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GPS/ESBC00DNK_R_20201770000_01D_MG.rnx" has been generated
-[2025-04-19T08:22:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GAL/ESBC00DNK_R_20201770000_01D_ME.rnx" has been generated
+[2025-04-20T11:33:22Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GPS/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:22Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GLO/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/BDS/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/QZSS/ESBC00DNK_R_20201770117_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/GAL/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/EGNOS/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/BDSBAS/ESBC00DNK_R_20201770030_01D_30S_MO.rnx" has been generated
+[2025-04-20T11:33:23Z INFO  rinex_cli::fops] "WORKSPACE/ESBC00DNK_R_20201770000_01D_30S_MO/SDCM/ESBC00DNK_R_20201770000_01D_30S_MO.rnx" has been generated
 ```
 
 We can see that the `GPS` product remains expressed in the native `GPST`:
