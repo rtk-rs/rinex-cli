@@ -41,7 +41,8 @@ cggtts = [
 ]
 
 [dependencies.rinex]
-path = "../rinex"
+git = "https://github.com/rtk-rs/rinex"
+branch = "dep/hifitime"
 features = [
     "qc", 
     "processing", 
