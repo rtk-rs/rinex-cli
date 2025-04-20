@@ -216,14 +216,6 @@ By default, report synthesis happens once per input set (file combnation and cli
 Use this option to force report regeneration.
 This has no effect on file operations that do not synthesize a report."))
         .arg(
-            Arg::new("report-brdc-sky")
-                .long("brdc-sky")
-                .action(ArgAction::SetTrue)
-                .help("When SP3 and/or BRDC RINEX is present,
-the skyplot (compass) projection is only calculated from the SP3 coordinates (highest precision). 
-Use this option to also calculate it from radio messages (for comparison purposes for example).")
-        )
-        .arg(
             Arg::new("report-nostats")
                 .long("nostats")
                 .action(ArgAction::SetTrue)
@@ -513,13 +505,12 @@ Otherwise it gets automatically picked up."))
     /// Returns QcConfig from command line
     pub fn qc_config(&self) -> QcConfig {
         QcConfig {
-            manual_rx_orbit: None,
+            user_rx_ecef: None,
             report: if self.matches.get_flag("report-sum") {
                 QcReportType::Summary
             } else {
                 QcReportType::Full
             },
-            force_brdc_skyplot: self.matches.get_flag("report-brdc-sky"),
         }
     }
     /// Customized / manually defined output to be generated

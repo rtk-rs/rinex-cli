@@ -70,8 +70,12 @@ fn user_data_parsing(
     max_depth: usize,
     is_rover: bool,
 ) -> QcContext {
-    let mut ctx = QcContext::new(cli.jpl_bpc_update())
-        .unwrap_or_else(|e| panic!("failed to initialize a context: {}", e));
+    let mut ctx = QcContext::new();
+
+    if cli.jpl_bpc_update() {
+        ctx.with_jpl_bpc()
+            .unwrap_or_else(|e| panic!("anise JPL BPC update failed with: {}", e));
+    }
 
     // recursive dir loader
     for dir in directories.iter() {
