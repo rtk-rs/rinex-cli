@@ -657,7 +657,7 @@ impl ReportContent {
 
                 let clock_offset = solutions
                     .iter()
-                    .map(|(_, sol)| sol.clock_offset.to_seconds())
+                    .map(|(_, sol)| sol.clock_offset_s)
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(

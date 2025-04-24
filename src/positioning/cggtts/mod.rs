@@ -168,7 +168,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: Time>
                         for sv_contrib in pvt.sv.iter() {
                             let (azim_deg, elev_deg) = (sv_contrib.azimuth, sv_contrib.elevation);
 
-                            let refsys = pvt.clock_offset.to_seconds();
+                            let refsys = pvt.clock_offset_s;
 
                             let refsv = refsys
                                 + sv_contrib.clock_correction.unwrap_or_default().to_seconds();

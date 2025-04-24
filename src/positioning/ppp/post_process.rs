@@ -80,7 +80,7 @@ pub fn post_process(
             alt_m,
             hdop,
             vdop,
-            solution.clock_offset.to_seconds(),
+            solution.clock_offset_s,
             tdop
         )?;
 

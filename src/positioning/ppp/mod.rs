@@ -100,7 +100,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: Time>
                     Ok((new_t, pvt)) => {
                         info!(
                             "{} : new pvt solution {:?} dt={}",
-                            new_t, pvt.pos_m, pvt.clock_offset
+                            new_t, pvt.pos_m, pvt.clock_offset_s
                         );
                         solutions.insert(new_t, pvt);
                     },
