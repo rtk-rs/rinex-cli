@@ -343,7 +343,7 @@ impl ReportContent {
                 map_proj
             },
             sv_plot: {
-                let mut plot = Plot::timedomain_plot("sv_plot", "SV ID#", "PRN #", true);
+                let mut plot = Plot::timedomain_plot("sv_plot", "Contributions", "PRN #", true);
                 for sv in summary.satellites.iter() {
                     let epochs = solutions
                         .iter()
