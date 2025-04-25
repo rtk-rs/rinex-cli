@@ -49,7 +49,7 @@ use gnss_qc::prelude::QcExtraPage;
 
 use gnss_rtk::prelude::{
     Bias, BiasRuntime, Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel,
-    Method, Solver, TroposphereModel,
+    Method, PPPSolver, TroposphereModel,
 };
 
 use thiserror::Error;
@@ -348,16 +348,16 @@ If your dataset does not describe one, you can manually describe one, see --help
 
     let apriori_ecef_m = match apriori {
         Some(apriori) => {
-            let pos_vel = apriori.to_cartesian_pos_vel();
-            Some((pos_vel[0] * 1.0E3, pos_vel[1] * 1.0E3, pos_vel[2] * 1.0E3))
+            let pos_vel = apriori.to_cartesian_pos_vel() * 1.0E3;
+            Some((pos_vel[0], pos_vel[1], pos_vel[2]))
         },
         None => None,
     };
 
-    let solver = Solver::new_almanac_frame(
-        cfg.clone(),
+    let solver = PPPSolver::new(
         ctx.data.almanac.clone(),
         ctx.data.earth_cef,
+        cfg.clone(),
         orbits,
         time,
         bias_model,

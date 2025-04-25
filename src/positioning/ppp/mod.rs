@@ -20,14 +20,14 @@ pub use report::Report;
 pub mod post_process;
 
 use gnss_rtk::prelude::{
-    Bias, Candidate, Epoch, Observation, OrbitSource, PVTSolution, Solver, Time,
+    Bias, Candidate, Epoch, Observation, OrbitSource, PPPSolver, PVTSolution, Time,
 };
 
 pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: Time>(
     ctx: &Context,
     eph: &'a RefCell<EphemerisSource<'b>>,
     mut clock: CK,
-    mut solver: Solver<O, B, T>,
+    mut solver: PPPSolver<O, B, T>,
 ) -> BTreeMap<Epoch, PVTSolution> {
     let mut past_epoch = Option::<Epoch>::None;
 
@@ -97,12 +97,12 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: Time>
                 }
 
                 match solver.resolve(past_t, &candidates) {
-                    Ok((new_t, pvt)) => {
+                    Ok(pvt) => {
                         info!(
                             "{} : new pvt solution {:?} dt={}",
-                            new_t, pvt.pos_m, pvt.clock_offset_s
+                            pvt.epoch, pvt.pos_m, pvt.clock_offset_s
                         );
-                        solutions.insert(new_t, pvt);
+                        solutions.insert(pvt.epoch, pvt);
                     },
                     Err(e) => warn!("{} : pvt solver error \"{}\"", past_t, e),
                 }
