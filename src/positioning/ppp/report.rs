@@ -311,7 +311,13 @@ impl ReportContent {
             .latlongalt()
             .unwrap_or_else(|e| panic!("latlongalt() physical error: {}", e));
 
-        let summary = Summary::new(cfg, ctx, solutions, (x0_km, y0_km, z0_km), (lat0_ddeg, lon0_ddeg, alt0_km));
+        let summary = Summary::new(
+            cfg,
+            ctx,
+            solutions,
+            (x0_km, y0_km, z0_km),
+            (lat0_ddeg, lon0_ddeg, alt0_km),
+        );
 
         Self {
             map_proj: {
