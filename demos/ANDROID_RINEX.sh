@@ -2,12 +2,19 @@
 
 RINEX_CLI="./target/release/rinex-cli -f"
 CONSTELLATION=Galileo
+CONFIG=/tmp/config.json
 
-# The sampling was static. But data is somewhat low quality,
-# especially using GPS, so we have to reduce the GDOP threshold
-# that we typically use. One quick way for us to do that, is to switch
-# to pedestrian roaming profile.
-CONFIG=examples/CONFIG/Dynamic/pedestrian_ppp.json
+# Static sampling with poor clock quality and poor receiver quality.
+rm -f $CONFIG
+echo '
+{
+    "method": "CPP",
+    "timescale": "GPST",
+    "solver": {
+        "postfit_denoising": 1000,
+        "max_gdop": 5.0
+    }
+}' >> $CONFIG
 
 $RINEX_CLI \
     -P $CONSTELLATION \
