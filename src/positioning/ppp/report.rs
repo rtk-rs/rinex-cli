@@ -39,6 +39,8 @@ struct Summary {
     timescale: TimeScale,
     final_err_m: (f64, f64, f64),
     lat_long_alt_ddeg_ddeg_m: (f64, f64, f64),
+    surveyed_position_ecef_m: Option<(f64, f64, f64)>,
+    surveyed_lat_long_alt_ddeg_ddeg_km: Option<(f64, f64, f64)>,
 }
 
 impl Render for Summary {
@@ -113,14 +115,34 @@ impl Render for Summary {
                                 (self.timescale.to_string())
                             }
                         }
-                        // tr {
-                        //     th class="is-info" {
-                        //         "Navigation Filter"
-                        //     }
-                        //     td {
-                        //         (self.filter.to_string())
-                        //     }
-                        // }
+
+                        @ match self.surveyed_lat_long_alt_ddeg_ddeg_km {
+                            Some((lat0_ddeg, long0_ddeg, alt0_km)) => {
+                                th class="is-info" {
+                                    "Surveyed"
+                                }
+                                td {
+                                    table class="table is-bordered" {
+                                        tr {
+                                            th class="is-info" {
+                                                "WGS84"
+                                            }
+                                            td {
+                                                (format!("lat={:.5}°", lat0_ddeg))
+                                            }
+                                            td {
+                                                (format!("long={:.5}°", long0_ddeg))
+                                            }
+                                            td {
+                                                (format!("alt={:.3}m", alt0_km * 1.0E3))
+                                            }
+                                        }
+                                    }
+                                }
+
+                            },
+                            _ => {},
+                        }
                         tr {
                             th class="is-info" {
                                 "Final"
@@ -132,10 +154,10 @@ impl Render for Summary {
                                             "WGS84"
                                         }
                                         td {
-                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_m.0))
+                                            (format!("lat={:.5}°", self.lat_long_alt_ddeg_ddeg_m.0))
                                         }
                                         td {
-                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_m.1))
+                                            (format!("long={:.5}°", self.lat_long_alt_ddeg_ddeg_m.1))
                                         }
                                         td {
                                             (format!("alt={:.3}m", self.lat_long_alt_ddeg_ddeg_m.2))
@@ -171,6 +193,7 @@ impl Summary {
         ctx: &Context,
         solutions: &BTreeMap<Epoch, PVTSolution>,
         x0_y0_z0_km: (f64, f64, f64),
+        lat0_long0_alt0_ddeg_ddeg_km: (f64, f64, f64),
     ) -> Self {
         let (x0_km, y0_km, z0_km) = x0_y0_z0_km;
         let (x0_m, y0_m, z0_m) = (x0_km * 1.0E3, y0_km * 1.0E3, z0_km * 1.0E3);
@@ -229,6 +252,12 @@ impl Summary {
             profile: cfg.profile,
             // filter: cfg.solver.filter,
             duration: last_epoch - first_epoch,
+            surveyed_position_ecef_m: Some((x0_m, y0_m, z0_m)),
+            surveyed_lat_long_alt_ddeg_ddeg_km: Some((
+                lat0_long0_alt0_ddeg_ddeg_km.0,
+                lat0_long0_alt0_ddeg_ddeg_km.1,
+                lat0_long0_alt0_ddeg_ddeg_km.2,
+            )),
         }
     }
 }
@@ -278,11 +307,11 @@ impl ReportContent {
 
         let (x0_m, y0_m, z0_m) = (x0_km * 1.0E3, y0_km * 1.0E3, z0_km * 1.0E3);
 
-        let (lat0_ddeg, lon0_ddeg, _) = rx_orbit
+        let (lat0_ddeg, lon0_ddeg, alt0_km) = rx_orbit
             .latlongalt()
             .unwrap_or_else(|e| panic!("latlongalt() physical error: {}", e));
 
-        let summary = Summary::new(cfg, ctx, solutions, (x0_km, y0_km, z0_km));
+        let summary = Summary::new(cfg, ctx, solutions, (x0_km, y0_km, z0_km), (lat0_ddeg, lon0_ddeg, alt0_km));
 
         Self {
             map_proj: {
