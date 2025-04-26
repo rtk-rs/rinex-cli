@@ -84,7 +84,6 @@ hifitime = { git = "https://github.com/nyx-space/hifitime", branch = "master", f
 gnss-qc = { git = "https://github.com/rtk-rs/gnss-qc", branch = "main", features = ["sp3", "navigation", "flate2"] } 
 
 gnss-rs = { git = "https://github.com/rtk-rs/gnss", branch = "main", features = ["serde"] }
-gnss-qc = { git = "https://github.com/rtk-rs/gnss-qc", branch = "main", features = ["sp3", "flate2"] } 
 
 # gnss-rtk = { path = "../gnss-rtk", features = ["serde", "embed_ephem"], optional = true }
 gnss-rtk = { git = "https://github.com/rtk-rs/gnss-rtk", branch = "main", features = ["serde", "embed_ephem"], optional = true }
