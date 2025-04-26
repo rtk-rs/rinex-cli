@@ -516,7 +516,6 @@ Otherwise it gets automatically picked up."))
             } else {
                 QcReportType::Full
             },
-            #[cfg(feature = "ppp")]
             user_rx_ecef: None,
         }
     }
