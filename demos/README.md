@@ -49,5 +49,6 @@ TODO
 Applications
 ============
 
+- [PPP surveying (from scratch) without apriori knowledge](./SURVEY.md)
 - [PPP using 10' of recording using the RINEX plugin
 available to smartphones running Android OS](./ANDROID_RINEX.sh)

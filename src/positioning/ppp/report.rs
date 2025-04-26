@@ -37,7 +37,7 @@ struct Summary {
     duration: Duration,
     satellites: Vec<SV>,
     timescale: TimeScale,
-    final_err_m: (f64, f64, f64),
+    final_err_m: Option<(f64, f64, f64)>,
     lat_long_alt_ddeg_ddeg_m: (f64, f64, f64),
     surveyed_position_ecef_m: Option<(f64, f64, f64)>,
     surveyed_lat_long_alt_ddeg_ddeg_km: Option<(f64, f64, f64)>,
@@ -192,17 +192,14 @@ impl Summary {
         cfg: &NaviConfig,
         ctx: &Context,
         solutions: &BTreeMap<Epoch, PVTSolution>,
-        x0_y0_z0_km: (f64, f64, f64),
-        lat0_long0_alt0_ddeg_ddeg_km: (f64, f64, f64),
+        x0_y0_z0_m: Option<(f64, f64, f64)>,
+        lat0_long0_alt0_ddeg_ddeg_km: Option<(f64, f64, f64)>,
     ) -> Self {
-        let (x0_km, y0_km, z0_km) = x0_y0_z0_km;
-        let (x0_m, y0_m, z0_m) = (x0_km * 1.0E3, y0_km * 1.0E3, z0_km * 1.0E3);
-
         let mut timescale = TimeScale::default();
 
         let (mut first_epoch, mut last_epoch) = (Epoch::default(), Epoch::default());
 
-        let mut final_err_m = (0.0_f64, 0.0_f64, 0.0_f64);
+        let mut final_err_m = Option::<(f64, f64, f64)>::None;
         let (mut lat_ddeg, mut long_ddeg, mut alt_m) = (0.0_f64, 0.0_f64, 0.0_f64);
 
         let satellites = solutions
@@ -225,10 +222,14 @@ impl Summary {
             }
 
             let (x_m, y_m, z_m) = sol.pos_m;
-            let (err_x, err_y, err_z) = (x_m - x0_m, y_m - y0_m, z_m - z0_m);
 
             (lat_ddeg, long_ddeg, alt_m) = sol.lat_long_alt_deg_deg_m;
-            final_err_m = (err_x, err_y, err_z);
+
+            if let Some((x0_m, y0_m, z0_m)) = x0_y0_z0_m {
+                let (err_x, err_y, err_z) = (x_m - x0_m, y_m - y0_m, z_m - z0_m);
+
+                final_err_m = Some((err_x, err_y, err_z));
+            }
 
             last_epoch = *t;
             timescale = sol.timescale;
@@ -252,12 +253,8 @@ impl Summary {
             profile: cfg.profile,
             // filter: cfg.solver.filter,
             duration: last_epoch - first_epoch,
-            surveyed_position_ecef_m: Some((x0_m, y0_m, z0_m)),
-            surveyed_lat_long_alt_ddeg_ddeg_km: Some((
-                lat0_long0_alt0_ddeg_ddeg_km.0,
-                lat0_long0_alt0_ddeg_ddeg_km.1,
-                lat0_long0_alt0_ddeg_ddeg_km.2,
-            )),
+            surveyed_position_ecef_m: x0_y0_z0_m,
+            surveyed_lat_long_alt_ddeg_ddeg_km: lat0_long0_alt0_ddeg_ddeg_km,
         }
     }
 }
@@ -278,9 +275,9 @@ struct ReportContent {
     /// altitude_plot
     altitude_plot: Plot,
     /// coords_err
-    coords_err_plot: Plot,
+    coords_err_plot: Option<Plot>,
     /// 3d_plot
-    coords_err3d_plot: Plot,
+    coords_err3d_plot: Option<Plot>,
     /// velocity_plot
     vel_plot: Plot,
     /// DOP
@@ -300,48 +297,60 @@ impl ReportContent {
         let nb_solutions = solutions.len();
         let epochs = solutions.keys().cloned().collect::<Vec<_>>();
 
-        let rx_orbit = ctx.rx_orbit.expect("rx orbit not defined!");
-        let pos_vel = rx_orbit.to_cartesian_pos_vel();
+        let (x0y0z0_m, lat0_long0_alt0_km) = if let Some(rx_orbit) = ctx.rx_orbit {
+            let pos_vel = rx_orbit.to_cartesian_pos_vel() * 1.0E3;
+            let (x0_m, y0_m, z0_m) = (pos_vel[0], pos_vel[1], pos_vel[2]);
 
-        let (x0_km, y0_km, z0_km) = (pos_vel[0], pos_vel[1], pos_vel[2]);
+            let (lat0_ddeg, long0_ddeg, alt0_km) = rx_orbit
+                .latlongalt()
+                .unwrap_or_else(|e| panic!("latlongalt() physical error: {}", e));
 
-        let (x0_m, y0_m, z0_m) = (x0_km * 1.0E3, y0_km * 1.0E3, z0_km * 1.0E3);
+            (
+                Some((x0_m, y0_m, z0_m)),
+                Some((lat0_ddeg, long0_ddeg, alt0_km)),
+            )
+        } else {
+            (None, None)
+        };
 
-        let (lat0_ddeg, lon0_ddeg, alt0_km) = rx_orbit
-            .latlongalt()
-            .unwrap_or_else(|e| panic!("latlongalt() physical error: {}", e));
-
-        let summary = Summary::new(
-            cfg,
-            ctx,
-            solutions,
-            (x0_km, y0_km, z0_km),
-            (lat0_ddeg, lon0_ddeg, alt0_km),
-        );
+        let summary = Summary::new(cfg, ctx, solutions, x0y0z0_m, lat0_long0_alt0_km);
 
         Self {
             map_proj: {
-                let mut map_proj = Plot::world_map(
-                    "map_proj",
-                    "Map Projection",
-                    MapboxStyle::OpenStreetMap,
-                    (lat0_ddeg, lon0_ddeg),
-                    18,
-                    true,
-                );
+                let mut map_proj = if let Some((lat0_ddeg, long0_ddeg, _)) = lat0_long0_alt0_km {
+                    Plot::world_map(
+                        "map_proj",
+                        "Map Projection",
+                        MapboxStyle::OpenStreetMap,
+                        (lat0_ddeg, long0_ddeg),
+                        18,
+                        true,
+                    )
+                } else {
+                    Plot::world_map(
+                        "map_proj",
+                        "Map Projection",
+                        MapboxStyle::OpenStreetMap,
+                        (0.0, 0.0),
+                        18,
+                        true,
+                    )
+                };
 
-                let apriori = Plot::mapbox(
-                    vec![lat0_ddeg],
-                    vec![lon0_ddeg],
-                    "apriori",
-                    3,
-                    MarkerSymbol::Circle,
-                    Some(NamedColor::Red),
-                    1.0,
-                    true,
-                );
+                if let Some((lat0_ddeg, long0_ddeg, _)) = lat0_long0_alt0_km {
+                    let apriori = Plot::mapbox(
+                        vec![lat0_ddeg],
+                        vec![long0_ddeg],
+                        "apriori",
+                        3,
+                        MarkerSymbol::Circle,
+                        Some(NamedColor::Red),
+                        1.0,
+                        true,
+                    );
 
-                map_proj.add_trace(apriori);
+                    map_proj.add_trace(apriori);
+                }
 
                 let mut prev_pct = 0;
                 for (index, (_, sol_i)) in solutions.iter().enumerate() {
@@ -726,7 +735,7 @@ impl ReportContent {
                 plot.add_trace(trace);
                 plot
             },
-            coords_err_plot: {
+            coords_err_plot: if let Some((x0_m, y0_m, z0_m)) = x0y0z0_m {
                 let mut plot = Plot::timedomain_plot("xy_plot", "X/Y/Z Error", "Error [m]", true);
 
                 let trace = Plot::timedomain_chart(
@@ -762,8 +771,10 @@ impl ReportContent {
 
                 plot.add_trace(trace);
                 plot
+            } else {
+                None
             },
-            coords_err3d_plot: {
+            coords_err3d_plot: if let Some((x0_m, y0_m, z0_m)) = x0y0z0_m {
                 let mut plot = Plot::plot_3d(
                     "3d_sphere",
                     "3D errors",
@@ -784,6 +795,8 @@ impl ReportContent {
                 );
                 plot.add_trace(trace);
                 plot
+            } else {
+                None
             },
             //navi_plot: {
             //    let plot = Plot::timedomain_plot("navi_plot", "NAVI Plot", "Error [m]", true);
