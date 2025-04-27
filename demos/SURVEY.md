@@ -114,7 +114,7 @@ Comparing coordinates resolved in both runs:
 
 <div align="center">
     <p>
-        Latitude coordinates, resolved with a reference point
+        Latitude coordinates, resolved with a reference point:
     </p>
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png>
         <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png alt="Plot">
@@ -123,7 +123,7 @@ Comparing coordinates resolved in both runs:
 
 <div align="center">
     <p>
-        Latitude coordinates, resolved without a reference point
+        Latitude coordinates, resolved without a reference point:
     </p>
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png>
         <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png alt="Plot">
@@ -132,7 +132,7 @@ Comparing coordinates resolved in both runs:
 
 <div align="center">
     <p>
-        Longitude coordinates, resolved with a reference point.
+        Longitude coordinates, resolved with a reference point:
     </p>
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png>
         <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png alt="Plot">
@@ -140,7 +140,7 @@ Comparing coordinates resolved in both runs:
 </div>
 <div align="center">
     <p>
-        Longitude coordinates, resolved without a reference point.
+        Longitude coordinates, resolved without a reference point:
     </p>
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png>
         <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png alt="Plot">
@@ -149,31 +149,6 @@ Comparing coordinates resolved in both runs:
 
 Absolute altitude comparison
 ============================
-
-Comparing absolute clock offset (to `GPST` in this example) from both runs:
-
-<div align="center">
-    <p>
-        Offset to GPST with a reference point:
-    </p>
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-clock.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-clock.png alt="Plot">
-    </a>
-</div>
-<div align="center">
-    <p>
-        Offset to GPST without a reference point:
-    </p>
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-clock.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-clock.png alt="Plot">
-    </a>
-</div>
-
-There is no reason that a geometric reference point interferes with the resolved absolute time.  
-We can see that it is verified.
-
-Absolute clock offset comparison
-================================
 
 Comparing absolute altitude (above mean sea level) resolved from both runs:
 
@@ -197,4 +172,25 @@ Comparing absolute altitude (above mean sea level) resolved from both runs:
 Absolute clock offset comparison
 ================================
 
-TODO
+Comparing absolute clock offset (to `GPST` in this example) from both runs:
+
+<div align="center">
+    <p>
+        Offset to GPST with a reference point:
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-clock.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-clock.png alt="Plot">
+    </a>
+</div>
+<div align="center">
+    <p>
+        Offset to GPST without a reference point:
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-clock.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-clock.png alt="Plot">
+    </a>
+</div>
+
+There is no reason that a geometric reference point interferes with the resolved absolute time.  
+We can see that it is verified.
+
