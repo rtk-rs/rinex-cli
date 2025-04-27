@@ -26,8 +26,32 @@ The most important being:
 PVT solver (on `ppp` feature only)
 - CGGTTS solutions solver (`ppp --cggtts` mode) by combining the `ppp` **and** `cggtts` options
 
-<img src="plots/errors-3d.png" alt="3D Errors" style="display: inline-block; width=100px" />
-<img src="plots/errors-coords.png" alt="3D Errors" style="display: inline-block; width=100px" />
+<div align="center">
+    <p>
+        Static surveying of a geodetic marker:
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/front-page/map.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/map.png alt="Plot">
+    </a>
+</div>
+
+<div align="center">
+    <p>
+        Errors from the geodetic marker (CPP, Galileo E1+E5)
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/front-page/coordinates.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/coordinates.png alt="Plot">
+    </a>
+</div>
+
+<div align="center">
+    <p>
+        REFSYS resolved from PPP+CGGTTS (CPP, Galileo E1+E5)
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/front-page/refsys.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/refsys.png alt="Plot">
+    </a>
+</div>
 
 ## Download the tool
 

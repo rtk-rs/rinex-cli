@@ -194,3 +194,16 @@ Comparing absolute clock offset (to `GPST` in this example) from both runs:
 There is no reason that a geometric reference point interferes with the resolved absolute time.  
 We can see that it is verified.
 
+:warning: CGGTTS mode
+=====================
+
+As stated elsewhere, `cggtts` mode option requires the definition of a reference point. 
+So it is normal that this command line does not work:
+
+```bash
+rinex-cli \
+    -P Gal \
+    --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx \
+    --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
+    ppp -c examples/CONFIG/Static/gpst_cpp.json --cggtts
+```

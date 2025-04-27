@@ -24,7 +24,7 @@ impl RTKTime for Time {
 
             Some(RTKTimeOffset::from_bdt_gpst_time_of_week(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomials,
+                header_offset.time_offset.polynomial,
             ))
         } else {
             // TODO
@@ -42,7 +42,7 @@ impl RTKTime for Time {
 
             Some(RTKTimeOffset::from_bdt_gst_time_of_week(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomials,
+                header_offset.time_offset.polynomial,
             ))
         } else {
             // TODO
@@ -60,7 +60,7 @@ impl RTKTime for Time {
 
             Some(RTKTimeOffset::from_bdt_utc_time_of_week(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomials,
+                header_offset.time_offset.polynomial,
             ))
         } else {
             // TODO
@@ -78,7 +78,7 @@ impl RTKTime for Time {
 
             Some(RTKTimeOffset::from_gpst_utc_time_of_week(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomials,
+                header_offset.time_offset.polynomial,
             ))
         } else {
             // TODO
@@ -96,7 +96,7 @@ impl RTKTime for Time {
 
             Some(RTKTimeOffset::from_gst_gpst_time_of_week(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomials,
+                header_offset.time_offset.polynomial,
             ))
         } else {
             // TODO
@@ -114,7 +114,7 @@ impl RTKTime for Time {
 
             Some(RTKTimeOffset::from_gst_utc_time_of_week(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomials,
+                header_offset.time_offset.polynomial,
             ))
         } else {
             // TODO
