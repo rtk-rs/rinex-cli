@@ -1,17 +1,18 @@
-use crate::cli::Context;
-use crate::Error;
 use clap::ArgMatches;
 use gnss_qc::prelude::ProductType;
-use rinex::prelude::Epoch;
+use rinex::prelude::{processing::Split, Epoch};
+use std::path::Path;
 
-use rinex::prelude::processing::Split;
+use crate::{cli::Context, fops::dump_rinex_auto_generated_name, Error};
 
-/*
- * Splits input files at specified Time Instant
- */
-pub fn split(ctx: &Context, matches: &ArgMatches) -> Result<(), Error> {
+/// Splits input files at specified Time Instant
+pub fn split(ctx: &Context, submatches: &ArgMatches) -> Result<(), Error> {
     let ctx_data = &ctx.data;
-    let split_instant = matches
+
+    let gzip = submatches.get_flag("gzip");
+    let forced_short_v2 = submatches.get_flag("short");
+
+    let split_instant = submatches
         .get_one::<Epoch>("split")
         .expect("split epoch is required");
 
@@ -25,93 +26,13 @@ pub fn split(ctx: &Context, matches: &ArgMatches) -> Result<(), Error> {
         if let Some(rinex) = ctx_data.rinex(product) {
             let (rinex_a, rinex_b) = rinex.split(*split_instant);
 
-            let first_epoch = rinex_a
-                .first_epoch()
-                .unwrap_or_else(|| panic!("failed to determine {} file suffix", product));
+            let input_name = rinex_a.standard_filename(forced_short_v2, None, None);
+            let input_path = Path::new(&input_name);
+            dump_rinex_auto_generated_name(&ctx, &input_path, &rinex_a, gzip, None);
 
-            let (y, m, d, hh, mm, ss, _) = first_epoch.to_gregorian_utc();
-            let file_suffix = format!(
-                "{}{}{}_{}{}{}{}",
-                y, m, d, hh, mm, ss, first_epoch.time_scale
-            );
-
-            let path = ctx_data
-                .files(product)
-                .unwrap_or_else(|| panic!("failed to determine output {} filename", product))
-                .first()
-                .unwrap();
-
-            let filename = path
-                .file_stem()
-                .unwrap_or_else(|| panic!("failed to determine output {} filename", product))
-                .to_string_lossy()
-                .to_string();
-
-            let mut extension = String::new();
-
-            let filename = if filename.contains('.') {
-                /* .crx.gz case */
-                let mut iter = filename.split('.');
-                let filename = iter
-                    .next()
-                    .expect("failed to determine output file name")
-                    .to_string();
-                extension.push_str(iter.next().expect("failed to determine output file name"));
-                extension.push('.');
-                filename
-            } else {
-                filename.clone()
-            };
-
-            let file_ext = path
-                .extension()
-                .expect("failed to determine output file name")
-                .to_string_lossy()
-                .to_string();
-
-            extension.push_str(&file_ext);
-
-            let output = ctx
-                .workspace
-                .root
-                .join(format!("{}-{}.{}", filename, file_suffix, extension))
-                .to_string_lossy()
-                .to_string();
-
-            rinex_a.to_file(&output)?;
-            info!("\"{}\" has been generated", output);
-
-            let first_epoch = rinex_b
-                .first_epoch()
-                .expect("failed to determine file suffix");
-
-            let (y, m, d, hh, mm, ss, _) = first_epoch.to_gregorian_utc();
-            let file_suffix = format!(
-                "{}{}{}_{}{}{}{}",
-                y, m, d, hh, mm, ss, first_epoch.time_scale
-            );
-
-            let path = ctx_data
-                .files(product)
-                .unwrap_or_else(|| panic!("failed to determine output {} filename", product))
-                .first()
-                .unwrap();
-
-            let filename = path
-                .file_stem()
-                .expect("failed to determine output file name")
-                .to_string_lossy()
-                .to_string();
-
-            let output = ctx
-                .workspace
-                .root
-                .join(format!("{}-{}.{}", filename, file_suffix, extension))
-                .to_string_lossy()
-                .to_string();
-
-            rinex_b.to_file(&output)?;
-            info!("{} RINEX \"{}\" has been generated", product, output);
+            let input_name = rinex_b.standard_filename(forced_short_v2, None, None);
+            let input_path = Path::new(&input_name);
+            dump_rinex_auto_generated_name(&ctx, &input_path, &rinex_b, gzip, None);
         }
     }
     Ok(())

@@ -37,8 +37,9 @@ struct Summary {
     duration: Duration,
     satellites: Vec<SV>,
     timescale: TimeScale,
-    final_err_m: (f64, f64, f64),
-    lat_long_alt_ddeg_ddeg_m: (f64, f64, f64),
+    final_err_m: Option<(f64, f64, f64)>,
+    final_geo_ddeg_m: (f64, f64, f64),
+    surveyed_lat_long_alt_ddeg_ddeg_km: Option<(f64, f64, f64)>,
 }
 
 impl Render for Summary {
@@ -55,6 +56,7 @@ impl Render for Summary {
                                 (self.profile.to_string())
                             }
                         }
+
                         tr {
                             th class="is-info" {
                                 "Technique"
@@ -63,6 +65,16 @@ impl Render for Summary {
                                 (self.method.to_string())
                             }
                         }
+
+                        tr {
+                            th class="is-info" {
+                                "Timescale"
+                            }
+                            td {
+                                (self.timescale.to_string())
+                            }
+                        }
+
                         tr {
                             th class="is-info" {
                                 "Orbit"
@@ -81,82 +93,146 @@ impl Render for Summary {
                                 (self.satellites.iter().join(" ,"))
                             }
                         }
+
                         tr {
                             th class="is-info" {
-                                "First solution"
-                            }
-                            td {
-                                (self.first_epoch.round(Duration::from_seconds(1.0)).to_string())
-                            }
-                        }
-                        tr {
-                            th class="is-info" {
-                                "Last solution"
-                            }
-                            td {
-                                (self.last_epoch.round(Duration::from_seconds(1.0)).to_string())
-                            }
-                        }
-                        tr {
-                            th class="is-info" {
-                                "Duration"
-                            }
-                            td {
-                                (self.duration.to_string())
-                            }
-                        }
-                        tr {
-                            th class="is-info" {
-                                "Timescale"
-                            }
-                            td {
-                                (self.timescale.to_string())
-                            }
-                        }
-                        // tr {
-                        //     th class="is-info" {
-                        //         "Navigation Filter"
-                        //     }
-                        //     td {
-                        //         (self.filter.to_string())
-                        //     }
-                        // }
-                        tr {
-                            th class="is-info" {
-                                "Final"
+                                "Time frame"
                             }
                             td {
                                 table class="table is-bordered" {
                                     tr {
                                         th class="is-info" {
-                                            "WGS84"
+                                            "First solution"
                                         }
                                         td {
-                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_m.0))
-                                        }
-                                        td {
-                                            (format!("x={:.5}°", self.lat_long_alt_ddeg_ddeg_m.1))
-                                        }
-                                        td {
-                                            (format!("alt={:.3}m", self.lat_long_alt_ddeg_ddeg_m.2))
+                                            (self.first_epoch.round(Duration::from_seconds(1.0)).to_string())
                                         }
                                     }
                                     tr {
                                         th class="is-info" {
-                                            "Error (m)"
+                                            "Last solution"
                                         }
                                         td {
-                                            (format!("x={:.3E}", self.final_err_m.0))
+                                            (self.last_epoch.round(Duration::from_seconds(1.0)).to_string())
+                                        }
+                                    }
+                                    tr {
+                                        th class="is-info" {
+                                            "Duration"
                                         }
                                         td {
-                                            (format!("y={:.3E}", self.final_err_m.1))
-                                        }
-                                        td {
-                                            (format!("z={:.3E}", self.final_err_m.2))
+                                            (self.duration.to_string())
                                         }
                                     }
                                 }
                             }
+                        }
+
+                        @ match self.surveyed_lat_long_alt_ddeg_ddeg_km {
+                            Some((lat0_ddeg, long0_ddeg, alt0_km)) => {
+                                tr {
+                                    th class="is-info" {
+                                        "Surveyed"
+                                    }
+                                    td {
+                                        table class="table is-bordered" {
+                                            tr {
+                                                th class="is-info" {
+                                                    "GEO"
+                                                }
+                                                td {
+                                                    (format!("lat={:.5}°", lat0_ddeg))
+                                                }
+                                                td {
+                                                    (format!("long={:.5}°", long0_ddeg))
+                                                }
+                                                td {
+                                                    (format!("alt={:.3}m", alt0_km * 1.0E3))
+                                                }
+                                            }
+                                        }
+                                     }
+                                }
+                            },
+                            _ => {},
+                        }
+
+
+                        @ match self.final_err_m {
+                            Some((final_err_x_m, final_err_y_m, final_err_z_m)) => {
+                                tr {
+                                    th class="is-info" {
+                                        "Final"
+                                    }
+                                    td {
+                                        table class="table is-bordered" {
+                                            tr {
+                                                th class="is-info" {
+                                                    "GEO"
+                                                }
+                                                td {
+                                                    (format!("lat={:.3E}°", self.final_geo_ddeg_m.0))
+                                                }
+                                                td {
+                                                    (format!("long={:.3E}°", self.final_geo_ddeg_m.1))
+                                                }
+                                                td {
+                                                    (format!("alt={:.3E}m", self.final_geo_ddeg_m.2))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+
+                                tr {
+                                    th class="is-info" {
+                                        "Final Error"
+                                    }
+                                    td {
+                                        table class="table is-bordered" {
+                                            tr {
+                                                th class="is-info" {
+                                                    "Error (m)"
+                                                }
+                                                td {
+                                                    (format!("x={:.3E}m", final_err_x_m))
+                                                }
+                                                td {
+                                                    (format!("y={:.3E}m", final_err_y_m))
+                                                }
+                                                td {
+                                                    (format!("z={:.3E}m", final_err_z_m))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
+                            _ => {
+                                tr {
+                                    th class="is-info" {
+                                        "Final"
+                                    }
+                                    td {
+                                        table class="table is-bordered" {
+                                            tr {
+                                                th class="is-info" {
+                                                    "GEO"
+                                                }
+                                                td {
+                                                    (format!("lat={:.3E}°", self.final_geo_ddeg_m.0))
+                                                }
+                                                td {
+                                                    (format!("long={:.3E}°", self.final_geo_ddeg_m.1))
+                                                }
+                                                td {
+                                                    (format!("alt={:.3E}m", self.final_geo_ddeg_m.2))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            },
                         }
                     }
                 }
@@ -170,17 +246,15 @@ impl Summary {
         cfg: &NaviConfig,
         ctx: &Context,
         solutions: &BTreeMap<Epoch, PVTSolution>,
-        x0_y0_z0_km: (f64, f64, f64),
+        x0_y0_z0_m: Option<(f64, f64, f64)>,
+        lat0_long0_alt0_ddeg_ddeg_km: Option<(f64, f64, f64)>,
     ) -> Self {
-        let (x0_km, y0_km, z0_km) = x0_y0_z0_km;
-        let (x0_m, y0_m, z0_m) = (x0_km * 1.0E3, y0_km * 1.0E3, z0_km * 1.0E3);
-
         let mut timescale = TimeScale::default();
 
         let (mut first_epoch, mut last_epoch) = (Epoch::default(), Epoch::default());
 
-        let mut final_err_m = (0.0_f64, 0.0_f64, 0.0_f64);
-        let (mut lat_ddeg, mut long_ddeg, mut alt_m) = (0.0_f64, 0.0_f64, 0.0_f64);
+        let mut final_err_m = Option::<(f64, f64, f64)>::None;
+        let mut final_geo_ddeg_m = (0.0, 0.0, 0.0);
 
         let satellites = solutions
             .values()
@@ -202,10 +276,14 @@ impl Summary {
             }
 
             let (x_m, y_m, z_m) = sol.pos_m;
-            let (err_x, err_y, err_z) = (x_m - x0_m, y_m - y0_m, z_m - z0_m);
 
-            (lat_ddeg, long_ddeg, alt_m) = sol.lat_long_alt_deg_deg_m;
-            final_err_m = (err_x, err_y, err_z);
+            final_geo_ddeg_m = sol.lat_long_alt_deg_deg_m;
+
+            if let Some((x0_m, y0_m, z0_m)) = x0_y0_z0_m {
+                let (err_x, err_y, err_z) = (x_m - x0_m, y_m - y0_m, z_m - z0_m);
+
+                final_err_m = Some((err_x, err_y, err_z));
+            }
 
             last_epoch = *t;
             timescale = sol.timescale;
@@ -217,7 +295,7 @@ impl Summary {
             timescale,
             satellites,
             final_err_m,
-            lat_long_alt_ddeg_ddeg_m: (lat_ddeg, long_ddeg, alt_m),
+            final_geo_ddeg_m,
             orbit: {
                 if ctx.data.has_sp3() {
                     "SP3".to_string()
@@ -229,6 +307,7 @@ impl Summary {
             profile: cfg.profile,
             // filter: cfg.solver.filter,
             duration: last_epoch - first_epoch,
+            surveyed_lat_long_alt_ddeg_ddeg_km: lat0_long0_alt0_ddeg_ddeg_km,
         }
     }
 }
@@ -249,9 +328,9 @@ struct ReportContent {
     /// altitude_plot
     altitude_plot: Plot,
     /// coords_err
-    coords_err_plot: Plot,
+    coords_err_plot: Option<Plot>,
     /// 3d_plot
-    coords_err3d_plot: Plot,
+    coords_err3d_plot: Option<Plot>,
     /// velocity_plot
     vel_plot: Plot,
     /// DOP
@@ -271,42 +350,60 @@ impl ReportContent {
         let nb_solutions = solutions.len();
         let epochs = solutions.keys().cloned().collect::<Vec<_>>();
 
-        let rx_orbit = ctx.rx_orbit.expect("rx orbit not defined!");
-        let pos_vel = rx_orbit.to_cartesian_pos_vel();
+        let (x0y0z0_m, lat0_long0_alt0_km) = if let Some(rx_orbit) = ctx.rx_orbit {
+            let pos_vel = rx_orbit.to_cartesian_pos_vel() * 1.0E3;
+            let (x0_m, y0_m, z0_m) = (pos_vel[0], pos_vel[1], pos_vel[2]);
 
-        let (x0_km, y0_km, z0_km) = (pos_vel[0], pos_vel[1], pos_vel[2]);
+            let (lat0_ddeg, long0_ddeg, alt0_km) = rx_orbit
+                .latlongalt()
+                .unwrap_or_else(|e| panic!("latlongalt() physical error: {}", e));
 
-        let (x0_m, y0_m, z0_m) = (x0_km * 1.0E3, y0_km * 1.0E3, z0_km * 1.0E3);
+            (
+                Some((x0_m, y0_m, z0_m)),
+                Some((lat0_ddeg, long0_ddeg, alt0_km)),
+            )
+        } else {
+            (None, None)
+        };
 
-        let (lat0_ddeg, lon0_ddeg, _) = rx_orbit
-            .latlongalt()
-            .unwrap_or_else(|e| panic!("latlongalt() physical error: {}", e));
-
-        let summary = Summary::new(cfg, ctx, solutions, (x0_km, y0_km, z0_km));
+        let summary = Summary::new(cfg, ctx, solutions, x0y0z0_m, lat0_long0_alt0_km);
 
         Self {
             map_proj: {
-                let mut map_proj = Plot::world_map(
-                    "map_proj",
-                    "Map Projection",
-                    MapboxStyle::OpenStreetMap,
-                    (lat0_ddeg, lon0_ddeg),
-                    18,
-                    true,
-                );
+                let mut map_proj = if let Some((lat0_ddeg, long0_ddeg, _)) = lat0_long0_alt0_km {
+                    Plot::world_map(
+                        "map_proj",
+                        "Map Projection",
+                        MapboxStyle::OpenStreetMap,
+                        (lat0_ddeg, long0_ddeg),
+                        18,
+                        true,
+                    )
+                } else {
+                    Plot::world_map(
+                        "map_proj",
+                        "Map Projection",
+                        MapboxStyle::OpenStreetMap,
+                        (summary.final_geo_ddeg_m.0, summary.final_geo_ddeg_m.1),
+                        18,
+                        true,
+                    )
+                };
 
-                let apriori = Plot::mapbox(
-                    vec![lat0_ddeg],
-                    vec![lon0_ddeg],
-                    "apriori",
-                    3,
-                    MarkerSymbol::Circle,
-                    Some(NamedColor::Red),
-                    1.0,
-                    true,
-                );
+                if let Some((lat0_ddeg, long0_ddeg, _)) = lat0_long0_alt0_km {
+                    let apriori = Plot::mapbox(
+                        vec![lat0_ddeg],
+                        vec![long0_ddeg],
+                        "apriori",
+                        3,
+                        MarkerSymbol::Circle,
+                        Some(NamedColor::Red),
+                        1.0,
+                        true,
+                    );
 
-                map_proj.add_trace(apriori);
+                    map_proj.add_trace(apriori);
+                }
 
                 let mut prev_pct = 0;
                 for (index, (_, sol_i)) in solutions.iter().enumerate() {
@@ -343,7 +440,7 @@ impl ReportContent {
                 map_proj
             },
             sv_plot: {
-                let mut plot = Plot::timedomain_plot("sv_plot", "SV ID#", "PRN #", true);
+                let mut plot = Plot::timedomain_plot("sv_plot", "Contributions", "PRN #", true);
                 for sv in summary.satellites.iter() {
                     let epochs = solutions
                         .iter()
@@ -657,7 +754,7 @@ impl ReportContent {
 
                 let clock_offset = solutions
                     .iter()
-                    .map(|(_, sol)| sol.clock_offset.to_seconds())
+                    .map(|(_, sol)| sol.clock_offset_s)
                     .collect::<Vec<_>>();
 
                 let trace = Plot::timedomain_chart(
@@ -691,7 +788,8 @@ impl ReportContent {
                 plot.add_trace(trace);
                 plot
             },
-            coords_err_plot: {
+
+            coords_err_plot: if let Some((x0_m, y0_m, z0_m)) = x0y0z0_m {
                 let mut plot = Plot::timedomain_plot("xy_plot", "X/Y/Z Error", "Error [m]", true);
 
                 let trace = Plot::timedomain_chart(
@@ -726,9 +824,13 @@ impl ReportContent {
                 );
 
                 plot.add_trace(trace);
-                plot
+
+                Some(plot)
+            } else {
+                None
             },
-            coords_err3d_plot: {
+
+            coords_err3d_plot: if let Some((x0_m, y0_m, z0_m)) = x0y0z0_m {
                 let mut plot = Plot::plot_3d(
                     "3d_sphere",
                     "3D errors",
@@ -747,13 +849,14 @@ impl ReportContent {
                     solutions.values().map(|sol| sol.pos_m.1 - y0_m).collect(),
                     solutions.values().map(|sol| sol.pos_m.2 - z0_m).collect(),
                 );
+
                 plot.add_trace(trace);
-                plot
+
+                Some(plot)
+            } else {
+                None
             },
-            //navi_plot: {
-            //    let plot = Plot::timedomain_plot("navi_plot", "NAVI Plot", "Error [m]", true);
-            //    plot
-            //},
+
             summary,
         }
     }
@@ -781,14 +884,6 @@ impl Render for ReportContent {
                                 (self.map_proj.render())
                             }
                         }
-                        //tr {
-                        //    th class="is-info" {
-                        //        "NAVI Plot"
-                        //    }
-                        //    td {
-                        //        (self.navi_plot.render())
-                        //    }
-                        //}
                         tr {
                             th class="is-info" {
                                 button aria-label="SV Contribution over time" data-balloon-pos="right" {
@@ -835,33 +930,52 @@ impl Render for ReportContent {
                                 (self.altitude_plot.render())
                             }
                         }
-                        tr {
-                            th class="is-info" {
-                                button aria-label="3D errors (surveying applications only)" data-balloon-pos="right" {
-                                    "Errors"
-                                }
-                            }
-                            td {
-                                table class="table is-bordered" {
-                                    tr {
-                                        th class="is-info" {
-                                            "Coordinates"
-                                        }
-                                        td {
-                                            (self.coords_err_plot.render())
-                                        }
+
+                        @ if let Some(plot) = &self.coords_err_plot {
+                            tr {
+                                th class="is-info" {
+                                    button aria-label="3D errors (surveying applications only)" data-balloon-pos="right" {
+                                        "Coordinates Error"
                                     }
-                                    tr {
-                                        th class="is-info" {
-                                            "3D"
-                                        }
-                                        td {
-                                            (self.coords_err3d_plot.render())
+                                }
+                                td {
+                                    table class="table is-bordered" {
+                                        tr {
+                                            th class="is-info" {
+                                                "Errors"
+                                            }
+                                            td {
+                                                (plot.render())
+                                            }
                                         }
                                     }
                                 }
                             }
                         }
+
+                        @ if let Some(plot) = &self.coords_err3d_plot {
+                            tr {
+                                th class="is-info" {
+                                    button aria-label="3D errors (surveying applications only)" data-balloon-pos="right" {
+                                        "Coordinates Error"
+                                    }
+                                }
+                                td {
+                                    table class="table is-bordered" {
+                                        tr {
+                                            th class="is-info" {
+                                                "3D Errors"
+                                            }
+                                            td {
+                                                (plot.render())
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+
                         tr {
                             th class="is-info" {
                                 "Velocity"
@@ -870,6 +984,7 @@ impl Render for ReportContent {
                                 (self.vel_plot.render())
                             }
                         }
+
                         tr {
                             th class="is-info" {
                                 "DOP"

@@ -9,6 +9,11 @@ Serie of demonstrations using `rinex-cli` and our [GNSS framework](https://githu
 - [Postfit Denoising filter for improved PVT solutions](./STATIC_POSTFIT_DENOISING.md)
 - [Code Smoothing combined to static PPP](./PPP_CODE_SMOOTHING.md)
 
+File Operations
+===============
+
+- [Constellation binning and Timescale binning (`cbin`)](./CBIN.md)
+
 Timescales & Constellations Demos
 =================================
 
@@ -40,3 +45,10 @@ RINEX V4 examples
 =================
 
 TODO
+
+Applications
+============
+
+- [PPP surveying (from scratch) without apriori knowledge](./SURVEY.md)
+- [PPP using 10' of recording using the RINEX plugin
+available to smartphones running Android OS](./ANDROID_RINEX.sh)

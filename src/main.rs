@@ -4,14 +4,17 @@
 
 mod cli; // command line interface
 mod fops; // file operations
-mod positioning; // post processed positioning
 mod preprocessing; // preprocessing
 mod report; // custom reports
 
-use preprocessing::preprocess;
+#[cfg(feature = "ppp")]
+mod positioning; // post processed positioning
+
 use report::Report;
 
-use gnss_qc::prelude::{QcContext, QcExtraPage};
+use preprocessing::context_preprocessing;
+
+use gnss_qc::prelude::QcContext;
 use rinex::prelude::{FormattingError as RinexFormattingError, ParsingError as RinexParsingError};
 
 use std::path::Path;
@@ -19,14 +22,15 @@ use walkdir::WalkDir;
 
 extern crate gnss_rs as gnss;
 
-use rinex::prelude::{qc::MergeError, Rinex};
-
-use sp3::prelude::SP3;
+use rinex::prelude::qc::MergeError;
 
 use cli::{Cli, Context, RemoteReferenceSite, Workspace};
 
 #[cfg(feature = "csv")]
 use csv::Error as CsvError;
+
+#[cfg(feature = "ppp")]
+use gnss_qc::prelude::QcExtraPage;
 
 use env_logger::{Builder, Target};
 
@@ -55,11 +59,12 @@ pub enum Error {
     MissingMeteoRinex,
     #[error("missing Clock RINEX")]
     MissingClockRinex,
-    #[error("positioning solver error")]
-    PositioningSolverError(#[from] positioning::Error),
     #[cfg(feature = "csv")]
     #[error("csv export error")]
     CsvError(#[from] CsvError),
+    #[cfg(feature = "ppp")]
+    #[error("positioning solver error")]
+    PositioningSolverError(#[from] positioning::Error),
 }
 
 /// Parses and preprepocess all files passed by User
@@ -73,8 +78,12 @@ fn user_data_parsing(
     let mut ctx = QcContext::new();
 
     if cli.jpl_bpc_update() {
+        #[cfg(not(feature = "ppp"))]
+        error!("--jpl-bpc only applies along PPP/PVT solver options");
+
+        #[cfg(feature = "ppp")]
         ctx.with_jpl_bpc()
-            .unwrap_or_else(|e| panic!("anise JPL BPC update failed with: {}", e));
+            .unwrap_or_else(|e| panic!("Upgrade to high precision context failed: {}", e));
     }
 
     // recursive dir loader
@@ -93,54 +102,32 @@ fn user_data_parsing(
                     .to_string();
 
                 if extension == "gz" {
-                    if let Ok(rinex) = Rinex::from_gzip_file(path) {
-                        let loading = ctx.load_rinex(path, rinex);
-                        if loading.is_ok() {
-                            info!("Loading RINEX file \"{}\"", path.display());
-                        } else {
-                            warn!(
-                                "failed to load RINEX file \"{}\": {}",
-                                path.display(),
-                                loading.err().unwrap()
-                            );
-                        }
-                    } else if let Ok(sp3) = SP3::from_gzip_file(path) {
-                        let loading = ctx.load_sp3(path, sp3);
-                        if loading.is_ok() {
-                            info!("Loading SP3 file \"{}\"", path.display());
-                        } else {
-                            warn!(
-                                "failed to load SP3 file \"{}\": {}",
-                                path.display(),
-                                loading.err().unwrap()
-                            );
-                        }
-                    } else {
-                        warn!("non supported file format \"{}\"", path.display());
+                    match ctx.load_gzip_rinex_file(path) {
+                        Ok(_) => {
+                            info!("RINEX file loaded: \"{}\"", path.display());
+                        },
+                        Err(_) => match ctx.load_gzip_sp3_file(path) {
+                            Ok(_) => {
+                                info!("SP3 file loaded: \"{}\"", path.display());
+                            },
+                            Err(_) => {
+                                panic!("File format not recognized!");
+                            },
+                        },
                     }
                 } else {
-                    if let Ok(rinex) = Rinex::from_file(path) {
-                        let loading = ctx.load_rinex(path, rinex);
-                        if loading.is_ok() {
-                            info!("Loading RINEX file \"{}\"", path.display());
-                        } else {
-                            warn!(
-                                "failed to load RINEX file \"{}\": {}",
-                                path.display(),
-                                loading.err().unwrap()
-                            );
-                        }
-                    } else if let Ok(sp3) = SP3::from_file(path) {
-                        let loading = ctx.load_sp3(path, sp3);
-                        if loading.is_ok() {
-                            info!("Loading SP3 file \"{}\"", path.display());
-                        } else {
-                            warn!(
-                                "failed to load SP3 file \"{}\": {}",
-                                path.display(),
-                                loading.err().unwrap()
-                            );
-                        }
+                    match ctx.load_rinex_file(path) {
+                        Ok(_) => {
+                            info!("RINEX file loaded: \"{}\"", path.display());
+                        },
+                        Err(_) => match ctx.load_sp3_file(path) {
+                            Ok(_) => {
+                                info!("SP3 file loaded: \"{}\"", path.display());
+                            },
+                            Err(_) => {
+                                panic!("File format not recognized!");
+                            },
+                        },
                     }
                 }
             }
@@ -158,54 +145,38 @@ fn user_data_parsing(
             .to_string();
 
         if extension == "gz" {
-            if let Ok(rinex) = Rinex::from_gzip_file(path) {
-                let loading = ctx.load_rinex(path, rinex);
-                if loading.is_err() {
-                    warn!(
-                        "failed to load RINEX file \"{}\": {}",
-                        path.display(),
-                        loading.err().unwrap()
-                    );
-                }
-            } else if let Ok(sp3) = SP3::from_gzip_file(path) {
-                let loading = ctx.load_sp3(path, sp3);
-                if loading.is_err() {
-                    warn!(
-                        "failed to load SP3 file \"{}\": {}",
-                        path.display(),
-                        loading.err().unwrap()
-                    );
-                }
-            } else {
-                warn!("non supported file format \"{}\"", path.display());
+            match ctx.load_gzip_rinex_file(path) {
+                Ok(_) => {
+                    info!("RINEX file loaded: \"{}\"", path.display());
+                },
+                Err(_) => match ctx.load_gzip_sp3_file(path) {
+                    Ok(_) => {
+                        info!("SP3 file loaded: \"{}\"", path.display());
+                    },
+                    Err(_) => {
+                        panic!("File format not recognized!");
+                    },
+                },
             }
         } else {
-            if let Ok(rinex) = Rinex::from_file(path) {
-                let loading = ctx.load_rinex(path, rinex);
-                if loading.is_err() {
-                    warn!(
-                        "failed to load RINEX file \"{}\": {}",
-                        path.display(),
-                        loading.err().unwrap()
-                    );
-                }
-            } else if let Ok(sp3) = SP3::from_file(path) {
-                let loading = ctx.load_sp3(path, sp3);
-                if loading.is_err() {
-                    warn!(
-                        "failed to load SP3 file \"{}\": {}",
-                        path.display(),
-                        loading.err().unwrap()
-                    );
-                }
-            } else {
-                warn!("non supported file format \"{}\"", path.display());
+            match ctx.load_rinex_file(path) {
+                Ok(_) => {
+                    info!("RINEX file loaded: \"{}\"", path.display());
+                },
+                Err(_) => match ctx.load_sp3_file(path) {
+                    Ok(_) => {
+                        info!("SP3 file loaded: \"{}\"", path.display());
+                    },
+                    Err(_) => {
+                        panic!("File format not recognized!");
+                    },
+                },
             }
         }
     }
 
     // Preprocessing
-    preprocess(&mut ctx, cli);
+    context_preprocessing(&mut ctx, cli);
 
     match cli.matches.subcommand() {
         Some(("rtk", _)) => {
@@ -253,6 +224,8 @@ pub fn main() -> Result<(), Error> {
     // Input context
     let mut ctx = Context {
         name: ctx_stem.clone(),
+
+        #[cfg(feature = "ppp")]
         rx_orbit: {
             // possible reference point
             if let Some(rx_orbit) = data_ctx.reference_rx_orbit() {
@@ -268,6 +241,7 @@ pub fn main() -> Result<(), Error> {
                 None
             }
         },
+
         data: data_ctx,
         reference_site: {
             match cli.matches.subcommand() {
@@ -293,6 +267,7 @@ pub fn main() -> Result<(), Error> {
     };
 
     // ground reference point
+    #[cfg(feature = "ppp")]
     match ctx.rx_orbit {
         Some(_) => {
             if let Some(obs_rinex) = ctx.data.observation() {
@@ -328,10 +303,8 @@ pub fn main() -> Result<(), Error> {
         },
     }
 
-    // Prepare for output productes (on any FOPS)
-    if cli.has_fops_output_product() {
-        ctx.workspace.create_subdir("OUTPUT");
-
+    // Prepare for file operation (output products)
+    if cli.is_file_operation_run() {
         // possible seamless CRINEX/RINEX compression
         if cli.rnx2crnx() {
             if let Some(observation) = ctx.data.observation_mut() {
@@ -339,6 +312,7 @@ pub fn main() -> Result<(), Error> {
                 observation.rnx2crnx_mut();
             }
         }
+
         if cli.crnx2rnx() {
             if let Some(observation) = ctx.data.observation_mut() {
                 info!("internal CRX2RNX decompression");
@@ -348,19 +322,19 @@ pub fn main() -> Result<(), Error> {
     }
 
     // Exclusive opmodes to follow
+    #[cfg(feature = "ppp")]
     let mut extra_pages = Vec::<QcExtraPage>::new();
 
     match cli.matches.subcommand() {
-        /*
-         *  File operations abort here and do not windup in analysis opmode.
-         *  Users needs to then deploy analysis mode on previously generated files.
-         */
+        // File operations abort here and do not continue to analysis opmode (special case).
+        // Users need to re-run (re execute) on previously generated data
+        // to perform their analysis.
         Some(("filegen", submatches)) => {
             fops::filegen(&ctx, &cli.matches, submatches)?;
             return Ok(());
         },
         Some(("merge", submatches)) => {
-            fops::merge(&ctx, submatches)?;
+            fops::merge(&ctx, &cli, submatches)?;
             return Ok(());
         },
         Some(("split", submatches)) => {
@@ -371,14 +345,20 @@ pub fn main() -> Result<(), Error> {
             fops::time_binning(&ctx, &cli.matches, submatches)?;
             return Ok(());
         },
-        Some(("diff", submatches)) => {
-            fops::diff(&ctx, submatches)?;
+        Some(("cbin", submatches)) => {
+            fops::constell_timescale_binning(&ctx, submatches)?;
             return Ok(());
         },
+        Some(("diff", submatches)) => {
+            fops::diff(&ctx, &cli, submatches)?;
+            return Ok(());
+        },
+        #[cfg(feature = "ppp")]
         Some(("ppp", submatches)) => {
             let chapter = positioning::precise_positioning(&cli, &ctx, false, submatches)?;
             extra_pages.push(chapter);
         },
+        #[cfg(feature = "ppp")]
         Some(("rtk", submatches)) => {
             let chapter = positioning::precise_positioning(&cli, &ctx, true, submatches)?;
             extra_pages.push(chapter);
@@ -388,10 +368,12 @@ pub fn main() -> Result<(), Error> {
 
     // report
     let cfg = cli.qc_config();
+
     let mut report = Report::new(&cli, &ctx, cfg);
 
-    // customization
+    #[cfg(feature = "ppp")]
     for extra in extra_pages {
+        // customization
         report.customize(extra);
     }
 

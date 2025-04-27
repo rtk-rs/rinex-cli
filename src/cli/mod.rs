@@ -24,7 +24,7 @@ mod workspace;
 
 pub use workspace::Workspace;
 
-use fops::{diff, filegen, merge, split, time_binning};
+use fops::{cbin, diff, filegen, merge, split, tbin};
 
 pub struct Cli {
     /// Arguments passed by user
@@ -46,20 +46,26 @@ pub struct RemoteReferenceSite {
 pub struct Context {
     /// Quiet option
     pub quiet: bool,
+
     /// Data context defined by user.
     /// In differential opmode, this is the ROVER.
     pub data: QcContext,
+
     /// Remote reference site (secondary dataset) defined by User.
     /// Serves as reference point in differential techniques.
     pub reference_site: Option<RemoteReferenceSite>,
+
     /// Context name is derived from the primary file loaded in Self,
     /// and mostly used in output products generation.
     pub name: String,
+
     /// Workspace is the place where this session will generate data.
     /// By default it is set to $WORKSPACE/$PRIMARYFILE.
     /// $WORKSPACE is either manually definedd by CLI or we create it (as is).
     /// $PRIMARYFILE is determined from the most major file contained in the dataset.
     pub workspace: Workspace,
+
+    #[cfg(feature = "ppp")]
     /// (RX) [Orbit] to use, whether is was automatically picked up,
     /// or manually overwritten.
     pub rx_orbit: Option<Orbit>,
@@ -78,6 +84,7 @@ impl Context {
             .expect("failed to determine a context name")
             .to_str()
             .expect("failed to determine a context name");
+
         /*
          * In case $FILENAME.RNX.gz gz compressed, we extract "$FILENAME".
          * Can use .file_name() once https://github.com/rust-lang/rust/issues/86319  is stabilized
@@ -215,13 +222,6 @@ In file operations (filegen, etc..) we can manually define output filenames with
 By default, report synthesis happens once per input set (file combnation and cli options).
 Use this option to force report regeneration.
 This has no effect on file operations that do not synthesize a report."))
-        .arg(
-            Arg::new("report-nostats")
-                .long("nostats")
-                .action(ArgAction::SetTrue)
-                .help("Hide statistical annotations that might be present in some plots.
-This has no effect on applications compiled without plot and statistical options.")
-        )
         .next_help_heading("Preprocessing")
             .arg(Arg::new("gps-filter")
                 .short('G')
@@ -305,11 +305,13 @@ Otherwise it gets automatically picked up."))
             .subcommand(positioning::rtk_subcommand())
             .subcommand(split::subcommand())
             .subcommand(diff::subcommand())
-            .subcommand(time_binning::subcommand());
+            .subcommand(cbin::subcommand())
+            .subcommand(tbin::subcommand());
         Self {
             matches: cmd.get_matches(),
         }
     }
+
     /// Recursive browser depth
     pub fn recursive_depth(&self) -> usize {
         if let Some(depth) = self.matches.get_one::<u8>("depth") {
@@ -318,6 +320,7 @@ Otherwise it gets automatically picked up."))
             5
         }
     }
+
     /// Returns individual input ROVER -d
     pub fn rover_directories(&self) -> Vec<&String> {
         if let Some(dirs) = self.matches.get_many::<String>("directory") {
@@ -326,6 +329,7 @@ Otherwise it gets automatically picked up."))
             Vec::new()
         }
     }
+
     /// Returns individual input ROVER -fp
     pub fn rover_files(&self) -> Vec<&String> {
         if let Some(fp) = self.matches.get_many::<String>("filepath") {
@@ -334,6 +338,7 @@ Otherwise it gets automatically picked up."))
             Vec::new()
         }
     }
+
     /// Returns individual input BASE STATION -d
     pub fn base_station_directories(&self) -> Vec<&String> {
         match self.matches.subcommand() {
@@ -460,13 +465,14 @@ Otherwise it gets automatically picked up."))
     }
 
     /// True if File Operations to generate data is being deployed
-    pub fn has_fops_output_product(&self) -> bool {
+    pub fn is_file_operation_run(&self) -> bool {
         matches!(
             self.matches.subcommand(),
             Some(("filegen", _))
                 | Some(("merge", _))
                 | Some(("split", _))
                 | Some(("tbin", _))
+                | Some(("cbin", _))
                 | Some(("diff", _))
         )
     }
@@ -505,12 +511,12 @@ Otherwise it gets automatically picked up."))
     /// Returns QcConfig from command line
     pub fn qc_config(&self) -> QcConfig {
         QcConfig {
-            user_rx_ecef: None,
             report: if self.matches.get_flag("report-sum") {
                 QcReportType::Summary
             } else {
                 QcReportType::Full
             },
+            user_rx_ecef: None,
         }
     }
     /// Customized / manually defined output to be generated

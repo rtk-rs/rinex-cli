@@ -13,7 +13,7 @@ use rinex::{
 };
 
 use gnss_rtk::prelude::{
-    Bias, Candidate, Carrier as RTKCarrier, Method, Observation, OrbitSource, Solver, Time,
+    Bias, Candidate, Carrier as RTKCarrier, Method, Observation, OrbitSource, PPPSolver, Time,
     SPEED_OF_LIGHT_M_S,
 };
 
@@ -86,7 +86,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: Time>
     ctx: &Context,
     eph: &'a RefCell<EphemerisSource<'b>>,
     mut clock: CK,
-    mut solver: Solver<O, B, T>,
+    mut solver: PPPSolver<O, B, T>,
     method: Method,
 ) -> Result<Vec<Track>, PositioningError> {
     let obs_data = ctx
@@ -164,11 +164,11 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: Time>
                 }
 
                 match solver.resolve(past_t, &candidates) {
-                    Ok((_, pvt)) => {
+                    Ok(pvt) => {
                         for sv_contrib in pvt.sv.iter() {
                             let (azim_deg, elev_deg) = (sv_contrib.azimuth, sv_contrib.elevation);
 
-                            let refsys = pvt.clock_offset.to_seconds();
+                            let refsys = pvt.clock_offset_s;
 
                             let refsv = refsys
                                 + sv_contrib.clock_correction.unwrap_or_default().to_seconds();

@@ -1,79 +1,90 @@
-use crate::cli::Context;
-use crate::Error;
 use clap::ArgMatches;
+use std::path::{Path, PathBuf};
 
-use std::path::PathBuf;
+use rinex::prelude::{qc::Merge, RinexType};
 
-use rinex::prelude::{qc::Merge, Rinex, RinexType};
+use crate::{
+    cli::{Cli, Context},
+    fops::{dump_rinex_auto_generated_name, parse_rinex},
+    preprocessing::rinex_preprocessing,
+    Error,
+};
 
 /// Merge single file into [Context], dump into workspace.
-pub fn merge(ctx: &Context, matches: &ArgMatches) -> Result<(), Error> {
+pub fn merge(ctx: &Context, cli: &Cli, submatches: &ArgMatches) -> Result<(), Error> {
     let ctx_data = &ctx.data;
-    let merge_path = matches.get_one::<PathBuf>("file").unwrap();
 
-    let extension = merge_path
-        .extension()
-        .unwrap_or_else(|| {
-            panic!(
-                "failed to determine file extension: {}",
-                merge_path.display()
-            )
-        })
-        .to_string_lossy()
-        .to_string();
+    // options
+    let gzip = submatches.get_flag("gzip");
+    let short_v2_name = submatches.get_flag("short");
+    let merge_path = submatches.get_one::<PathBuf>("file").unwrap();
 
-    let rinex_b = if extension == "gz" {
-        Rinex::from_gzip_file(&merge_path)
-    } else {
-        Rinex::from_file(&merge_path)
-    };
+    let forced_rinex = cli.matches.get_flag("crx2rnx");
+    let forced_crinex = cli.matches.get_flag("rnx2crx");
 
-    let rinex_b =
-        rinex_b.unwrap_or_else(|e| panic!("failed to parse {}: {}", merge_path.display(), e));
+    let mut rinex_b = parse_rinex(&merge_path);
 
-    let rinex_c = match rinex_b.header.rinex_type {
+    rinex_preprocessing(&mut rinex_b, cli);
+
+    if forced_rinex {
+        rinex_b.crnx2rnx_mut();
+    }
+
+    if forced_crinex {
+        rinex_b.rnx2crnx_mut();
+    }
+
+    // perform merge
+    let (origin_name, rinex_c) = match rinex_b.header.rinex_type {
         RinexType::ObservationData => {
             let rinex_a = ctx_data
                 .observation()
                 .ok_or(Error::MissingObservationRinex)?;
-            rinex_a.merge(&rinex_b)?
+
+            (
+                rinex_a.standard_filename(short_v2_name, None, None),
+                rinex_a.merge(&rinex_b)?,
+            )
         },
         RinexType::NavigationData => {
             let rinex_a = ctx_data
                 .brdc_navigation()
                 .ok_or(Error::MissingNavigationRinex)?;
-            rinex_a.merge(&rinex_b)?
+
+            (
+                rinex_a.standard_filename(short_v2_name, None, None),
+                rinex_a.merge(&rinex_b)?,
+            )
         },
         RinexType::MeteoData => {
             let rinex_a = ctx_data.meteo().ok_or(Error::MissingMeteoRinex)?;
-            rinex_a.merge(&rinex_b)?
+
+            (
+                rinex_a.standard_filename(short_v2_name, None, None),
+                rinex_a.merge(&rinex_b)?,
+            )
         },
         RinexType::IonosphereMaps => {
             let rinex_a = ctx_data.ionex().ok_or(Error::MissingIONEX)?;
-            rinex_a.merge(&rinex_b)?
+
+            (
+                rinex_a.standard_filename(short_v2_name, None, None),
+                rinex_a.merge(&rinex_b)?,
+            )
         },
         RinexType::ClockData => {
             let rinex_a = ctx_data.clock().ok_or(Error::MissingClockRinex)?;
-            rinex_a.merge(&rinex_b)?
+
+            (
+                rinex_a.standard_filename(short_v2_name, None, None),
+                rinex_a.merge(&rinex_b)?,
+            )
         },
-        _ => unimplemented!(),
+        rinex_format => panic!("merge is not available for {}", rinex_format),
     };
 
-    let suffix = merge_path
-        .file_name()
-        .expect("failed to determine output path")
-        .to_string_lossy()
-        .to_string();
+    let input_path = Path::new(&origin_name);
+    dump_rinex_auto_generated_name(&ctx, &input_path, &rinex_c, gzip, None);
 
-    let output_path = ctx
-        .workspace
-        .root
-        .join(suffix)
-        .to_string_lossy()
-        .to_string();
-
-    rinex_c.to_file(&output_path)?;
-
-    info!("\"{}\" has been generated", output_path);
     Ok(())
 }

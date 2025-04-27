@@ -1,71 +1,17 @@
+pub mod cbin;
 pub mod diff;
 pub mod filegen;
 pub mod merge;
 pub mod split;
-pub mod time_binning;
+pub mod tbin;
 
 use lazy_static::lazy_static;
 
 use ::clap::{value_parser, Arg, ArgAction};
 
+use gnss_qc::prelude::TimeScale;
 use rinex::prod::{DataSource, FFU, PPU};
 
-/*
- * Arguments that are shared by all file operations.
- * Mainly [ProductionAttributes] (re)definition opts
- */
-#[cfg(not(feature = "csv"))]
-lazy_static! {
-    pub static ref SHARED_GENERAL_ARGS : Vec<Arg> = vec![
-        Arg::new("batch")
-            .short('b')
-            .long("batch")
-            .required(false)
-            .value_parser(value_parser!(u8))
-            .help("Set # (number ID) in case this file is part of a file serie"),
-        Arg::new("short")
-            .short('s')
-            .long("short")
-            .action(ArgAction::SetTrue)
-            .help("Prefer (deprecated) short filenames as historically used.
-Otherwise, this ecosystem prefers modern (longer) filenames that contain more information."),
-        Arg::new("gzip")
-            .long("gzip")
-            .action(ArgAction::SetTrue)
-            .help("Force .gzip compressed file generation, even if input data is not."),
-        Arg::new("unzip")
-            .long("unzip")
-            .action(ArgAction::SetTrue)
-            .help("Force plain/readable file generation. By default, if input data is gzip compressed, we will preserve
-the input compression. Use this to bypass."),
-        Arg::new("csv")
-            .long("csv")
-            .action(ArgAction::SetTrue)
-            .help("[NOT AVAILABLE] requires `csv` compilation option"),
-        Arg::new("agency")
-            .short('a')
-            .long("agency")
-            .required(false)
-            .help("Define a custom agency name, possibly overwriting
-what the original filename did define (according to conventions)."),
-        Arg::new("country")
-            .short('c')
-            .long("country")
-            .required(false)
-            .help("Define a custom (3 letter) country code.
-This code should represent where the Agency is located."),
-        Arg::new("source")
-            .long("src")
-            .required(false)
-            .value_name("[RCVR,STREAM]")
-            .value_parser(value_parser!(DataSource))
-            .help("Define the data source.
-In RINEX standards, we use \"RCVR\" when data was sampled from a hardware receiver.
-Use \"STREAM\" for other stream data source, like RTCM for example.")
-    ];
-}
-
-#[cfg(feature = "csv")]
 lazy_static! {
     pub static ref SHARED_GENERAL_ARGS : Vec<Arg> = vec![
         Arg::new("batch")
@@ -114,7 +60,12 @@ This code should represent where the Agency is located."),
             .value_parser(value_parser!(DataSource))
             .help("Define the data source.
 In RINEX standards, we use \"RCVR\" when data was sampled from a hardware receiver.
-Use \"STREAM\" for other stream data source, like RTCM for example.")
+Use \"STREAM\" for other stream data source, like RTCM for example."),
+Arg::new("timescale")
+.long("timescale")
+.required(false)
+.value_parser(value_parser!(TimeScale))
+.help("Temporal shift and re-expression into desired Timescale"),
     ];
 }
 

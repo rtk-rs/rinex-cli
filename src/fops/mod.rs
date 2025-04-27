@@ -1,3 +1,4 @@
+mod cbin;
 mod diff;
 mod filegen;
 mod merge;
@@ -7,11 +8,14 @@ mod tbin;
 #[cfg(feature = "csv")]
 pub mod csv;
 
+pub use cbin::constell_timescale_binning;
 pub use diff::diff;
 pub use filegen::filegen;
 pub use merge::merge;
 pub use split::split;
 pub use tbin::time_binning;
+
+use std::path::Path;
 
 use clap::ArgMatches;
 
@@ -19,6 +23,67 @@ use rinex::{
     prelude::Rinex,
     prod::{DataSource, DetailedProductionAttributes, ProductionAttributes, FFU, PPU},
 };
+
+use crate::Context;
+
+/// Shared method to parse a RINEX file
+pub fn parse_rinex(path: &Path) -> Rinex {
+    let extension = path
+        .extension()
+        .unwrap_or_else(|| panic!("failed to determine file extension: {}", path.display()))
+        .to_string_lossy()
+        .to_string();
+
+    let rinex = if extension == "gz" {
+        Rinex::from_gzip_file(&path)
+            .unwrap_or_else(|e| panic!("Failed to parse gzip compressed RINEX: {}", e))
+    } else {
+        Rinex::from_file(&path).unwrap_or_else(|e| panic!("Failed to parse RINEX: {}", e))
+    };
+
+    rinex
+}
+
+/// Shared method to dump a RINEX file into the workspace
+pub fn dump_rinex_auto_generated_name(
+    ctx: &Context,
+    input_path: &Path,
+    rinex: &Rinex,
+    gzip: bool,
+    custom_subdir: Option<String>,
+) {
+    let suffix = input_path
+        .file_name()
+        .expect("failed to determine output filename")
+        .to_string_lossy()
+        .to_string();
+
+    let mut output_path = ctx.workspace.root.clone();
+
+    if let Some(subdir) = custom_subdir {
+        output_path = output_path.join(subdir);
+    }
+
+    output_path = output_path.join(suffix);
+
+    let mut output_path = output_path.to_string_lossy().to_string();
+
+    if gzip {
+        output_path.push_str(".gz");
+    }
+
+    if gzip {
+        rinex
+            .to_gzip_file(&output_path)
+            .unwrap_or_else(|e| panic!("Failed to format {}: {}", output_path, e));
+    } else {
+        rinex
+            .to_file(&output_path)
+            .unwrap_or_else(|e| panic!("Failed to format {}: {}", output_path, e));
+    }
+
+    info!("\"{}\" has been generated", output_path);
+}
 
 /*
  * Parses share RINEX production attributes.

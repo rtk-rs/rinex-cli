@@ -5,26 +5,63 @@ RINEX-Cli
 [![Rust](https://github.com/rtk-rs/rinex-cli/actions/workflows/daily.yml/badge.svg)](https://github.com/rtk-rs/rinex-cli/actions/workflows/daily.yml)
 [![crates.io](https://img.shields.io/crates/v/rinex-cli.svg)](https://crates.io/crates/rinex-cli)
 
+[![MRSV](https://img.shields.io/badge/MSRV-1.81.0-orange?style=for-the-badge)](https://github.com/rust-lang/rust/releases/tag/1.81.0)
 [![License](https://img.shields.io/badge/license-MPL_2.0-orange?style=for-the-badge&logo=mozilla)](https://github.com/rtk-rs/rinex-cli/blob/main/LICENSE)
 
-`rinex-cli` is a command line tool to post process RINEX + SP3 data.  
+`rinex-cli` is a command line tool to post process RINEX and SP3 files.
 
-Since RINEX and SP3 cover many applications, so does `rinex-cli`. You can use
-this toolbox for
+Because RINEX and SP3 cover many applications, `rinex-cli` can be used for many applications. 
+The most important being:
 
-- Analysis and high level report synthesis
-- Data patching and fixing
-- Data synthesis (RINEX, CSV)
-- Post processed navigation and PVT solutions solving
-- High precision PVT solutions solving 
-- Timing solutions solving
+- File management
+  - patching & reworking (for example: zero repair)
+  - splitting: create a batch of files
+  - transposing: to a single timescale, into a batch of timescales
+  - reformat: export to CSV
+- Analysis 
+  - generate high level reports
+- Synthesis
+  - generate RINEX (and soon SP3) from provided products
+- Post processed navigation (`ppp` mode) because it integrates a complete
+PVT solver (on `ppp` feature only)
+- CGGTTS solutions solver (`ppp --cggtts` mode) by combining the `ppp` **and** `cggtts` options
 
-<img src="plots/errors-3d.png" alt="3D Errors" style="display: inline-block; width=100px" />
-<img src="plots/errors-coords.png" alt="3D Errors" style="display: inline-block; width=100px" />
+<div align="center">
+    <p>
+        Static surveying of a geodetic marker:
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/front-page/map.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/front-page/map.png alt="Plot">
+    </a>
+</div>
+
+<div align="center">
+    <p>
+        Errors from the geodetic marker (CPP, Galileo E1+E5)
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/front-page/coordinates.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/front-page/coordinates.png alt="Plot">
+    </a>
+</div>
+
+<div align="center">
+    <p>
+        REFSYS resolved from PPP+CGGTTS (CPP, Galileo E1+E5)
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/front-page/refsys.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/front-page/refsys.png alt="Plot">
+    </a>
+</div>
 
 ## Download the tool
 
-You can download the latest version from [the release portal](https://github.com/rtk-rs/rinex-cli/releases)
+You can download the latest version from [the release portal](https://github.com/rtk-rs/rinex-cli/releases).
+
+Two version of the toolbox are automatically released:
+
+* the smallest is published under the name `rinex-cli` and is only compatible with file management
+* the heaviest allows all features, including the NAV PVT Solver and NAV CGGTTS solutions solver, and is published
+under the name `rinex-cli-ppp`
 
 ## Install from Cargo
 
@@ -42,19 +79,18 @@ Download the version you are interested in:
 git clone https://github.com/rtk-rs/rinex-cli
 ```
 
-If you're interested in running one of the demos, you will need the data submodule:
+If you're interested in running one of the demos, you should enable all features
+and should download our example data set:
 
 ```bash
 git clone --recurse-submodules https://github.com/rtk-rs/rinex-cli
 ```
 
-This will build and install the stripped binary to `${HOME}/.cargo/bin`, which
-is usally defined in the ${PATH}. Because our examples span all applications, you should
-activate `--all-features`:
+To install in the default location, in this example activating all features,
+you should run this:
 
 ```bash
 cargo install --all-features --path .
-
 rinex-cli --version
 
 which rinex-cli
@@ -105,30 +141,35 @@ Then, continue your learning journey with:
 - [`merge` mode](./documentation/Merge.md): to merge RINEX files together,
 which is particularly useful in Data production context & files management
 
-- [`split` mode](./documentation/Split.md): demonstrates how to
-split one RINEX file into two
+- [`split` mode](./documentation/Split.md): divide/split your input products at a specific point in time (`Epoch`)
 
-- [`tbin` mode](./documentation/Tbin.md): allows creating a batch of RINEX
-from a single one (basically, dividing into sub-parts)
+- [`tbin` (time) binning mode](./documentation/TBin.md) create a batch (file series) of RINEX of equal duration
 
-- [`diff` mode](./documentation/Diff.md): to create a special RINEX
-by substracting one from the other
+- [`cbin` (Constellation /Timescale) binning mode](./demos/CBIN.md) to split Multi-GNSS RINEX into individual
+Constellations, with possible Timescale re-expression
 
-- [`filegen` mode](./documentation/Filegen.md) to generate text data, whether it is
-RINEX, SP3 or CSV. Patch data using the preprocessor. Perform RINEX to CSV export etc..
+- [`diff` mode](./demos/DIFF.md): create a special RINEX=RINEX(A)-RINEX(B)
+by substracting two observation RINEX files together, per frequency and signal modulations
+
+- [`filegen` mode](./documentation/Filegen.md): generate output products (RINEX, SP3, CSV..)
+after a possible preprocessing pipeline. Use this to either reformat RINEX or perform a RINEX to CSV conversion.
+
+## Post Processed Positioning
 
 Dive into the world of precise navigation:
 
-- [Introduction to the PPP (Post Processed Positioning) opmode](./documentation/PPP.md)
-- [PPP with special +cggtts option](./documentation/CGGTTS.md)
-- [Many examples](./examples/README.md) are provided, spanning many applications
+- [`ppp` opmode introduction](./documentation/PPP.md): resolve PVT solutions
+- [`ppp` with special `--cggtts` option](./documentation/CGGTTS.md): resolve CGGTTS solutions
+
+Examples
+========
+
+[Many examples](./examples/README.md) are provided for each mode individually.
 
 Demos
 =====
 
-- [Zero Repair (-z) to obtain valid PVT solutions](./demos/zero-repair-ppp)
-- [Apriori knowledge and PVT solution solving](./demos)
-- [RINEX to CSV export](./demos)
+Our [Demo folder](./demos) hosts many illustrations and high level applications
 
 Special Thanks
 ==============

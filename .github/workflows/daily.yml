@@ -27,11 +27,13 @@ jobs:
       with:
         submodules: recursive
         fetch-depth: 0
+    
     - uses: actions-rs/toolchain@v1
       name: Install Rust
       with:
-        toolchain: stable
+        toolchain: 1.81.0
         override: true
+    
     - name: Install Dependencies
       run: |
         sudo apt-get update

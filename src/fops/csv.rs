@@ -1,11 +1,82 @@
-use crate::Error;
 use csv::Writer;
-use rinex::prelude::Rinex;
 use std::{fs::File, io::Write, path::Path};
 
 use itertools::Itertools;
 
-pub fn write_obs_rinex<P: AsRef<Path>>(rnx: &Rinex, path: P) -> Result<(), Error> {
+use crate::{
+    cli::Context,
+    fops::{custom_prod_attributes, output_filename},
+    Error,
+};
+
+use gnss_qc::prelude::{ProductType, Rinex};
+
+use clap::ArgMatches;
+
+pub fn dump_context_csv(
+    ctx: &Context,
+    matches: &ArgMatches,
+    submatches: &ArgMatches,
+) -> Result<(), Error> {
+    let ctx_data = &ctx.data;
+
+    ctx.workspace.create_subdir("CSV");
+
+    // OBS RINEX
+    if let Some(rinex) = ctx_data.rinex(ProductType::Observation) {
+        let prod = custom_prod_attributes(rinex, submatches);
+
+        let output = ctx
+            .workspace
+            .root
+            .join("CSV")
+            .join(output_filename(rinex, matches, submatches, prod));
+
+        write_obs_rinex(rinex, &output)?;
+
+        info!(
+            "{} dumped in {}",
+            ProductType::Observation,
+            output.display()
+        );
+    }
+
+    // NAV RINEX
+    if let Some(brdc) = ctx_data.rinex(ProductType::BroadcastNavigation) {
+        ctx.workspace.create_subdir("BRDC");
+
+        let prod = custom_prod_attributes(brdc, submatches);
+        let output_name = output_filename(brdc, matches, submatches, prod);
+
+        let output = ctx.workspace.root.join("BRDC").join(&output_name);
+
+        write_raw_nav_rinex(brdc, &output)?;
+
+        info!(
+            "{} dumped in {}",
+            ProductType::BroadcastNavigation,
+            output.display()
+        );
+
+        if let Some(obs) = ctx_data.rinex(ProductType::Observation) {
+            ctx.workspace.create_subdir("BRDC+OBS");
+
+            let output = ctx.workspace.root.join("BRDC+OBS").join(&output_name);
+
+            write_joint_nav_obs_rinex(brdc, obs, &output)?;
+
+            info!(
+                "{} dumped in {}",
+                ProductType::BroadcastNavigation,
+                output.display()
+            );
+        }
+    }
+
+    Ok(())
+}
+
+fn write_obs_rinex<P: AsRef<Path>>(rnx: &Rinex, path: P) -> Result<(), Error> {
     let mut w = Writer::from_path(path)?;
     w.write_record(&[
         "Epoch",
@@ -51,7 +122,7 @@ pub fn write_obs_rinex<P: AsRef<Path>>(rnx: &Rinex, path: P) -> Result<(), Error
     Ok(())
 }
 
-pub fn write_joint_nav_obs_rinex(brdc: &Rinex, obs: &Rinex, path: &Path) -> Result<(), Error> {
+fn write_joint_nav_obs_rinex(brdc: &Rinex, obs: &Rinex, path: &Path) -> Result<(), Error> {
     let mut orbit_w = Writer::from_path(path)?;
     orbit_w.write_record(&["Epoch", "SV", "x_ecef_km", "y_ecef_km", "z_ecef_km"])?;
 
@@ -95,7 +166,7 @@ pub fn write_joint_nav_obs_rinex(brdc: &Rinex, obs: &Rinex, path: &Path) -> Resu
     Ok(())
 }
 
-pub fn write_raw_nav_rinex(brdc: &Rinex, path: &Path) -> Result<(), Error> {
+fn write_raw_nav_rinex(brdc: &Rinex, path: &Path) -> Result<(), Error> {
     let mut fd = File::create(path)
         .unwrap_or_else(|e| panic!("Failed to create file: {} - {}", path.display(), e));
 
