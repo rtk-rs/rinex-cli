@@ -53,7 +53,15 @@ correctly loaded, that the observation source is reference, and that a geodetic 
 
 Surveyed position:   
 
-TODO: IMAGE
+<div align="center">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-map.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-map.png alt="Plot">
+    </a>
+</div>
+
+We can see that a reference point is being reported. All projects are reported with respect of that position.
+
+## PPP from scratch with initial guess
 
 As of today, `rinex-cli` does not offer micro patching options so we will have to cheat manually.
 Using the following sequence, we unzip the observations and remove the geodetic marker:
@@ -68,8 +76,6 @@ If you load the file we just patched, you can see that the summary report will n
 ```bash
 rinex-cli --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx
 ```
-
-TODO: IMAGE
 
 Now we can run a new `ppp` session. This framework is powerful enough to determine it needs to do an initial guess,
 and we will see that the initial guess is good enough to obtain similar results:
@@ -93,11 +99,51 @@ initial phase is more complicated:
 ```
 
 <div align="center">
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute0-map.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute0-map.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-map.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-map.png alt="Plot">
     </a>
-
-    We can see that no reference point is reported, and only the absolute PVT can be projected.
-    The final results look fairly similar.
 </div>
 
+We can see that no reference point is being reported, and we can only project the absolute PVT solutions.
+The final results look fairly similar. 
+
+Resolved Coordinates comparison
+===============================
+
+Comparing coordinates resolved in both runs:
+
+<div align="left">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png alt="Plot">
+    </a>
+    Latitude coordinates, resolved with a reference point.
+</div>
+<div align="right">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png alt="Plot">
+    </a>
+    Latitude coordinates, resolved without a reference point.
+</div>
+
+<div align="left">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png alt="Plot">
+    </a>
+    Longitude coordinates, resolved with a reference point.
+</div>
+<div align="right">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png alt="Plot">
+    </a>
+    Longitude coordinates, resolved without a reference point.
+</div>
+
+Absolute altitude comparison
+============================
+
+TODO
+
+Absolute clock offset comparison
+================================
+
+TODO
