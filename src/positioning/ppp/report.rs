@@ -171,13 +171,13 @@ impl Render for Summary {
                                                     "GEO"
                                                 }
                                                 td {
-                                                    (format!("lat={:.3E}°", self.final_geo_ddeg_m.0))
+                                                    (format!("lat={:.5}°", self.final_geo_ddeg_m.0))
                                                 }
                                                 td {
-                                                    (format!("long={:.3E}°", self.final_geo_ddeg_m.1))
+                                                    (format!("long={:.5}°", self.final_geo_ddeg_m.1))
                                                 }
                                                 td {
-                                                    (format!("alt={:.3E}m", self.final_geo_ddeg_m.2))
+                                                    (format!("alt={:.3}m", self.final_geo_ddeg_m.2))
                                                 }
                                             }
                                         }
