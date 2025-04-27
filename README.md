@@ -31,7 +31,7 @@ PVT solver (on `ppp` feature only)
         Static surveying of a geodetic marker:
     </p>
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/front-page/map.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/map.png alt="Plot">
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/front-page/map.png alt="Plot">
     </a>
 </div>
 
@@ -40,7 +40,7 @@ PVT solver (on `ppp` feature only)
         Errors from the geodetic marker (CPP, Galileo E1+E5)
     </p>
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/front-page/coordinates.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/coordinates.png alt="Plot">
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/front-page/coordinates.png alt="Plot">
     </a>
 </div>
 
@@ -49,7 +49,7 @@ PVT solver (on `ppp` feature only)
         REFSYS resolved from PPP+CGGTTS (CPP, Galileo E1+E5)
     </p>
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/front-page/refsys.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/refsys.png alt="Plot">
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/front-page/refsys.png alt="Plot">
     </a>
 </div>
 
