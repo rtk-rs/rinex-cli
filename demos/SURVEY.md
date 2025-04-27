@@ -154,7 +154,7 @@ Comparing absolute clock offset (to `GPST` in this example) from both runs:
 
 <div align="center">
     <p>
-        Offset to `GPST`, with a reference point:
+        Offset to GPST with a reference point:
     </p>
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-clock.png>
         <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-clock.png alt="Plot">
@@ -162,12 +162,15 @@ Comparing absolute clock offset (to `GPST` in this example) from both runs:
 </div>
 <div align="center">
     <p>
-        Offset to `GPST`, without a reference point:
+        Offset to GPST without a reference point:
     </p>
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-clock.png>
         <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-clock.png alt="Plot">
     </a>
 </div>
+
+There is no reason that a geometric reference point interferes with the resolved absolute time.  
+We can see that it is the case.
 
 Absolute clock offset comparison
 ================================
