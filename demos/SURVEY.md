@@ -93,13 +93,11 @@ initial phase is more complicated:
 ```
 
 <div align="center">
-    <a href=https://github.com/rtk-rs/rinex-cli/tree/develop/plots/survey-demo/absolute0-map.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/tree/develop/plots/survey-demo/absolute0-map.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute0-map.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute0-map.png alt="Plot">
     </a>
 
-    <p>
     We can see that no reference point is reported, and only the absolute PVT can be projected.
     The final results look fairly similar.
-    </p>
 </div>
 
