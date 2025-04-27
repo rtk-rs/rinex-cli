@@ -170,7 +170,7 @@ Comparing absolute clock offset (to `GPST` in this example) from both runs:
 </div>
 
 There is no reason that a geometric reference point interferes with the resolved absolute time.  
-We can see that it is the case.
+We can see that it is verified.
 
 Absolute clock offset comparison
 ================================
