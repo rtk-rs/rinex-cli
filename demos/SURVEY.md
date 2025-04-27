@@ -91,3 +91,15 @@ initial phase is more complicated:
     Broadcast Navigation (BRDC): ["data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz"]
 [2025-04-26T19:58:37Z WARN  rinex_cli] no reference point identifed
 ```
+
+<div align="center">
+    <a href=https://github.com/rtk-rs/rinex-cli/tree/develop/plots/survey-demo/absolute0-map.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/tree/develop/plots/survey-demo/absolute0-map.png alt="Plot">
+    </a>
+
+    <p>
+    We can see that no reference point is reported, and only the absolute PVT can be projected.
+    The final results look fairly similar.
+    </p>
+</div>
+
