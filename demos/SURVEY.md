@@ -1,10 +1,10 @@
 Post Processed Positioning without apriori knowledge
 ====================================================
 
-| Topics         | - Illustrate one deployment aspect of `ppp` mode                      |
+| Topics         | Post Processed Navigation                                             |
 |----------------|-----------------------------------------------------------------------|
-| Category       | `Post Processed Navigation`                                           |
-| Modes          | `cbin`                                                                |
+| Category       | `Navigation`                                                          |
+| Modes          | `ppp`                                                                 |
 | Difficulty     | <span style="color:gold"> &#9733;&#9733;&#9733;</span>&#9734;&#9734;  |
 | Constellations | Any                                                                   |
 | Input          | RINEX                                                                 |
