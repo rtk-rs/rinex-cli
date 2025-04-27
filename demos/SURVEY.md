@@ -113,44 +113,83 @@ Resolved Coordinates comparison
 Comparing coordinates resolved in both runs:
 
 <div align="center">
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png alt="Plot">
-    </a>
     <p>
         Latitude coordinates, resolved with a reference point
     </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png alt="Plot">
+    </a>
 </div>
 
 <div align="center">
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png alt="Plot">
-    </a>
     <p>
         Latitude coordinates, resolved without a reference point
     </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png alt="Plot">
+    </a>
 </div>
 
 <div align="center">
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png alt="Plot">
-    </a>
     <p>
         Longitude coordinates, resolved with a reference point.
     </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png alt="Plot">
+    </a>
 </div>
 <div align="center">
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png alt="Plot">
-    </a>
     <p>
         Longitude coordinates, resolved without a reference point.
     </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png alt="Plot">
+    </a>
 </div>
 
 Absolute altitude comparison
 ============================
 
-TODO
+Comparing absolute clock offset (to `GPST` in this example) from both runs:
+
+<div align="center">
+    <p>
+        Offset to `GPST`, with a reference point:
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-clock.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-clock.png alt="Plot">
+    </a>
+</div>
+<div align="center">
+    <p>
+        Offset to `GPST`, without a reference point:
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-clock.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-clock.png alt="Plot">
+    </a>
+</div>
+
+Absolute clock offset comparison
+================================
+
+Comparing absolute altitude (above mean sea level) resolved from both runs:
+
+<div align="center">
+    <p>
+        Absolute altitude, with a reference point:
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-altitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-altitude.png alt="Plot">
+    </a>
+</div>
+<div align="center">
+    <p>
+        Absolute altitude, without a reference point:
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-altitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-altitude.png alt="Plot">
+    </a>
+</div>
 
 Absolute clock offset comparison
 ================================
