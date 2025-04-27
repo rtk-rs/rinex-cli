@@ -112,30 +112,39 @@ Resolved Coordinates comparison
 
 Comparing coordinates resolved in both runs:
 
-<div align="left">
+<div align="center">
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png>
         <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png alt="Plot">
     </a>
-    Latitude coordinates, resolved with a reference point.
+    <p>
+        Latitude coordinates, resolved with a reference point
+    </p>
 </div>
-<div align="right">
+
+<div align="center">
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png>
         <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png alt="Plot">
     </a>
-    Latitude coordinates, resolved without a reference point.
+    <p>
+        Latitude coordinates, resolved without a reference point
+    </p>
 </div>
 
-<div align="left">
+<div align="center">
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png>
         <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png alt="Plot">
     </a>
-    Longitude coordinates, resolved with a reference point.
+    <p>
+        Longitude coordinates, resolved with a reference point.
+    </p>
 </div>
-<div align="right">
+<div align="center">
     <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png>
         <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png alt="Plot">
     </a>
-    Longitude coordinates, resolved without a reference point.
+    <p>
+        Longitude coordinates, resolved without a reference point.
+    </p>
 </div>
 
 Absolute altitude comparison
