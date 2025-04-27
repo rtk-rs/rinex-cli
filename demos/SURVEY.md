@@ -54,8 +54,8 @@ correctly loaded, that the observation source is reference, and that a geodetic 
 Surveyed position:   
 
 <div align="center">
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-map.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-map.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/survey-map.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/survey-map.png alt="Plot">
     </a>
 </div>
 
@@ -99,8 +99,8 @@ initial phase is more complicated:
 ```
 
 <div align="center">
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-map.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-map.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/absolute-map.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/absolute-map.png alt="Plot">
     </a>
 </div>
 
@@ -116,8 +116,8 @@ Comparing coordinates resolved in both runs:
     <p>
         Latitude coordinates, resolved with a reference point:
     </p>
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-latitude.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/survey-latitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/survey-latitude.png alt="Plot">
     </a>
 </div>
 
@@ -125,8 +125,8 @@ Comparing coordinates resolved in both runs:
     <p>
         Latitude coordinates, resolved without a reference point:
     </p>
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-latitude.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/absolute-latitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/absolute-latitude.png alt="Plot">
     </a>
 </div>
 
@@ -134,16 +134,16 @@ Comparing coordinates resolved in both runs:
     <p>
         Longitude coordinates, resolved with a reference point:
     </p>
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-longitude.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/survey-longitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/survey-longitude.png alt="Plot">
     </a>
 </div>
 <div align="center">
     <p>
         Longitude coordinates, resolved without a reference point:
     </p>
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-longitude.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/absolute-longitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/absolute-longitude.png alt="Plot">
     </a>
 </div>
 
@@ -156,16 +156,16 @@ Comparing absolute altitude (above mean sea level) resolved from both runs:
     <p>
         Absolute altitude, with a reference point:
     </p>
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-altitude.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-altitude.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/survey-altitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/survey-altitude.png alt="Plot">
     </a>
 </div>
 <div align="center">
     <p>
         Absolute altitude, without a reference point:
     </p>
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-altitude.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-altitude.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/absolute-altitude.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/absolute-altitude.png alt="Plot">
     </a>
 </div>
 
@@ -178,16 +178,16 @@ Comparing absolute clock offset (to `GPST` in this example) from both runs:
     <p>
         Offset to GPST with a reference point:
     </p>
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-clock.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/survey-clock.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/survey-clock.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/survey-clock.png alt="Plot">
     </a>
 </div>
 <div align="center">
     <p>
         Offset to GPST without a reference point:
     </p>
-    <a href=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-clock.png>
-        <img src=https://github.com/rtk-rs/rinex-cli/blob/develop/plots/survey-demo/absolute-clock.png alt="Plot">
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/absolute-clock.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/survey-demo/absolute-clock.png alt="Plot">
     </a>
 </div>
 
@@ -197,7 +197,7 @@ We can see that it is verified.
 :warning: CGGTTS mode
 =====================
 
-As stated elsewhere, `cggtts` mode option requires the definition of a reference point. 
+As stated elsewhere, `cggtts` mode requires the definition of a reference point. 
 So it is normal that this command line does not work:
 
 ```bash
