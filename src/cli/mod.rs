@@ -37,11 +37,6 @@ impl Default for Cli {
     }
 }
 
-pub struct RemoteReferenceSite {
-    pub data: QcContext,
-    pub rx_ecef: Option<(f64, f64, f64)>,
-}
-
 /// Context defined by User.
 pub struct Context {
     /// Quiet option
@@ -50,10 +45,6 @@ pub struct Context {
     /// Data context defined by user.
     /// In differential opmode, this is the ROVER.
     pub data: QcContext,
-
-    /// Remote reference site (secondary dataset) defined by User.
-    /// Serves as reference point in differential techniques.
-    pub reference_site: Option<RemoteReferenceSite>,
 
     /// Context name is derived from the primary file loaded in Self,
     /// and mostly used in output products generation.
