@@ -5,8 +5,8 @@ use rinex::navigation::TimeOffset as RINEXTimeOffset;
 use crate::cli::Context;
 
 struct HeaderTimeOffset {
-    time_offset: RINEXTimeOffset,
     published: bool,
+    time_offset: RINEXTimeOffset,
 }
 
 pub struct Time {
@@ -22,9 +22,9 @@ impl RTKTime for Time {
         }) {
             header_offset.published = true;
 
-            Some(RTKTimeOffset::from_bdt_gpst_time_of_week(
+            Some(RTKTimeOffset::from_bdt_gpst_time_of_week_nanos(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomial,
+                header_offset.time_offset.polynomial.into(),
             ))
         } else {
             // TODO
@@ -40,9 +40,9 @@ impl RTKTime for Time {
         }) {
             header_offset.published = true;
 
-            Some(RTKTimeOffset::from_bdt_gst_time_of_week(
+            Some(RTKTimeOffset::from_bdt_gst_time_of_week_nanos(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomial,
+                header_offset.time_offset.polynomial.into(),
             ))
         } else {
             // TODO
@@ -58,9 +58,9 @@ impl RTKTime for Time {
         }) {
             header_offset.published = true;
 
-            Some(RTKTimeOffset::from_bdt_utc_time_of_week(
+            Some(RTKTimeOffset::from_bdt_utc_time_of_week_nanos(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomial,
+                header_offset.time_offset.polynomial.into(),
             ))
         } else {
             // TODO
@@ -76,9 +76,9 @@ impl RTKTime for Time {
         }) {
             header_offset.published = true;
 
-            Some(RTKTimeOffset::from_gpst_utc_time_of_week(
+            Some(RTKTimeOffset::from_gpst_utc_time_of_week_nanos(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomial,
+                header_offset.time_offset.polynomial.into(),
             ))
         } else {
             // TODO
@@ -94,9 +94,9 @@ impl RTKTime for Time {
         }) {
             header_offset.published = true;
 
-            Some(RTKTimeOffset::from_gst_gpst_time_of_week(
+            Some(RTKTimeOffset::from_gst_gpst_time_of_week_nanos(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomial,
+                header_offset.time_offset.polynomial.into(),
             ))
         } else {
             // TODO
@@ -112,9 +112,9 @@ impl RTKTime for Time {
         }) {
             header_offset.published = true;
 
-            Some(RTKTimeOffset::from_gst_utc_time_of_week(
+            Some(RTKTimeOffset::from_gst_utc_time_of_week_nanos(
                 header_offset.time_offset.t_ref,
-                header_offset.time_offset.polynomial,
+                header_offset.time_offset.polynomial.into(),
             ))
         } else {
             // TODO
