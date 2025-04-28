@@ -1,8 +1,4 @@
 {
     "method": "CPP",
-    "timescale": "GPST",
-    "solver": {
-        "postfit_denoising": 1000,
-        "max_gdop": 3
-    }
+    "timescale": "GPST"
 }
