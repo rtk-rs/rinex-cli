@@ -20,10 +20,10 @@ pub use report::Report;
 pub mod post_process;
 
 use gnss_rtk::prelude::{
-    Bias, Candidate, Epoch, Observation, OrbitSource, PPPSolver, PVTSolution, Time,
+    AbsoluteTime, Bias, Candidate, Epoch, Observation, OrbitSource, PPPSolver, PVTSolution,
 };
 
-pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: Time>(
+pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: AbsoluteTime>(
     ctx: &Context,
     eph: &'a RefCell<EphemerisSource<'b>>,
     mut clock: CK,

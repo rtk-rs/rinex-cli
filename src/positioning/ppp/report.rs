@@ -196,13 +196,13 @@ impl Render for Summary {
                                                     "Error"
                                                 }
                                                 td {
-                                                    (format!("x={:.3E}m", final_err_x_m))
+                                                    (format!("x={:.6}m", final_err_x_m))
                                                 }
                                                 td {
-                                                    (format!("y={:.3E}m", final_err_y_m))
+                                                    (format!("y={:.6}m", final_err_y_m))
                                                 }
                                                 td {
-                                                    (format!("z={:.3E}m", final_err_z_m))
+                                                    (format!("z={:.6}m", final_err_z_m))
                                                 }
                                             }
                                         }
@@ -215,13 +215,13 @@ impl Render for Summary {
                                                         "Averaged Error"
                                                     }
                                                     td {
-                                                        (format!("x={:.3E}m", err_x))
+                                                        (format!("{:.6}m", err_x))
                                                     }
                                                     td {
-                                                        (format!("y={:.3E}m", err_y))
+                                                        (format!("y={:.6}m", err_y))
                                                     }
                                                     td {
-                                                        (format!("z={:.3E}m", err_z))
+                                                        (format!("z={:.6}m", err_z))
                                                     }
                                                 }
                                             }
