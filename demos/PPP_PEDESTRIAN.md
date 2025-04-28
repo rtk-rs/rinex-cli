@@ -29,9 +29,6 @@ echo '
 {
     "method": "CPP",
     "timescale": "GPST",
-    "solver": {
-        "max_gdop": 5.0
-    },
     "user": {
         "profile": "pedestrian"
     }
@@ -48,11 +45,40 @@ rinex-cli \
     ppp -c /tmp/pedestrian.json
 ```
 
+We can see that the dilution of precision is rather good for a moving target (good receiver quality). `solver:max_gdop=5` is a good choice in this example. You can reduce it to `3` and still obtain quite a lot of solutions, but gaps will be be frequent.
+
+We can see that the clock drift is about 10ms/s, we can emphasize it by adjusting our user profile:
+
+```bash
+echo '
+{
+    "method": "CPP",
+    "timescale": "GPST",
+    "user": {
+        "profile": "pedestrian",
+        "clock_sigma": 10.0
+    }
+}' >> /tmp/pedestrian.json
+```
+
+GPS + Galileo mix
+=================
+
 We can check that the data set is compatible with Galileo as well:
 
 ```bash
 rinex-cli \
     -P Galileo \
+    --fp data/OBS/V3/2024_09_20_10_17_06.obs.gz \
+    --fp data/NAV/V3/2024_09_20_10_17_06.nav \
+    ppp -c /tmp/pedestrian.json
+```
+
+So it is possible to deploy the Galileo + GPS mixed scenario, to improve the overall accuracy:
+
+```bash
+rinex-cli \
+    -P GPS,Gal \
     --fp data/OBS/V3/2024_09_20_10_17_06.obs.gz \
     --fp data/NAV/V3/2024_09_20_10_17_06.nav \
     ppp -c /tmp/pedestrian.json
