@@ -24,7 +24,7 @@ extern crate gnss_rs as gnss;
 
 use rinex::prelude::qc::MergeError;
 
-use cli::{Cli, Context, RemoteReferenceSite, Workspace};
+use cli::{Cli, Context, Workspace};
 
 #[cfg(feature = "csv")]
 use csv::Error as CsvError;
@@ -229,39 +229,24 @@ pub fn main() -> Result<(), Error> {
         rx_orbit: {
             // possible reference point
             if let Some(rx_orbit) = data_ctx.reference_rx_orbit() {
-                let posvel = rx_orbit.to_cartesian_pos_vel();
-                let (x0_km, y0_km, z0_km) = (posvel[0], posvel[1], posvel[2]);
-                let (lat_ddeg, long_ddeg, _) = rx_orbit
+                let (lat_ddeg, long_ddeg, alt_km) = rx_orbit
                     .latlongalt()
                     .unwrap_or_else(|e| panic!("latlongalt - physical error: {}", e));
-                info!("reference point identified: {:.5E}km, {:.5E}km, {:.5E}km (lat={:.5}°, long={:.5}°)", x0_km, y0_km, z0_km, lat_ddeg, long_ddeg);
+
+                info!(
+                    "reference point identified: latitude={:.5}°, longitude={:.5}° altitude={:.5}m",
+                    lat_ddeg,
+                    long_ddeg,
+                    alt_km * 1.0E3
+                );
                 Some(rx_orbit)
             } else {
-                warn!("no reference point identifed");
+                warn!("no reference point identified");
                 None
             }
         },
 
         data: data_ctx,
-        reference_site: {
-            match cli.matches.subcommand() {
-                // Remote reference site (Base Station) User specs.
-                Some(("rtk", _)) => {
-                    let data = user_data_parsing(
-                        &cli,
-                        cli.base_station_files(),
-                        cli.base_station_directories(),
-                        max_recursive_depth,
-                        false,
-                    );
-                    Some(RemoteReferenceSite {
-                        data,
-                        rx_ecef: Some((0.0, 0.0, 0.0)),
-                    })
-                },
-                _ => None,
-            }
-        },
         quiet: cli.matches.get_flag("quiet"),
         workspace: Workspace::new(&ctx_stem, &cli),
     };
@@ -273,12 +258,11 @@ pub fn main() -> Result<(), Error> {
             if let Some(obs_rinex) = ctx.data.observation() {
                 if let Some(t0) = obs_rinex.first_epoch() {
                     if let Some(rx_orbit) = cli.manual_rx_orbit(t0, ctx.data.earth_cef) {
-                        let posvel = rx_orbit.to_cartesian_pos_vel();
-                        let (x0_km, y0_km, z0_km) = (posvel[0], posvel[1], posvel[2]);
-                        let (lat_ddeg, long_ddeg, _) = rx_orbit
+                        let (lat_ddeg, long_ddeg, alt_km) = rx_orbit
                             .latlongalt()
                             .unwrap_or_else(|e| panic!("latlongalt - physical error: {}", e));
-                        info!("reference point manually overwritten: {:.5E}km, {:.5E}km, {:.5E}km (lat={:.5}°, long={:.5}°)", x0_km, y0_km, z0_km, lat_ddeg, long_ddeg);
+
+                        info!("reference point manually overwritten: latitude={:.5}°, longitude={:.5}°, altitude={:.5}m", lat_ddeg, long_ddeg, alt_km * 1.0E3);
                         ctx.rx_orbit = Some(rx_orbit);
                     }
                 }
@@ -290,12 +274,11 @@ pub fn main() -> Result<(), Error> {
             if let Some(obs_rinex) = ctx.data.observation() {
                 if let Some(t0) = obs_rinex.first_epoch() {
                     if let Some(rx_orbit) = cli.manual_rx_orbit(t0, ctx.data.earth_cef) {
-                        let posvel = rx_orbit.to_cartesian_pos_vel();
-                        let (x0_km, y0_km, z0_km) = (posvel[0], posvel[1], posvel[2]);
-                        let (lat_ddeg, long_ddeg, _) = rx_orbit
+                        let (lat_ddeg, long_ddeg, alt_km) = rx_orbit
                             .latlongalt()
                             .unwrap_or_else(|e| panic!("latlongalt - physical error: {}", e));
-                        info!("manually defined reference point: {:.5E}km, {:.5E}km, {:.5E}km (lat={:.5}°, long={:.5}°)", x0_km, y0_km, z0_km, lat_ddeg, long_ddeg);
+
+                        info!("reference point manually defined: latitude={:.5}°, longitude={:.5}°, altitude={:.5}m", lat_ddeg, long_ddeg, alt_km * 1.0E3);
                         ctx.rx_orbit = Some(rx_orbit);
                     }
                 }
