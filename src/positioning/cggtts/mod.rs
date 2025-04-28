@@ -13,8 +13,8 @@ use rinex::{
 };
 
 use gnss_rtk::prelude::{
-    Bias, Candidate, Carrier as RTKCarrier, Method, Observation, OrbitSource, PPPSolver, Time,
-    SPEED_OF_LIGHT_M_S,
+    AbsoluteTime, Bias, Candidate, Carrier as RTKCarrier, Method, Observation, OrbitSource,
+    PPPSolver, SPEED_OF_LIGHT_M_S,
 };
 
 use cggtts::prelude::{
@@ -82,7 +82,7 @@ fn rinex_ref_observable(
 }
 
 /// Resolves CGGTTS tracks from input context
-pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: Time>(
+pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: AbsoluteTime>(
     ctx: &Context,
     eph: &'a RefCell<EphemerisSource<'b>>,
     mut clock: CK,

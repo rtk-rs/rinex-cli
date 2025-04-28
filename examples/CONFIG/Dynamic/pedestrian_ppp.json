@@ -1,7 +1,10 @@
 {
     "method": "CPP",
     "timescale": "GPST",
-    "profile": "pedestrian",
+    "user": {
+        "profile": "pedestrian",
+        "clock_sigma": 1e-3
+    },
     "solver": {
         "max_gdop": 10.0,
         "postfit_denoising": 1000

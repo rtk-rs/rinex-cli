@@ -1,7 +1,0 @@
-{
-    "method": "CPP",
-    "timescale": "GPST",
-    "solver": {
-        "postfit_kf": true
-    }
-}

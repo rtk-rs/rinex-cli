@@ -1,7 +1,4 @@
 {
     "method": "CPP",
-    "timescale": "GST",
-    "solver": {
-        "postfit_denoising": 1000
-    }
+    "timescale": "GST"
 }

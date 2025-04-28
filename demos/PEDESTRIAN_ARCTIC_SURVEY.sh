@@ -5,7 +5,7 @@
 # arctic/glacier environment
 ###############################
 RINEX_CLI="./target/release/rinex-cli -f"
-CONSTELLATION="Galileo,GPS"
+CONSTELLATION="Galileo"
 
 $RINEX_CLI \
     -P $CONSTELLATION \

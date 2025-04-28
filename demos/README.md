@@ -3,9 +3,11 @@ Demos
 
 Serie of demonstrations using `rinex-cli` and our [GNSS framework](https://github.com/rtk-rs)
 
+- [PPP surveying (from scratch) without apriori knowledge](./SURVEY.md)
+- [PPP using 10' of smartphone recording (urban environment)](./ANDROID_RINEX.sh)
+- [Roaming PPP (pedestrian profile)](./PPP_PEDESTRIAN.md)
 - [Zero Repair (-z) to obtain valid PVT solutions](./ZERO_REPAIR_PPP.md)
 - [Two 24H RINEX (=48h) surveying using static PPP technique](./STATIC_PPP_48H.md)
-- [Pedestrian profile (roaming) PPP](./PPP_ROAMING_PEDESTRIAN.md)
 - [Postfit Denoising filter for improved PVT solutions](./STATIC_POSTFIT_DENOISING.md)
 - [Code Smoothing combined to static PPP](./PPP_CODE_SMOOTHING.md)
 
@@ -45,10 +47,3 @@ RINEX V4 examples
 =================
 
 TODO
-
-Applications
-============
-
-- [PPP surveying (from scratch) without apriori knowledge](./SURVEY.md)
-- [PPP using 10' of recording using the RINEX plugin
-available to smartphones running Android OS](./ANDROID_RINEX.sh)

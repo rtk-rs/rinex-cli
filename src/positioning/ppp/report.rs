@@ -39,6 +39,8 @@ struct Summary {
     timescale: TimeScale,
     final_err_m: Option<(f64, f64, f64)>,
     final_geo_ddeg_m: (f64, f64, f64),
+    averaged_err_m: Option<(f64, f64, f64)>,
+    averaged_latlongalt_ddeg_m: Option<(f64, f64, f64)>,
     surveyed_lat_long_alt_ddeg_ddeg_km: Option<(f64, f64, f64)>,
 }
 
@@ -157,7 +159,6 @@ impl Render for Summary {
                             _ => {},
                         }
 
-
                         @ match self.final_err_m {
                             Some((final_err_x_m, final_err_y_m, final_err_z_m)) => {
                                 tr {
@@ -171,13 +172,13 @@ impl Render for Summary {
                                                     "GEO"
                                                 }
                                                 td {
-                                                    (format!("lat={:.3E}°", self.final_geo_ddeg_m.0))
+                                                    (format!("lat={:.5}°", self.final_geo_ddeg_m.0))
                                                 }
                                                 td {
-                                                    (format!("long={:.3E}°", self.final_geo_ddeg_m.1))
+                                                    (format!("long={:.5}°", self.final_geo_ddeg_m.1))
                                                 }
                                                 td {
-                                                    (format!("alt={:.3E}m", self.final_geo_ddeg_m.2))
+                                                    (format!("alt={:.3}m", self.final_geo_ddeg_m.2))
                                                 }
                                             }
                                         }
@@ -186,22 +187,42 @@ impl Render for Summary {
 
                                 tr {
                                     th class="is-info" {
-                                        "Final Error"
+                                        "Final"
                                     }
                                     td {
                                         table class="table is-bordered" {
                                             tr {
                                                 th class="is-info" {
-                                                    "Error (m)"
+                                                    "Error"
                                                 }
                                                 td {
-                                                    (format!("x={:.3E}m", final_err_x_m))
+                                                    (format!("x={:.6}m", final_err_x_m))
                                                 }
                                                 td {
-                                                    (format!("y={:.3E}m", final_err_y_m))
+                                                    (format!("y={:.6}m", final_err_y_m))
                                                 }
                                                 td {
-                                                    (format!("z={:.3E}m", final_err_z_m))
+                                                    (format!("z={:.6}m", final_err_z_m))
+                                                }
+                                            }
+                                        }
+                                    }
+                                    @ if let Some((err_x, err_y, err_z)) = &self.averaged_err_m {
+                                        td {
+                                            table class="table is-bordered" {
+                                                tr {
+                                                    th class="is-info" {
+                                                        "Averaged Error"
+                                                    }
+                                                    td {
+                                                        (format!("{:.6}m", err_x))
+                                                    }
+                                                    td {
+                                                        (format!("y={:.6}m", err_y))
+                                                    }
+                                                    td {
+                                                        (format!("z={:.6}m", err_z))
+                                                    }
                                                 }
                                             }
                                         }
@@ -234,6 +255,36 @@ impl Render for Summary {
                                 }
                             },
                         }
+
+                        @ match self.averaged_latlongalt_ddeg_m {
+                            Some((lat_ddeg, long_ddeg, alt_m)) => {
+                                tr {
+                                    th class="is-info" {
+                                        "Averaged"
+                                    }
+                                    td {
+                                        table class="table is-bordered" {
+                                            tr {
+                                                th class="is-info" {
+                                                    "GEO"
+                                                }
+                                                td {
+                                                    (format!("lat={:.5}°", lat_ddeg))
+                                                }
+                                                td {
+                                                    (format!("lat={:.5}°", long_ddeg))
+                                                }
+                                                td {
+                                                    (format!("alt={:.5}m", alt_m))
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            _ => {},
+                        }
+
                     }
                 }
             }
@@ -255,6 +306,11 @@ impl Summary {
 
         let mut final_err_m = Option::<(f64, f64, f64)>::None;
         let mut final_geo_ddeg_m = (0.0, 0.0, 0.0);
+
+        let mut averaged_err_m = Option::<(f64, f64, f64)>::None;
+        let mut averaged_latlongalt_ddeg_m = Option::<(f64, f64, f64)>::None;
+
+        let num_solutions = solutions.len();
 
         let satellites = solutions
             .values()
@@ -283,10 +339,47 @@ impl Summary {
                 let (err_x, err_y, err_z) = (x_m - x0_m, y_m - y0_m, z_m - z0_m);
 
                 final_err_m = Some((err_x, err_y, err_z));
+
+                if let Some(averaged_err_m) = &mut averaged_err_m {
+                    *averaged_err_m = (
+                        averaged_err_m.0 + err_x,
+                        averaged_err_m.1 + err_y,
+                        averaged_err_m.2 + err_z,
+                    );
+                }
+            }
+
+            if cfg.user.profile.is_static() {
+                // averaged coords
+                if let Some(averaged_latlongalt_ddeg_m) = &mut averaged_latlongalt_ddeg_m {
+                    *averaged_latlongalt_ddeg_m = (
+                        averaged_latlongalt_ddeg_m.0 + sol.lat_long_alt_deg_deg_m.0,
+                        averaged_latlongalt_ddeg_m.1 + sol.lat_long_alt_deg_deg_m.1,
+                        averaged_latlongalt_ddeg_m.2 + sol.lat_long_alt_deg_deg_m.2,
+                    );
+                } else {
+                    averaged_latlongalt_ddeg_m = Some(sol.lat_long_alt_deg_deg_m);
+                }
             }
 
             last_epoch = *t;
             timescale = sol.timescale;
+        }
+
+        if let Some(averaged_err_m) = &mut averaged_err_m {
+            *averaged_err_m = (
+                averaged_err_m.0 / num_solutions as f64,
+                averaged_err_m.1 / num_solutions as f64,
+                averaged_err_m.2 / num_solutions as f64,
+            );
+        }
+
+        if let Some(averaged_latlongalt_ddeg_m) = &mut averaged_latlongalt_ddeg_m {
+            *averaged_latlongalt_ddeg_m = (
+                averaged_latlongalt_ddeg_m.0 / num_solutions as f64,
+                averaged_latlongalt_ddeg_m.1 / num_solutions as f64,
+                averaged_latlongalt_ddeg_m.2 / num_solutions as f64,
+            );
         }
 
         Self {
@@ -296,6 +389,8 @@ impl Summary {
             satellites,
             final_err_m,
             final_geo_ddeg_m,
+            averaged_err_m,
+            averaged_latlongalt_ddeg_m,
             orbit: {
                 if ctx.data.has_sp3() {
                     "SP3".to_string()
@@ -304,7 +399,7 @@ impl Summary {
                 }
             },
             method: cfg.method,
-            profile: cfg.profile,
+            profile: cfg.user.profile,
             // filter: cfg.solver.filter,
             duration: last_epoch - first_epoch,
             surveyed_lat_long_alt_ddeg_ddeg_km: lat0_long0_alt0_ddeg_ddeg_km,
@@ -409,7 +504,7 @@ impl ReportContent {
                 for (index, (_, sol_i)) in solutions.iter().enumerate() {
                     let (lat_ddeg, long_ddeg, _) = sol_i.lat_long_alt_deg_deg_m;
 
-                    let modulo = if cfg.profile.is_static() { 10 } else { 1 };
+                    let modulo = if cfg.user.profile.is_static() { 10 } else { 1 };
                     let pct = index * 100 / nb_solutions;
 
                     if pct % modulo == 0 && index > 0 && pct != prev_pct

@@ -1,5 +1,4 @@
 {
     "method": "PPP",
-    "timescale": "GPST",
-    "code_smoothing": 15
+    "timescale": "GPST"
 }
