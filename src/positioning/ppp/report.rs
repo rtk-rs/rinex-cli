@@ -30,13 +30,13 @@ impl Render for ReportTab {
 
 struct Summary {
     method: NaviMethod,
-    profile: NaviProfile,
     orbit: String,
     first_epoch: Epoch,
     last_epoch: Epoch,
     duration: Duration,
     satellites: Vec<SV>,
     timescale: TimeScale,
+    profile: Option<NaviProfile>,
     final_err_m: Option<(f64, f64, f64)>,
     final_geo_ddeg_m: (f64, f64, f64),
     averaged_err_m: Option<(f64, f64, f64)>,
@@ -54,8 +54,14 @@ impl Render for Summary {
                             th class="is-info" {
                                 "Profile"
                             }
-                            td {
-                                (self.profile.to_string())
+                            @ if let Some(profile) = self.profile {
+                                td {
+                                    (profile.to_string())
+                                }
+                            } else {
+                                td {
+                                    "Static"
+                                }
                             }
                         }
 
@@ -349,7 +355,7 @@ impl Summary {
                 }
             }
 
-            if cfg.user.profile.is_static() {
+            if cfg.user.profile.is_none() {
                 // averaged coords
                 if let Some(averaged_latlongalt_ddeg_m) = &mut averaged_latlongalt_ddeg_m {
                     *averaged_latlongalt_ddeg_m = (
@@ -504,7 +510,7 @@ impl ReportContent {
                 for (index, (_, sol_i)) in solutions.iter().enumerate() {
                     let (lat_ddeg, long_ddeg, _) = sol_i.lat_long_alt_deg_deg_m;
 
-                    let modulo = if cfg.user.profile.is_static() { 10 } else { 1 };
+                    let modulo = if cfg.user.profile.is_none() { 10 } else { 1 };
                     let pct = index * 100 / nb_solutions;
 
                     if pct % modulo == 0 && index > 0 && pct != prev_pct

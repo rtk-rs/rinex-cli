@@ -49,7 +49,7 @@ use gnss_qc::prelude::QcExtraPage;
 
 use gnss_rtk::prelude::{
     Bias, BiasRuntime, Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel,
-    Method, PPPSolver, TroposphereModel,
+    Method, StaticPPP, TroposphereModel,
 };
 
 use thiserror::Error;
@@ -354,7 +354,7 @@ If your dataset does not describe one, you can manually describe one, see --help
         None => None,
     };
 
-    let solver = PPPSolver::new(
+    let solver = StaticPPP::new(
         ctx.data.almanac.clone(),
         ctx.data.earth_cef,
         cfg.clone(),
