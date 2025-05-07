@@ -19,7 +19,7 @@ exclude = [
 ]
 
 [package.metadata]
-msrv = "1.81"
+msrv = "1.82"
 
 [features]
 # PPP and PPP+CGGTTS are not supported by default, because they are quite heavy.
