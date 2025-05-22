@@ -49,7 +49,7 @@ use gnss_qc::prelude::QcExtraPage;
 
 use gnss_rtk::prelude::{
     Bias, BiasRuntime, Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel,
-    Method, PPPSolver, TroposphereModel,
+    Method, Profile, TroposphereModel, User, PPP,
 };
 
 use thiserror::Error;
@@ -354,20 +354,35 @@ If your dataset does not describe one, you can manually describe one, see --help
         None => None,
     };
 
-    let solver = PPPSolver::new(
+    let solver = PPP::new(
         ctx.data.almanac.clone(),
         ctx.data.earth_cef,
         cfg.clone(),
-        orbits,
+        orbits.into(),
         time,
         bias_model,
         apriori_ecef_m,
     );
 
+    let user_profile = User {
+        profile: {
+            if matches.get_flag("pedestrian") {
+                Some(Profile::Pedestrian)
+            } else {
+                None
+            }
+        },
+        clock_sigma_s: if let Some(clock_sigma) = matches.get_one::<f64>("clock-sigma") {
+            *clock_sigma
+        } else {
+            0.01
+        },
+    };
+
     #[cfg(feature = "cggtts")]
     if matches.get_flag("cggtts") {
         //* CGGTTS special opmode */
-        let tracks = cggtts::resolve(ctx, &eph, clocks, solver, cfg.method)?;
+        let tracks = cggtts::resolve(ctx, &eph, user_profile, clocks, solver, cfg.method)?;
         if !tracks.is_empty() {
             cggtts_post_process(&ctx, &tracks, matches)?;
             let report = CggttsReport::new(&ctx, &tracks);
@@ -380,7 +395,7 @@ If your dataset does not describe one, you can manually describe one, see --help
     }
 
     /* PPP */
-    let solutions = ppp::resolve(ctx, &eph, clocks, solver);
+    let solutions = ppp::resolve(ctx, &eph, user_profile, clocks, solver);
     if !solutions.is_empty() {
         ppp_post_process(&ctx, &solutions, matches)?;
         let report = PPPReport::new(&cfg, &ctx, &solutions);

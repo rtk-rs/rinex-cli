@@ -192,7 +192,7 @@ impl<'a, 'b> Orbits<'a, 'b> {
 }
 
 impl OrbitSource for Orbits<'_, '_> {
-    fn next_at(&mut self, t: Epoch, sv: SV, frame: Frame) -> Option<Orbit> {
+    fn next_at(&self, t: Epoch, sv: SV, frame: Frame) -> Option<Orbit> {
         if self.has_precise {
             let orbit = self.next_precise_at(INTERP_ORDER, t, sv, frame)?;
             let state = orbit.to_cartesian_pos_vel();
