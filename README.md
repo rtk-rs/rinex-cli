@@ -180,6 +180,13 @@ Demos
 
 Our [Demo folder](./demos) hosts many illustrations and high level applications
 
+Toolbox features
+================
+
+- `csv`: unlock CSV export (default)
+- `ppp`: unlock P.V.T. solver (not available by default, because it is heavy)
+- `ppp+cggtts`: unlock CGGTTS solver (not available by default, because it is heavy)
+
 Special Thanks
 ==============
 

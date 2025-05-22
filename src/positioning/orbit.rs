@@ -192,39 +192,39 @@ impl<'a, 'b> Orbits<'a, 'b> {
 }
 
 impl OrbitSource for Orbits<'_, '_> {
-    fn next_at(&mut self, t: Epoch, sv: SV, frame: Frame) -> Option<Orbit> {
-        if self.has_precise {
-            let orbit = self.next_precise_at(INTERP_ORDER, t, sv, frame)?;
-            let state = orbit.to_cartesian_pos_vel();
+    fn next_at(&self, t: Epoch, sv: SV, frame: Frame) -> Option<Orbit> {
+        // if self.has_precise {
+        //     let orbit = self.next_precise_at(INTERP_ORDER, t, sv, frame)?;
+        //     let state = orbit.to_cartesian_pos_vel();
 
-            let (x_km, y_km, z_km) = (state[0], state[1], state[2]);
+        //     let (x_km, y_km, z_km) = (state[0], state[1], state[2]);
 
-            debug!(
-                "{} ({}) - precise state : x={}, y={}, z={} (km, ECEF)",
-                t.round(Duration::from_milliseconds(1.0)),
-                sv,
-                x_km,
-                y_km,
-                z_km
-            );
+        //     debug!(
+        //         "{} ({}) - precise state : x={}, y={}, z={} (km, ECEF)",
+        //         t.round(Duration::from_milliseconds(1.0)),
+        //         sv,
+        //         x_km,
+        //         y_km,
+        //         z_km
+        //     );
 
-            Some(orbit)
-        } else {
-            let (toc, _, eph) = self.eph.borrow_mut().select(t, sv)?;
-            let orbit = eph.kepler2position(sv, toc, t)?;
-            let state = orbit.to_cartesian_pos_vel();
-            let (x_km, y_km, z_km) = (state[0], state[1], state[2]);
+        //     Some(orbit)
+        // } else {
+        let (toc, _, eph) = self.eph.borrow_mut().select(t, sv)?;
+        let orbit = eph.kepler2position(sv, toc, t)?;
+        let state = orbit.to_cartesian_pos_vel();
+        let (x_km, y_km, z_km) = (state[0], state[1], state[2]);
 
-            debug!(
-                "{} ({}) - keplerian state : x={}, y={}, z={} (km, ECEF)",
-                t.round(Duration::from_milliseconds(1.0)),
-                sv,
-                x_km,
-                y_km,
-                z_km
-            );
+        debug!(
+            "{} ({}) - keplerian state : x={}, y={}, z={} (km, ECEF)",
+            t.round(Duration::from_milliseconds(1.0)),
+            sv,
+            x_km,
+            y_km,
+            z_km
+        );
 
-            Some(orbit)
-        }
+        Some(orbit)
+        // }
     }
 }
