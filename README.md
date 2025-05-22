@@ -46,6 +46,15 @@ PVT solver (on `ppp` feature only)
 
 <div align="center">
     <p>
+        `PPP` solver applied to a roaming session (pedestrian profile) around station `NYA100NOR`
+    </p>
+    <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/front-page/roaming-ppp1.png>
+        <img src=https://github.com/rtk-rs/rinex-cli/blob/main/plots/front-page/roaming-ppp1.png alt="Plot">
+    </a>
+</div>
+
+<div align="center">
+    <p>
         REFSYS resolved from PPP+CGGTTS (CPP, Galileo E1+E5)
     </p>
     <a href=https://github.com/rtk-rs/rinex-cli/blob/main/plots/front-page/refsys.png>
