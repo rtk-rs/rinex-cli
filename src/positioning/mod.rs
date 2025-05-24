@@ -12,6 +12,9 @@ pub use snapshot::{CenteredDataPoints, CenteredSnapshot};
 mod eph;
 use eph::EphemerisSource;
 
+mod precise;
+use precise::PreciseOrbits;
+
 mod time;
 use time::Time;
 
