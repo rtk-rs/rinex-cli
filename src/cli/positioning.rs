@@ -12,10 +12,27 @@ fn shared_args(cmd: Command) -> Command {
             .action(ArgAction::Append)
             .help("Position Solver configuration file (JSON). See --help.")
             .long_help("
-Read [https://github.com/georust/rinex/wiki/Positioning] 
-and refer to the tutorials/ folder shipped with the RINEX repo.
+Refer to all our navigation demos (subfolder).
 [https://docs.rs/gnss-rtk/latest/gnss_rtk/prelude/struct.Config.html] is the structure to represent in JSON.
 "));
+
+    let cmd = cmd.next_help_heading("User / Rover Profile")
+        .arg(
+            Arg::new("static")
+                .long("static")
+                .action(ArgAction::SetTrue)
+                .help("Define that the user (rover) is static. Antenna was held static for the entire session."))
+        .arg(
+            Arg::new("clock-sigma")
+                .long("clock-sigma")
+                .action(ArgAction::Set)
+                .value_parser(value_parser!(f64))
+                .required(false)
+                .help("Define the uncertainty/bias over next clock state prediction (in seconds).
+Default value is 10ms (=low quality clock).")
+        );
+
+    let cmd = cmd.next_help_heading("Solutions formating");
 
     let cmd = if cfg!(feature = "kml") {
         cmd.arg(
@@ -49,8 +66,7 @@ and refer to the tutorials/ folder shipped with the RINEX repo.
         )
     };
 
-    let cmd =
-        cmd.next_help_heading("CGGTTS (special resolution for clock comparison / time transfer)");
+    let cmd = cmd.next_help_heading("CGGTTS Post FIT");
 
     let cmd = if cfg!(not(feature = "cggtts")) {
         cmd.arg(
@@ -64,8 +80,7 @@ and refer to the tutorials/ folder shipped with the RINEX repo.
             .arg(Arg::new("cggtts")
                 .long("cggtts")
                 .action(ArgAction::SetTrue)
-                .help("Activate CGGTTS special solver. See --help.")
-                .long_help("Refer to the [https://github.com/georust/rinex/wiki/CGGTTS] tutorial."))
+                .help("Activate CGGTTS special Post FIT"))
             .arg(Arg::new("tracking")
                 .long("trk")
                 .value_parser(value_parser!(Duration))

@@ -15,7 +15,7 @@ PIPELINE="Gal;C1C,C5Q,L1C,L5Q;>E01"
 TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T12:00:00 GPST"
 
 # CPP basic configuration
-RTK_CONF=examples/CONFIG/Static/gpst_ppp.json
+RTK_CONF=examples/CONFIG/gpst_ppp.json
 
 # Analysis + ppp solutions
 #   -f: force new report synthesis
@@ -27,4 +27,4 @@ RTK_CONF=examples/CONFIG/Static/gpst_ppp.json
     -o "BRDC-Gal-PPP" \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
-    ppp -c $RTK_CONF
+    ppp -c $RTK_CONF --static

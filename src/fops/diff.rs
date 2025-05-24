@@ -40,7 +40,11 @@ pub fn diff(ctx: &Context, cli: &Cli, submatches: &ArgMatches) -> Result<(), Err
 
     rinex_preprocessing(&mut rinex_b, &cli);
 
-    let rinex_c = rinex_b.observation_substract(&rinex_a);
+    let rinex_c = rinex_b
+        .observations_substract(&rinex_a)
+        .unwrap_or_else(|e| {
+            panic!("diff failed with: {:?}", e);
+        });
 
     let input_name = rinex_a.standard_filename(forced_short_v2, None, None);
     let input_path = Path::new(&input_name);

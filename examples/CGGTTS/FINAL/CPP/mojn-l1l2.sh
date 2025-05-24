@@ -16,7 +16,7 @@ TIMEFRAME=">=2020-06-25T01:00:00 GPST;<2020-06-25T09:30:00 GPST"
 TIMEFRAME=">=2020-06-25T02:10:00 GPST;<2020-06-25T09:30:00 GPST"
 
 # CPP basic configuratio
-RTK_CONF=examples/CONFIG/Static/gpst_cpp.json
+RTK_CONF=examples/CONFIG/gpst_cpp.json
 
 # Analysis + ppp solutions
 #   -f: force new report synthesis
@@ -28,4 +28,4 @@ RTK_CONF=examples/CONFIG/Static/gpst_cpp.json
     -o "BRDC-GPS-CPP" \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
-    ppp -c $RTK_CONF
+    ppp --static -c $RTK_CONF

@@ -56,7 +56,7 @@ pub fn post_process(
 
     writeln!(
         fd,
-        "Epoch, x_ecef [m], y_ecef [m], z_ecef [m], vel_x [m/s], vel_y [m/s], vel_z [m/s], altitude [m], hdop, vdop, rx_clock_offset, tdop"
+        "Epoch, MJD, x_ecef [m], y_ecef [m], z_ecef [m], vel_x [m/s], vel_y [m/s], vel_z [m/s], altitude [m], hdop, vdop, rx_clock_offset, tdop"
     )?;
 
     for (epoch, solution) in solutions {
@@ -69,8 +69,9 @@ pub fn post_process(
 
         writeln!(
             fd,
-            "{:?}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}",
+            "{:?}, {}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}, {:.6E}",
             epoch,
+            epoch.to_mjd_utc_days(),
             x_m,
             y_m,
             z_m,
