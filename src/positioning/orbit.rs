@@ -37,7 +37,7 @@ impl OrbitSource for Orbits<'_, '_> {
     fn next_at(&self, t: Epoch, sv: SV, frame: Frame) -> Option<Orbit> {
         if self.has_precise {
             let mut precise_orbits = self.precise.borrow_mut();
-            let orbit = precise_orbits.next_at(t, sv, frame)?;
+            let orbit = precise_orbits.next_precise_at(t, sv, frame)?;
             let state = orbit.to_cartesian_pos_vel();
 
             let (x_km, y_km, z_km) = (state[0], state[1], state[2]);

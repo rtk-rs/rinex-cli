@@ -104,11 +104,6 @@ impl<'a> PreciseOrbits<'a> {
         }
     }
 
-    /// Attempts to return a precise state at desired [Epoch].
-    pub fn next_at(&mut self, t: Epoch, sv: SV, frame: Frame) -> Option<Orbit> {
-        None
-    }
-
     /// Consume one symbol from iterator
     fn consume_one(&mut self) {
         if let Some((t, sv, (x_km, y_km, z_km))) = self.iter.next() {
@@ -135,7 +130,8 @@ impl<'a> PreciseOrbits<'a> {
         }
     }
 
-    fn next_precise_at(&mut self, _: usize, t: Epoch, sv: SV, frame: Frame) -> Option<Orbit> {
+    /// Attempts to return a precise state at desired [Epoch].
+    pub fn next_precise_at(&mut self, t: Epoch, sv: SV, frame: Frame) -> Option<Orbit> {
         let min_t = t - ((INTERP_ORDER + 1) / 2) as f64 * self.sampling_period;
         let max_t = t + ((INTERP_ORDER + 1) / 2) as f64 * self.sampling_period;
 
