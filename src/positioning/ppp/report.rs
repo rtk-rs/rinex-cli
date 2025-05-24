@@ -3,7 +3,7 @@ use std::collections::BTreeMap;
 
 use gnss_rtk::prelude::{
     Config as NaviConfig, Duration, Epoch, Method as NaviMethod, PVTSolution,
-    Profile as NaviProfile, TimeScale, SV,
+    Profile as NaviProfile, TimeScale, User as UserProfile, SV,
 };
 
 use gnss_qc::{
@@ -30,7 +30,7 @@ impl Render for ReportTab {
 
 struct Summary {
     method: NaviMethod,
-    profile: Option<NaviProfile>,
+    profile: NaviProfile,
     orbit: String,
     first_epoch: Epoch,
     last_epoch: Epoch,
@@ -54,14 +54,8 @@ impl Render for Summary {
                             th class="is-info" {
                                 "Profile"
                             }
-                            @ if let Some(profile) = &self.profile {
-                                td {
-                                    (profile.to_string())
-                                }
-                            } @ else {
-                                td {
-                                    "Static"
-                                }
+                            td {
+                                (self.profile.to_string())
                             }
                         }
 
@@ -302,6 +296,7 @@ impl Summary {
     fn new(
         cfg: &NaviConfig,
         ctx: &Context,
+        user: &UserProfile,
         solutions: &BTreeMap<Epoch, PVTSolution>,
         x0_y0_z0_m: Option<(f64, f64, f64)>,
         lat0_long0_alt0_ddeg_ddeg_km: Option<(f64, f64, f64)>,
@@ -355,7 +350,7 @@ impl Summary {
                 }
             }
 
-            if cfg.user.profile.is_none() {
+            if user.profile == NaviProfile::Static {
                 // averaged coords
                 if let Some(averaged_latlongalt_ddeg_m) = &mut averaged_latlongalt_ddeg_m {
                     *averaged_latlongalt_ddeg_m = (
@@ -405,7 +400,7 @@ impl Summary {
                 }
             },
             method: cfg.method,
-            profile: cfg.user.profile,
+            profile: user.profile,
             // filter: cfg.solver.filter,
             duration: last_epoch - first_epoch,
             surveyed_lat_long_alt_ddeg_ddeg_km: lat0_long0_alt0_ddeg_ddeg_km,
@@ -447,7 +442,12 @@ struct ReportContent {
 }
 
 impl ReportContent {
-    pub fn new(cfg: &NaviConfig, ctx: &Context, solutions: &BTreeMap<Epoch, PVTSolution>) -> Self {
+    pub fn new(
+        cfg: &NaviConfig,
+        ctx: &Context,
+        user_profile: UserProfile,
+        solutions: &BTreeMap<Epoch, PVTSolution>,
+    ) -> Self {
         let nb_solutions = solutions.len();
         let epochs = solutions.keys().cloned().collect::<Vec<_>>();
 
@@ -467,7 +467,14 @@ impl ReportContent {
             (None, None)
         };
 
-        let summary = Summary::new(cfg, ctx, solutions, x0y0z0_m, lat0_long0_alt0_km);
+        let summary = Summary::new(
+            cfg,
+            ctx,
+            &user_profile,
+            solutions,
+            x0y0z0_m,
+            lat0_long0_alt0_km,
+        );
 
         Self {
             map_proj: {
@@ -510,7 +517,11 @@ impl ReportContent {
                 for (index, (_, sol_i)) in solutions.iter().enumerate() {
                     let (lat_ddeg, long_ddeg, _) = sol_i.lat_long_alt_deg_deg_m;
 
-                    let modulo = if cfg.user.profile.is_none() { 10 } else { 1 };
+                    let modulo = if user_profile.profile == NaviProfile::Static {
+                        10
+                    } else {
+                        1
+                    };
                     let pct = index * 100 / nb_solutions;
 
                     if pct % modulo == 0 && index > 0 && pct != prev_pct
@@ -1156,10 +1167,16 @@ impl Report {
             content: Box::new(self.content),
         }
     }
-    pub fn new(cfg: &NaviConfig, ctx: &Context, solutions: &BTreeMap<Epoch, PVTSolution>) -> Self {
+
+    pub fn new(
+        cfg: &NaviConfig,
+        ctx: &Context,
+        user_profile: UserProfile,
+        solutions: &BTreeMap<Epoch, PVTSolution>,
+    ) -> Self {
         Self {
             tab: ReportTab {},
-            content: ReportContent::new(cfg, ctx, solutions),
+            content: ReportContent::new(cfg, ctx, user_profile, solutions),
         }
     }
 }

@@ -261,7 +261,8 @@ pub fn precise_positioning(
         },
         None => {
             let method = Method::default();
-            let cfg = Config::static_preset(method);
+
+            let cfg = Config::default().with_navigation_method(method);
 
             /*
              * CGGTTS special case
@@ -366,10 +367,10 @@ If your dataset does not describe one, you can manually describe one, see --help
 
     let user_profile = User {
         profile: {
-            if matches.get_flag("pedestrian") {
-                Some(Profile::Pedestrian)
+            if matches.get_flag("static") {
+                Profile::Static
             } else {
-                None
+                Profile::Pedestrian
             }
         },
         clock_sigma_s: if let Some(clock_sigma) = matches.get_one::<f64>("clock-sigma") {
@@ -398,7 +399,7 @@ If your dataset does not describe one, you can manually describe one, see --help
     let solutions = ppp::resolve(ctx, &eph, user_profile, clocks, solver);
     if !solutions.is_empty() {
         ppp_post_process(&ctx, &solutions, matches)?;
-        let report = PPPReport::new(&cfg, &ctx, &solutions);
+        let report = PPPReport::new(&cfg, &ctx, user_profile, &solutions);
         Ok(report.formalize())
     } else {
         error!("solver did not generate a single solution");
