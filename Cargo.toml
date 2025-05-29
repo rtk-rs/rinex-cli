@@ -55,6 +55,15 @@ features = [
     "serde",
 ]
 
+[dependencies.gnss-rtk]
+git = "https://github.com/rtk-rs/gnss-rtk"
+rev = "5eb681c3f6f123d36b1c5b46cf27429bcf45f3f7"
+optional = true
+features = [
+    "serde",
+    "embed_ephem"
+]
+
 [dependencies]
 log = "0.4"
 walkdir = "2.4.0"
@@ -76,6 +85,3 @@ anise = { version = "0.6", features = ["embed_ephem"] }
 gnss-qc = { version = "0.2", features = ["sp3", "navigation", "flate2"] } 
 serde = { version = "1.0", default-features = false, features = ["derive"] }
 cggtts = { version = "4.3", features = ["serde", "scheduler", "tracker"], optional = true }
-
-# gnss-rtk = { path = "../gnss-rtk", features = ["serde", "embed_ephem"], optional = true }
-gnss-rtk = { git = "https://github.com/rtk-rs/gnss-rtk", rev = "5eb681c3f6f123d36b1c5b46cf27429bcf45f3f7", features = ["serde", "embed_ephem"], optional = true }
