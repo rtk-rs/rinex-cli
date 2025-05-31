@@ -38,7 +38,7 @@ rinex-cli \
     -P Gal \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json --static
 ```
 
 When deploying, the framework gives all meaningful information. In particular that both RINEX files were
@@ -85,7 +85,7 @@ rinex-cli \
     -P Gal \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json --static
 ```
 
 The frameworks lets us know once again, now with a ""warning"" to emphasize that the 
@@ -205,5 +205,5 @@ rinex-cli \
     -P Gal \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json --cggtts
+    ppp -c examples/CONFIG/gpst_cpp.json --static --cggtts
 ```

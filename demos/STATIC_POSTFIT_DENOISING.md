@@ -31,7 +31,7 @@ rinex-cli \
     -P Gal;C1C,C5Q
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
-    ppp -c /tmp/gpst_no_postfit_no_smoothing_cpp.json
+    ppp -c /tmp/gpst_no_postfit_no_smoothing_cpp.json --static
 ```
 
 Then we activate the denoising filter:
@@ -51,7 +51,7 @@ rinex-cli \
     -P Gal;C1C,C5Q
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
-    ppp -c /tmp/gpst_postfit_no_smooting_cpp.json
+    ppp -c /tmp/gpst_postfit_no_smooting_cpp.json --static
 ```
 
 Finally, for ultimate performance, we activate the phase/code smoothing filter, with a 10 sample window length, combined to the denoising filter (with x1000 denoising factor):
@@ -72,5 +72,5 @@ rinex-cli \
     -P Gal;C1C,C5Q
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
-    ppp -c /tmp/gpst_cpp.json
+    ppp -c /tmp/gpst_cpp.json --static
 ```

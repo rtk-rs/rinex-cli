@@ -140,7 +140,7 @@ fn write_joint_nav_obs_rinex(brdc: &Rinex, obs: &Rinex, path: &Path) -> Result<(
             let sv_str = sv.to_string();
 
             if let Some((toc, _, eph)) = brdc.nav_ephemeris_selection(sv, k.epoch) {
-                if let Some(sv_orbit) = eph.kepler2position(sv, toc, k.epoch) {
+                if let Some(sv_orbit) = eph.kepler2position(sv, k.epoch) {
                     let sv_state = sv_orbit.to_cartesian_pos_vel();
                     let (x_km, y_km, z_km) = (sv_state[0], sv_state[1], sv_state[2]);
 

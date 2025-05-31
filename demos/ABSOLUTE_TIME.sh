@@ -69,14 +69,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GPST/GPST_GPS_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json
 $RINEX_CLI \
     -P GPS \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GPST/GPST_GPS_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gpst_cpp.json
 
 # GPST measurements T.GST
 $RINEX_CLI \
@@ -85,14 +85,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GST/GPST_GPS_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp -c examples/CONFIG/Static/gst_cpp.json
+    ppp -c examples/CONFIG/gst_cpp.json
 $RINEX_CLI \
     -P GPS \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GST/GPST_GPS_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp --cggtts -c examples/CONFIG/Static/gst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gst_cpp.json
 
 # GPST measurements T.UTC
 $RINEX_CLI \
@@ -101,14 +101,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/UTC/GPST_GPS_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp -c examples/CONFIG/Static/utc_cpp.json
+    ppp -c examples/CONFIG/utc_cpp.json
 $RINEX_CLI \
     -P GPS \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/UTC/GPST_GPS_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp --cggtts -c examples/CONFIG/Static/utc_cpp.json
+    ppp --cggtts -c examples/CONFIG/utc_cpp.json
 
 #######################
 # GPS Only (GST)
@@ -120,14 +120,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GPST/GST_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json
 $RINEX_CLI \
     -P GPS \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GPST/GST_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gpst_cpp.json
 
 # GST measurements T.GST
 $RINEX_CLI \
@@ -136,14 +136,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GST/GST_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
-    ppp -c examples/CONFIG/Static/gst_cpp.json
+    ppp -c examples/CONFIG/gst_cpp.json
 $RINEX_CLI \
     -P GPS \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GST/GST_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gst_cpp.json
 
 # GST measurements T.UTC
 $RINEX_CLI \
@@ -152,14 +152,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/UTC/GST_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
-    ppp -c examples/CONFIG/Static/utc_cpp.json
+    ppp -c examples/CONFIG/utc_cpp.json
 $RINEX_CLI \
     -P GPS \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/UTC/GST_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
-    ppp --cggtts -c examples/CONFIG/Static/utc_cpp.json
+    ppp --cggtts -c examples/CONFIG/utc_cpp.json
 
 #######################
 # GPS Only (UTC)
@@ -171,14 +171,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GPST/UTC_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json
 $RINEX_CLI \
     -P GPS \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GPST/UTC_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gpst_cpp.json
 
 # UTC measurements T.GST
 $RINEX_CLI \
@@ -187,14 +187,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GST/UTC_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
-    ppp -c examples/CONFIG/Static/gst_cpp.json
+    ppp -c examples/CONFIG/gst_cpp.json
 $RINEX_CLI \
     -P GPS \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GST/UTC_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gst_cpp.json
 
 # UTC measurements T.UTC
 $RINEX_CLI \
@@ -203,14 +203,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/UTC/UTC_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
-    ppp -c examples/CONFIG/Static/utc_cpp.json
+    ppp -c examples/CONFIG/utc_cpp.json
 $RINEX_CLI \
     -P GPS \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/UTC/GST_GPS_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
-    ppp --cggtts -c examples/CONFIG/Static/utc_cpp.json
+    ppp --cggtts -c examples/CONFIG/utc_cpp.json
 
 #######################
 # GAL Only (GPST)
@@ -222,14 +222,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GPST/GPST_GAL_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json
 $RINEX_CLI \
     -P Gal \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GPST/GPST_GAL_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gpst_cpp.json
 
 # GPST measurements T.GST
 $RINEX_CLI \
@@ -238,14 +238,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GST/GPST_GAL_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp -c examples/CONFIG/Static/gst_cpp.json
+    ppp -c examples/CONFIG/gst_cpp.json
 $RINEX_CLI \
     -P Gal \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GST/GPST_GAL_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp --cggtts -c examples/CONFIG/Static/gst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gst_cpp.json
 
 # GPST measurements T.UTC
 $RINEX_CLI \
@@ -254,14 +254,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/UTC/GPST_GAL_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp -c examples/CONFIG/Static/utc_cpp.json
+    ppp -c examples/CONFIG/utc_cpp.json
 $RINEX_CLI \
     -P Gal \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/UTC/GPST_GAL_Only \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp --cggtts -c examples/CONFIG/Static/utc_cpp.json
+    ppp --cggtts -c examples/CONFIG/utc_cpp.json
 
 #######################
 # GAL Only (GST)
@@ -273,14 +273,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GPST/GST_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json
 $RINEX_CLI \
     -P Gal \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GPST/GST_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gpst_cpp.json
 
 # GST measurements T.GST
 $RINEX_CLI \
@@ -289,14 +289,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GST/GST_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp -c examples/CONFIG/Static/gst_cpp.json
+    ppp -c examples/CONFIG/gst_cpp.json
 $RINEX_CLI \
     -P Gal \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GST/GST_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gst_cpp.json
 
 # GST measurements T.UTC
 $RINEX_CLI \
@@ -305,14 +305,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/UTC/GST_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp -c examples/CONFIG/Static/utc_cpp.json
+    ppp -c examples/CONFIG/utc_cpp.json
 $RINEX_CLI \
     -P Gal \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/UTC/GST_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp --cggtts -c examples/CONFIG/Static/utc_cpp.json
+    ppp --cggtts -c examples/CONFIG/utc_cpp.json
 
 #######################
 # GAL Only (UTC)
@@ -324,14 +324,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GPST/UTC_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json
 $RINEX_CLI \
     -P Gal \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GPST/UTC_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gpst_cpp.json
 
 # UTC measurements T.GST
 $RINEX_CLI \
@@ -340,14 +340,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GST/UTC_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp -c examples/CONFIG/Static/gst_cpp.json
+    ppp -c examples/CONFIG/gst_cpp.json
 $RINEX_CLI \
     -P Gal \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GST/UTC_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gst_cpp.json
 
 # UTC measurements T.UTC
 $RINEX_CLI \
@@ -356,14 +356,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/UTC/UTC_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp -c examples/CONFIG/Static/utc_cpp.json
+    ppp -c examples/CONFIG/utc_cpp.json
 $RINEX_CLI \
     -P Gal \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/UTC/UTC_GAL_Only \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp --cggtts -c examples/CONFIG/Static/utc_cpp.json
+    ppp --cggtts -c examples/CONFIG/utc_cpp.json
 
 #######################
 # GPS+GAL (GPST)
@@ -375,14 +375,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GPST/GPST_GPS+GAL \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json
 $RINEX_CLI \
     -P "GPS,Gal" \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GPST/GPST_GPS+GAL \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gpst_cpp.json
 
 # GPST measurements T.GST
 $RINEX_CLI \
@@ -391,14 +391,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/GST/GPST_GPS+GAL \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp -c examples/CONFIG/Static/gst_cpp.json
+    ppp -c examples/CONFIG/gst_cpp.json
 $RINEX_CLI \
     -P "GPS,Gal" \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/GST/GPST_GPS+GAL \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp --cggtts -c examples/CONFIG/Static/gst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gst_cpp.json
 
 # GPST measurements T.UTC
 $RINEX_CLI \
@@ -407,14 +407,14 @@ $RINEX_CLI \
     -o $OUTPUT_DIR/UTC/GPST_GPS+GAL \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp -c examples/CONFIG/Static/utc_cpp.json
+    ppp -c examples/CONFIG/utc_cpp.json
 $RINEX_CLI \
     -P "GPS,Gal" \
     -P "$TIMEFRAME" \
     -o $OUTPUT_DIR/UTC/GPST_GPS+GAL \
     --fp $NAV_FILE \
     --fp $OBS_FILE \
-    ppp --cggtts -c examples/CONFIG/Static/utc_cpp.json
+    ppp --cggtts -c examples/CONFIG/utc_cpp.json
 
 #######################
 # GPS+GAL (GST)
@@ -427,7 +427,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json
 $RINEX_CLI \
     -P "GPS,Gal" \
     -P "$TIMEFRAME" \
@@ -435,7 +435,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gpst_cpp.json
 
 # GST measurements T.GST
 $RINEX_CLI \
@@ -445,7 +445,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp -c examples/CONFIG/Static/gst_cpp.json
+    ppp -c examples/CONFIG/gst_cpp.json
 $RINEX_CLI \
     -P "GPS,Gal" \
     -P "$TIMEFRAME" \
@@ -453,7 +453,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gst_cpp.json
 
 # GST measurements T.UTC
 $RINEX_CLI \
@@ -463,7 +463,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp -c examples/CONFIG/Static/utc_cpp.json
+    ppp -c examples/CONFIG/utc_cpp.json
 $RINEX_CLI \
     -P "GPS,Gal" \
     -P "$TIMEFRAME" \
@@ -471,7 +471,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_GST.crx \
     --fp $WORKSPACE/GAL_IN_GST.crx \
-    ppp --cggtts -c examples/CONFIG/Static/utc_cpp.json
+    ppp --cggtts -c examples/CONFIG/utc_cpp.json
 
 #######################
 # GPS+GAL (UTC)
@@ -484,7 +484,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json
 $RINEX_CLI \
     -P "GPS,Gal" \
     -P "$TIMEFRAME" \
@@ -492,7 +492,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gpst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gpst_cpp.json
 
 # UTC measurements T.GST
 $RINEX_CLI \
@@ -502,7 +502,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp -c examples/CONFIG/Static/gst_cpp.json
+    ppp -c examples/CONFIG/gst_cpp.json
 $RINEX_CLI \
     -P "GPS,Gal" \
     -P "$TIMEFRAME" \
@@ -510,7 +510,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp --cggtts -c examples/CONFIG/Static/gst_cpp.json
+    ppp --cggtts -c examples/CONFIG/gst_cpp.json
 
 # UTC measurements T.UTC
 $RINEX_CLI \
@@ -520,7 +520,7 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp -c examples/CONFIG/Static/utc_cpp.json
+    ppp -c examples/CONFIG/utc_cpp.json
 $RINEX_CLI \
     -P "GPS,Gal" \
     -P "$TIMEFRAME" \
@@ -528,4 +528,4 @@ $RINEX_CLI \
     --fp $NAV_FILE \
     --fp $WORKSPACE/GPS_IN_UTC.crx \
     --fp $WORKSPACE/GAL_IN_UTC.crx \
-    ppp --cggtts -c examples/CONFIG/Static/utc_cpp.json
+    ppp --cggtts -c examples/CONFIG/utc_cpp.json
