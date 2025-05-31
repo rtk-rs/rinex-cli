@@ -21,13 +21,12 @@ rinex-cli \
     -P Gal;C1C,C5Q \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
-    ppp -c examples/CONFIG/Static/gpst_cpp.json
+    ppp -c examples/CONFIG/gpst_cpp.json --static
 ```
 
-`Static/gpst_cpp.json` emphasizes that we're surveing the laboratory geodetic marker
-that provided this GPST RINEX, and that we want to express the solution in GPST.
-Which is, as previously stated, the easiest case and would work (in that very setup)
-without "much more".
+`--static` because we are surveying the laboratory geodetic marker and it
+remains static for the entire session. `examples/CONFIG` gives many configuration
+presets, this one says we want to express the solutions in `GPST`.
 
 `gnss_rtk` and this framework is now very advanced in its time management and handling,
 and offers a high level of flexibility. If we look that `NAV/V3/MOJN00DNK_R_20201770000`
@@ -40,30 +39,28 @@ header, we see that this file describes the behavior of few timescales (for that
 GST solutions
 =============
 
-Now we take advantage of (1) and request PVT solutions expressed in UTC timescale.
+When solutions are requested in `GST`, the framework will take advantage of (1) 
+to adjust the solutions:
 
 ```bash
 rinex-cli \
     -P Gal;C1C,C5Q \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
-    ppp -c examples/CONFIG/Static/gst_cpp.json
+    ppp -c examples/CONFIG/gst_cpp.json --static
 ```
-
-That's it! all you need to do, is describe your prefered timescale in the configuration script. 
-Obviously, you are limited by what your input data allows to do.
 
 UTC Solutions
 =============
 
-Now we take advantage of (2) and (3) and request PVT solutions expressed in UTC timescale.
+Same (in this example) applies to `UTC` solutions:
 
 ```bash
 rinex-cli \
     -P Gal;C1C,C5Q \
     --fp data/NAV/V3/MOJN00DNK_R_20201770000_01D_MN.rnx.gz \
     --fp data/CRNX/V3/MOJN00DNK_R_20201770000_01D_30S_MO.crx.gz \
-    ppp -c examples/CONFIG/Static/utc_cpp.json
+    ppp -c examples/CONFIG/utc_cpp.json --static
 ```
 
 :warning: RINEX V3 /V4
