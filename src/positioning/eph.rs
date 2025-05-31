@@ -27,8 +27,7 @@ impl<'a> EphemerisSource<'a> {
             toc: Epoch::default(),
             buffer: HashMap::with_capacity(32),
             iter: Box::new(brdc.nav_ephemeris_frames_iter().filter_map(|(k, v)| {
-                let sv_ts = k.sv.timescale()?;
-                let toe = v.toe(sv_ts)?;
+                let toe = v.toe(k.sv)?;
                 Some((k.sv, k.epoch, toe, v))
             })),
         };
@@ -81,7 +80,7 @@ impl<'a> EphemerisSource<'a> {
             buffer
                 .iter()
                 .filter_map(|(toc_i, toe_i, eph_i)| {
-                    if eph_i.is_valid(sv, t, *toe_i) {
+                    if eph_i.is_valid(sv, t) {
                         Some((*toc_i, *toe_i, eph_i))
                     } else {
                         None

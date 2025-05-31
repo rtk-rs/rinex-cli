@@ -54,7 +54,7 @@ impl OrbitSource for Orbits<'_, '_> {
             Some(orbit)
         } else {
             let (toc, _, eph) = self.eph.borrow_mut().select(t, sv)?;
-            let orbit = eph.kepler2position(sv, toc, t)?;
+            let orbit = eph.kepler2position(sv, t)?;
             let state = orbit.to_cartesian_pos_vel();
             let (x_km, y_km, z_km) = (state[0], state[1], state[2]);
 
