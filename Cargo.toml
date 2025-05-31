@@ -41,7 +41,7 @@ cggtts = [
 ]
 
 [dependencies.rinex]
-path = "/hdd/git/rtk-rs/rinex"
+version = "0.19"
 features = [
     "qc", 
     "processing", 
@@ -56,7 +56,7 @@ features = [
 ]
 
 [dependencies.gnss-qc]
-path = "/hdd/git/rtk-rs/gnss-qc"
+version = "0.3"
 features = [
     "sp3",
     "navigation",
