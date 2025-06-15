@@ -50,7 +50,7 @@ impl<'a> PreciseOrbits<'a> {
             sv_buffers: HashMap::with_capacity(16),
             sv_snapshots: HashMap::with_capacity(16),
             sampling_period: if let Some(sp3) = ctx.data.sp3() {
-                sp3.header.epoch_interval
+                sp3.header.sampling_period
             } else {
                 Duration::default()
             },
@@ -59,7 +59,7 @@ impl<'a> PreciseOrbits<'a> {
                     if let Some(atx) = ctx.data.antex() {
                         info!("Orbit source created: operating with Ultra Precise Orbits.");
                         Box::new(sp3.satellites_position_km_iter().filter_map(
-                            |(t, sv, (x_km, y_km, z_km))| {
+                            |(t, sv, _predicted, _maneuvered, (x_km, y_km, z_km))| {
                                 // TODO: needs rework and support all frequencies
                                 let delta = atx.sv_antenna_apc_offset(t, sv, Carrier::L1)?;
                                 let delta = Vector3::new(delta.0, delta.1, delta.2);
@@ -94,7 +94,9 @@ impl<'a> PreciseOrbits<'a> {
                         info!("Orbit source created: operating with Precise Orbits.");
                         warn!("Cannot determine exact precise coordinates without ANTEX database");
                         warn!("Expect tiny errors in your results (<1m).");
-                        Box::new(sp3.satellites_position_km_iter())
+                        Box::new(sp3.satellites_position_km_iter().map(
+                            |(t, sv, _predicted, _maneuvered, coordinates)| (t, sv, coordinates),
+                        ))
                     }
                 } else {
                     info!("Orbit source created: operating without Precise Orbits");

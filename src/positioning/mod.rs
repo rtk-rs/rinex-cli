@@ -313,7 +313,7 @@ pub fn precise_positioning(
                             info!("Temporal PPP compliancy");
                         } else {
                             error!("Working with different timescales in OBS/SP3 is not PPP compatible and will generate tiny errors");
-                            if sp3.header.epoch_interval >= Duration::from_seconds(300.0) {
+                            if sp3.header.sampling_period >= Duration::from_seconds(300.0) {
                                 warn!("Interpolating clock states from low sample rate SP3 will most likely introduce errors");
                             }
                         }

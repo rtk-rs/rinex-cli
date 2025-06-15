@@ -27,9 +27,6 @@ pub fn constell_timescale_binning(ctx: &Context, submatches: &ArgMatches) -> Res
         panic!("timescale binning (--ts) and prefered timescale (--timescale) are incompatible!");
     }
 
-    // obtain solver
-    let solver = ctx.data.gnss_absolute_time_solver();
-
     for product in [
         ProductType::Observation,
         ProductType::BroadcastNavigation,
@@ -43,6 +40,8 @@ pub fn constell_timescale_binning(ctx: &Context, submatches: &ArgMatches) -> Res
                 ctx.workspace.create_subdir(&custom_subdir);
 
                 // design filter
+                debug!("{} constellation binning..", constellation);
+
                 let filter = QcFilter::mask(
                     QcMaskOperand::Equals,
                     QcFilterItem::ConstellationItem(vec![constellation]),
@@ -58,18 +57,24 @@ pub fn constell_timescale_binning(ctx: &Context, submatches: &ArgMatches) -> Res
                 if ts_binning || prefered_ts.is_some() {
                     if constellation.timescale().is_none() {
                         // timescale not supported: abort
+                        error!("{} timescale is not supported yet. Skipped.", constellation);
                         continue;
                     }
                 }
 
                 // prefered timescale shift
                 if let Some(prefered_ts) = prefered_ts {
-                    focused.timeshift_mut(&solver, *prefered_ts);
+                    debug!("Transposition to {}..", prefered_ts);
+                    focused.timeshift_mut(*prefered_ts);
                 }
 
                 // timescale binning
                 if ts_binning {
-                    focused.timeshift_mut(&solver, constellation.timescale().unwrap());
+                    let ts = constellation.timescale().unwrap(); // infaillible at this point
+
+                    // transpose
+                    debug!("Transposition to {}..", ts);
+                    focused.timeshift_mut(ts);
                 }
 
                 let standard_name = focused.standard_filename(forced_short_v2, None, None);
@@ -93,6 +98,8 @@ pub fn constell_timescale_binning(ctx: &Context, submatches: &ArgMatches) -> Res
             ctx.workspace.create_subdir(&custom_subdir);
 
             // design filter
+            debug!("{} constellation binning..", constellation);
+
             let filter = QcFilter::mask(
                 QcMaskOperand::Equals,
                 QcFilterItem::ConstellationItem(vec![constellation]),
@@ -108,18 +115,23 @@ pub fn constell_timescale_binning(ctx: &Context, submatches: &ArgMatches) -> Res
             if ts_binning || prefered_ts.is_some() {
                 if focused.header.constellation.timescale().is_none() {
                     // abort here: timescale not supported
+                    error!("{} timescale is not supported yet. Skipped.", constellation);
                     continue;
                 }
             }
 
             // prefered timescale shift
             if let Some(prefered_ts) = prefered_ts {
-                focused.timeshift_mut(&solver, *prefered_ts);
+                debug!("Transposition to {}..", prefered_ts);
+                focused.timeshift_mut(*prefered_ts);
             }
 
             // timescale binning
             if ts_binning {
-                focused.timeshift_mut(&solver, constellation.timescale().unwrap());
+                let ts = constellation.timescale().unwrap(); // infaillble at this point
+
+                debug!("Transposition to {}..", ts);
+                focused.timeshift_mut(ts);
             }
 
             // filename
