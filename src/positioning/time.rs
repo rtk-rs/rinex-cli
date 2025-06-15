@@ -1,24 +1,33 @@
 use crate::cli::Context;
-use gnss_qc::prelude::GnssAbsoluteTime;
-use gnss_rtk::prelude::{AbsoluteTime, Epoch, TimeScale};
+use gnss_qc::prelude::TimeCorrectionsDB;
 use hifitime::Unit;
 
+use gnss_rtk::prelude::{AbsoluteTime, Epoch, TimeScale};
+
 pub struct Time {
-    solver: GnssAbsoluteTime,
+    database: Option<TimeCorrectionsDB>,
 }
 
 impl AbsoluteTime for Time {
     fn new_epoch(&mut self, now: Epoch) {
-        self.solver.outdate_weekly(now);
+        if let Some(db) = &mut self.database {
+            db.outdate_weekly(now);
+        }
     }
 
-    fn epoch_correction(&self, t: Epoch, target: TimeScale) -> Epoch {
-        // try to run the precise correction, if we have such information in the database
-        if let Some(corrected) = self.solver.precise_epoch_correction(t, target) {
-            corrected
+    fn epoch_correction(&self, t: Epoch, timescale: TimeScale) -> Epoch {
+        // try to apply a precise correction
+        if let Some(db) = &self.database {
+            match db.precise_epoch_correction(t, timescale) {
+                Some(epoch) => epoch,
+                None => {
+                    // otherwise, rely on coarse conversion
+                    t.to_time_scale(timescale)
+                },
+            }
         } else {
-            // otherwise, rely on coarse conversion
-            t.to_time_scale(target)
+            // only coarse conversion possible
+            t.to_time_scale(timescale)
         }
     }
 }
@@ -26,7 +35,7 @@ impl AbsoluteTime for Time {
 impl Time {
     pub fn new(ctx: &Context) -> Self {
         Self {
-            solver: ctx.data.gnss_absolute_time_solver(),
+            database: ctx.data.time_corrections_database(),
         }
     }
 }
