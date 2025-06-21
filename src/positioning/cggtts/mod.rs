@@ -13,8 +13,9 @@ use rinex::{
 };
 
 use gnss_rtk::prelude::{
-    AbsoluteTime, Bias, Candidate, Carrier as RTKCarrier, Method, Observation, OrbitSource, User,
-    PPP, SPEED_OF_LIGHT_M_S,
+    AbsoluteTime, Bias, Candidate, Carrier as RTKCarrier, ClockProfile,
+    EphemerisSource as RTKEphemerisSource, Method, Observation, OrbitSource, Solver,
+    UserParameters, UserProfile, SPEED_OF_LIGHT_M_S,
 };
 
 use cggtts::prelude::{
@@ -82,12 +83,20 @@ fn rinex_ref_observable(
 }
 
 /// Resolves CGGTTS tracks from input context
-pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: AbsoluteTime>(
+pub fn resolve<
+    'a,
+    'b,
+    CK: ClockStateProvider,
+    EPH: RTKEphemerisSource,
+    O: OrbitSource,
+    B: Bias,
+    T: AbsoluteTime,
+>(
     ctx: &Context,
     eph: &'a RefCell<EphemerisSource<'b>>,
-    user_profile: User,
+    params: UserParameters,
     mut clock: CK,
-    mut solver: PPP<O, B, T>,
+    mut solver: Solver<EPH, O, B, T>,
     method: Method,
 ) -> Result<Vec<Track>, PositioningError> {
     let obs_data = ctx
@@ -164,7 +173,7 @@ pub fn resolve<'a, 'b, CK: ClockStateProvider, O: OrbitSource, B: Bias, T: Absol
                     }
                 }
 
-                match solver.resolve(user_profile, past_t, &candidates) {
+                match solver.ppp_solving(past_t, params, &candidates) {
                     Ok(pvt) => {
                         for sv_contrib in pvt.sv.iter() {
                             let (azim_deg, elev_deg) =

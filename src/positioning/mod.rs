@@ -51,8 +51,9 @@ use rinex::{
 use gnss_qc::prelude::QcExtraPage;
 
 use gnss_rtk::prelude::{
-    Bias, BiasRuntime, Carrier as RTKCarrier, Config, Duration, Epoch, Error as RTKError, KbModel,
-    Method, Profile, TroposphereModel, User, PPP,
+    Bias, BiasRuntime, Carrier as RTKCarrier, ClockProfile, Config, Duration,
+    Ephemeris as RTKEphemerisData, EphemerisSource as RTKEphemeris, Epoch, Error as RTKError,
+    KbModel, Method, Solver, TroposphereModel, UserParameters, UserProfile, SV,
 };
 
 use thiserror::Error;
@@ -66,6 +67,14 @@ impl Bias for BiasModel {
 
     fn troposphere_bias_m(&self, rtm: &BiasRuntime) -> f64 {
         TroposphereModel::Niel.bias_m(rtm)
+    }
+}
+
+struct NullEphemeris {}
+
+impl RTKEphemeris for NullEphemeris {
+    fn ephemeris_data(&self, epoch: Epoch, sv: SV) -> Option<RTKEphemerisData> {
+        None
     }
 }
 
@@ -347,6 +356,7 @@ If your dataset does not describe one, you can manually describe one, see --help
     }
 
     let bias_model = BiasModel {};
+    let null_eph = NullEphemeris {};
 
     let apriori = ctx.rx_orbit;
 
@@ -358,35 +368,31 @@ If your dataset does not describe one, you can manually describe one, see --help
         None => None,
     };
 
-    let solver = PPP::new(
+    let solver = Solver::new(
         ctx.data.almanac.clone(),
         ctx.data.earth_cef,
         cfg.clone(),
+        null_eph.into(),
         orbits.into(),
         time,
         bias_model,
         apriori_ecef_m,
     );
 
-    let user_profile = User {
-        profile: {
-            if matches.get_flag("static") {
-                Profile::Static
-            } else {
-                Profile::Pedestrian
-            }
-        },
-        clock_sigma_s: if let Some(clock_sigma) = matches.get_one::<f64>("clock-sigma") {
-            *clock_sigma
-        } else {
-            0.01
-        },
+    let user_profile = if matches.get_flag("static") {
+        UserProfile::Static
+    } else {
+        UserProfile::Pedestrian
     };
+
+    let clock_profile = ClockProfile::Oscillator;
+
+    let params = UserParameters::new(user_profile.clone(), clock_profile.clone());
 
     #[cfg(feature = "cggtts")]
     if matches.get_flag("cggtts") {
         //* CGGTTS special opmode */
-        let tracks = cggtts::resolve(ctx, &eph, user_profile, clocks, solver, cfg.method)?;
+        let tracks = cggtts::resolve(ctx, &eph, params, clocks, solver, cfg.method)?;
         if !tracks.is_empty() {
             cggtts_post_process(&ctx, &tracks, matches)?;
             let report = CggttsReport::new(&ctx, &tracks);
@@ -399,10 +405,10 @@ If your dataset does not describe one, you can manually describe one, see --help
     }
 
     /* PPP */
-    let solutions = ppp::resolve(ctx, &eph, user_profile, clocks, solver);
+    let solutions = ppp::resolve(ctx, &eph, params, clocks, solver);
     if !solutions.is_empty() {
         ppp_post_process(&ctx, &solutions, matches)?;
-        let report = PPPReport::new(&cfg, &ctx, user_profile, &solutions);
+        let report = PPPReport::new(&cfg, &ctx, user_profile, clock_profile, &solutions);
         Ok(report.formalize())
     } else {
         error!("solver did not generate a single solution");
