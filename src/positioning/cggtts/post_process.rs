@@ -35,18 +35,14 @@ pub fn post_process(
     //     }
     // })
 
-    // agency customization
-    if let Some(custom) = matches.get_one::<String>("agency") {
-        header = header.with_station(custom);
+    // TODO: agency customization
+    let stem = Context::context_stem(&ctx.data);
+    let value = if let Some(index) = stem.find('_') {
+        stem[..index].to_string()
     } else {
-        let stem = Context::context_stem(&ctx.data);
-        let value = if let Some(index) = stem.find('_') {
-            stem[..index].to_string()
-        } else {
-            "LAB".to_string()
-        };
-        header = header.with_station(&value);
+        "LAB".to_string()
     };
+    header = header.with_station(&value);
 
     // TODO
     // header = header.with_receiver_hardware(rx);
