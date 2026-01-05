@@ -49,7 +49,7 @@ The default profile is \"pedestrian\" (very low velocity), which is not suited f
 The default profile is Oscillator/OCXO."))
 .arg(
     Arg::new("atomic")
-        .long("quartz")
+        .long("atomic")
         .action(ArgAction::SetTrue)
         .help("Define atomic (rover clock) profile (high quality, at the scale of a GNSS constellation).
 The default profile is Oscillator/OCXO."))
