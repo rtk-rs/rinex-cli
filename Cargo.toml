@@ -93,7 +93,7 @@ thiserror = "2"
 itertools = "0.14"
 maud = "0.26"
 plotly = "0.9"
-kml = { version = "0.8", optional = true }
+kml = { version = "0.14", optional = true }
 gpx = { version = "0.10", optional = true }
 csv = { version = "1.3", optional = true }
 gnss-rs = { version = "2.5", features = ["serde"] }
